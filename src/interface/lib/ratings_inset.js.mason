@@ -1,0 +1,59 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin <% $source %> -->
+<div class="inset-container">
+  <div class="inset-header">
+Ratings used in this version of STAT
+  </div>
+<% $table %>
+  <div class="inset-footer">(These descriptions will also be shown in tooltips on the assessment page)</div>
+</div>
+    <!-- end <% $source %> -->\
+<%init>
+  my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/lib/ratings_overlay.js.mason,v 2.2 2013/09/12 22:43:59 stat Exp $);
+
+  my %ratingSymbol = $Model->rating_symbol_hash;
+  my %ratingTitle = $Model->rating_desc_hash;
+
+
+  my $table = '<table><tr><td class="table-group-header" colspan="3">For knowledge:</td></tr>';
+
+  foreach my $rating (50 .. 53) {
+    my $desc = $ratingTitle{$rating};
+    if ($desc =~ /;/ ) {
+      $desc =~ s%; %&rdquo;</td><td>%;
+      $desc =~ s/\b([Nn])a.{1,2}ve\b/$1a&iuml;ve/gi; # browser tooltips can't use non-ascii characters in the title attribute
+    }
+    else {
+      $desc .= '&rdquo;</td><td>';
+    }
+    $table .= "<tr><td class=\"rating-symbol\">$ratingSymbol{$rating}</td><td class=\"rating-desc\">\&ldquo;$desc</td></tr>";
+  }
+
+  $table .= '<tr><td class="table-group-header" colspan="3">For behavior:</td></tr>';
+  foreach my $rating (40 .. 43) {
+    my $desc = $ratingTitle{$rating};
+    if ($desc =~ /;/ ) {
+      $desc =~ s%; %&rdquo;</td><td>%;
+      $desc =~ s/\b([Nn])a.{1,2}ve\b/$1a&iuml;ve/gi; # browser tooltips can't use non-ascii characters in the title attribute
+    }
+    else {
+      $desc .= '&rdquo;</td><td>';
+    }
+    $table .= "<tr><td class=\"rating-symbol\">$ratingSymbol{$rating}</td><td class=\"rating-desc\">\&ldquo;$desc</td></tr>";
+  }
+
+  $table .= "</table>";
+</%init>

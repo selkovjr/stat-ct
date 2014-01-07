@@ -1,0 +1,241 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin <% $source %> -->
+            <p style="margin-top: 1em"></p>
+% if ( @remarks ) {
+            <h3>Remarks:</h3>
+%   foreach ( @remarks ) {
+%     my %r = $_->get_columns;
+%     next unless $r{text};
+            <p style="margin-left: 2em"><b><% $r{assessor} %></b>: <em><% $r{text} %></em></p>
+%   }
+% }
+            <pre><% $generaltreeview %></pre>
+            <pre><% $proctreeview %></pre>
+            <!-- end <% $source %> -->
+<%args>
+  $trainee
+  $date
+  $case_no
+  $activity
+</%args>
+<%init>
+my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/assessment_details.html,v 2.19 2009-03-09 18:18:58 selkovjr Exp $);
+
+my $proctreeview;
+my $generaltreeview;
+my %rating;
+my %assessment;
+my %np_reason;
+
+my $purple = "#B040A0";
+my $red = "#C03030";
+my $black = "#606060";
+my $lightgray = "#a0a0a0";
+
+my $id_of_overall = $Model->id_of_overall;
+
+my @remarks = $Model->remarks_on_case(
+            date => $date,
+            case_no => $case_no,
+            activity => $activity,
+            trainee => $trainee,
+);
+
+my $assessment = $Model->assessments_of_case(
+					     date => $date,
+					     case_no => $case_no,
+					     activity => $activity,
+					     trainee => $trainee
+					    );
+
+my %rating_symbol = $Model->rating_symbol_hash;
+my %rating_desc = $Model->rating_desc_hash;
+my %np_desc = $Model->np_description_hash;
+my $assessor = $Model->case_assessors(
+				      date => $date,
+				      case_no => $case_no,
+				      activity => $activity,
+				      trainee => $trainee
+				     );
+
+my $tree = $m->scomp('/lib/render_tree.mason', tree => 'activity', start => $activity, with_id => 1);
+my @tree_nodes;
+my $width = 0;
+foreach ( split "\n", $tree ) { # for each tree node
+  my ($id, $label) = split "\t";
+  $id = $id_of_overall if $id == $activity; # take overall assessment for the top node
+  $label =~ s/\(\s*\d+\s*,\s*\d+\s*\)\s*$//;
+  $width = length($label) if length($label) > $width;
+
+  # form the prefix -- a row of assessments for this node; self-assessments
+  # followed by the given assessments
+  my $color;
+  my %prefix = (self => '', given => '');
+  my %flag = (self => undef, given => undef);
+  foreach my $source ( 'self', 'given' ) {
+    foreach my $assID ( sort keys %{$assessment->{$source}->{submissions}} ) {
+      my $raw = $assessment->{$source}->{$assID}->{$id};
+      $raw =~ s/-1:/-/;
+      my $r = $raw !~ /^-/ ? $rating_symbol{$raw} : $raw;
+      $flag{$source}++ if $raw;
+      my $symbol = ($r =~ /^-/) ? sprintf("%-3s ", $r) : sprintf(" %-3s", $r);
+      if ( $r =~ /^-/ ) {
+	$symbol =~ s%(\S+)%'<a><span class="q" title="Non-participatory: ' . $np_desc{$r} . qq(\">$1</span></a>)%e;
+      }
+      elsif ( $id == $id_of_overall ) {
+	$symbol =~ s%(\S+)%'<a><span class="q" title="Overall assessment on the scale of F to A (American school grade equivalent)">' . $1 .'</span></a>'%e;
+      }
+      else {
+	$symbol =~ s%(\S+)%'<a><span class="q" title="' . $rating_desc{$raw} . qq(\">$1</span></a>)%e;
+      }
+      $prefix{$source} .= $symbol;
+    }
+  }
+
+  $color = $purple if $flag{self} and not $flag{given};
+  $color = $red if $flag{given} and not $flag{self};
+  $color = $black if $flag{self} and $flag{given};
+  $color = $lightgray if not $flag{self} and not $flag{given};
+  my ($bopen, $bclose) = ($flag{self} or $flag{given}) ?  ("<b>", "</b>") : "" x 2;
+  push @tree_nodes, " $bopen<font color=\"$purple\">$prefix{self}</font><font color=\"$red\">$prefix{given}</font>\t<font color=\"$color\">$label</font>$bclose";
+}
+
+my $longest_id_length = (sort {$a <=> $b} map {length($_)} values %$assessor)[-1];
+my @header;
+my $prefix_length;
+foreach my $i ( 0 .. $longest_id_length-1 ) {
+  my $buf = ' ';
+  foreach my $assID ( sort keys %{$assessment->{self}->{submissions}} ) {
+    $buf .= sprintf(" %-3s", substr($assessor->{$assID},  $i - $longest_id_length, 1) || ' ');
+  }
+  foreach my $assID ( sort keys %{$assessment->{given}->{submissions}} ) {
+    $buf .= sprintf(" %-3s", substr($assessor->{$assID},  $i - $longest_id_length, 1) || ' ');
+  }
+  $prefix_length = length($buf);
+  my $filler =  ' ' x ($width + 2);
+  my $title = "S P E C I F I C";
+  substr($filler, ($width - length($title))/2 - 2, length($title)) = $title if $i == 2;
+  push @header, qq(<span style="width:100%;background:black;filter:alpha(opacity=15);-moz-opacity:.15;opacity:.15"><font color="white"><b>$buf</b></font>$filler</span>);
+}
+unshift @header, qq(<span style="width:100%;background:black;filter:alpha(opacity=15);-moz-opacity:.15;opacity:.15"><font color="white">) . (' ' x ($prefix_length + $width + 2)) . "</span>";
+$proctreeview = join "\n", @header, "", @tree_nodes;
+
+my $start = $Model->id_of_general;
+
+$tree = $m->scomp('/lib/render_tree.mason', tree => 'activity', start => $start, with_id => 1);
+undef @tree_nodes;
+$width = 0;
+foreach ( split "\n", $tree ) {
+  my ($id, $label) = split "\t";
+  $id = $id_of_overall if $id == $activity;
+  $label =~ s/\(\s*\d+\s*,\s*\d+\s*\)\s*$//;
+  $width = length($label) if length($label) > $width;
+  my $prefix_self = "";
+  my $prefix_given = "";
+  my $color;
+  my ($self, $given) = (undef, undef);
+  foreach my $assID ( sort keys %{$assessment->{self}->{submissions}} ) {
+    my $raw = $assessment->{self}->{$assID}->{$id};
+    my $r = $rating_symbol{$raw};
+    $self++ if $raw;
+    my $symbol = sprintf(" %-3s", $r);
+    $symbol =~ s%(\S+)%'<a><span class="q" title="' . $rating_desc{$raw} . qq(\">$1</span></a>)%e;
+    $prefix_self .= $symbol;
+  }
+  foreach my $assID ( sort keys %{$assessment->{given}->{submissions}} ) {
+    my $raw = $assessment->{given}->{$assID}->{$id};
+    my $r = $rating_symbol{$raw};
+    $given++ if $raw;
+    my $symbol = sprintf(" %-3s", $r);
+    $symbol =~ s%(\S+)%'<a><span class="q" title="' . $rating_desc{$raw} . qq(\">$1</span></a>)%e;
+    $prefix_given .= $symbol;
+  }
+  $color = $purple if $self and not $given;
+  $color = $red if $given and not $self;
+  $color = $black if $self and $given;
+  $color = $lightgray if not $self and not $given;
+  my ($bopen, $bclose) = "" x 2;
+  ($bopen, $bclose) = ( "<b>", "</b>" ) if $self or $given;
+  push @tree_nodes, " $bopen<font color=\"$purple\">$prefix_self</font><font color=\"$red\">$prefix_given</font>\t<font color=\"$color\">$label</font>$bclose";
+}
+
+undef @header;
+foreach my $i ( 0 .. $longest_id_length-1 ) {
+  my $buf = ' ';
+  foreach my $assID ( sort keys %{$assessment->{self}->{submissions}} ) {
+    $buf .= sprintf(" %-3s", substr($assessor->{$assID},  $i - $longest_id_length, 1) || ' ');
+  }
+  foreach my $assID ( sort keys %{$assessment->{given}->{submissions}} ) {
+    $buf .= sprintf(" %-3s", substr($assessor->{$assID},  $i - $longest_id_length, 1) || ' ');
+  }
+  $prefix_length = length($buf);
+  my $filler =  ' ' x ($width + 2);
+  my $title = "G E N E R A L";
+  substr($filler, ($width - length($title))/2 - 2, length($title)) = $title if $i == 2;
+  push @header, qq(<span style="width:100%;background:black;filter:alpha(opacity=15);-moz-opacity:.15;opacity:.15"><font color="white"><b>$buf</b></font>$filler</span>);
+}
+unshift @header, qq(<span style="width:100%;background:black;filter:alpha(opacity=15);-moz-opacity:.15;opacity:.15"><font color="white">) . (' ' x ($prefix_length + $width + 2)) . "</span>";
+
+$generaltreeview = join "\n", @header, "", @tree_nodes;
+</%init>
+<%method title><& PARENT:title &> &mdash; View Case Details</%method>
+<%method page_title>Assessment details</%method>
+<%method help>
+<%args>
+</%args>
+    <p style="margin-top: 1em">&nbsp;</p>
+    <h4>Viewing Detailed Assessments</h4>
+
+    <p>
+      This page lists all specific elements of the case and the
+      general competencies. The items that were assessed are
+      emphasized in bold. Those that were not assessed are also
+      present, set in a faint color, to provide context for
+      reading. The grades are lined up in vertical columns, one for
+      each assessor. The resident's self-assessments, if present, are
+      displayed in the leftmost column; assessments given by the
+      mentors follow in the chronological order (based on the time of
+      entry).
+    </p>
+
+    <p>
+      Additionally, the ratings and the items to which they are
+      attached are color-coded for clarity: unmatched self-assessments
+      are set in purple, unmatched given assessments in red, and
+      paired assessmentsents are set in black.
+    </p>
+
+    <p>
+      Each rating represents a click on a button on the Assessment
+      page. The meaning of the symbols is explained <a
+      href="help.html?path=eval.html;role=trainee">here</a> (for the
+      trainee) and <a
+      href="help.html?path=eval.html;role=attending">here</a> (for the
+      attending). Note that in the specific categories, attendings
+      apply a system of ratings that differs form that of the
+      trainee's.
+    </p>
+
+    <p>
+      If you let your mouse pointer hover over a symbol, a short
+      exlanation of that symbol will pop up.
+    </p>
+
+    <p>
+      The overall ratings are attached to the top-level node in the Specific category.
+    </p>
+</%method>
+<%method file_info> <% Util::print_revision(q$Id: assessment_details.html,v 2.19 2009-03-09 18:18:58 selkovjr Exp $) %> </%method>

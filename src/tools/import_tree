@@ -1,0 +1,174 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+package Node;
+
+sub new {
+    my ($class, $label) = @_;
+    my $self = {label => $label, children => []};
+    return bless $self, $class;
+}
+
+sub add {
+    my ($self, $node) = @_;
+    if ( my $child = $self->childExists($node) ) {
+        # this is dangerous; it will only work without data loss 
+        # if nodes being added have no data but their labels
+        return $child;
+    }
+    else {
+        push @{$self->{children}}, $node;
+        return $node;
+    }
+}
+
+sub childExists {
+    my ($self, $node) = @_;
+    my @res = grep {$_->{label} eq $node->{label}} @{$self->{children}};
+    return $res[0] if @res;
+    return undef;
+}
+
+sub preOrderTraverse {
+    my ($self, $callback) = @_;
+    $_ = $self;
+    $callback->();
+    foreach my $child ( @{$self->{children}} ) {
+        $child->preOrderTraverse($callback);
+    }
+}
+
+sub postOrderTraverse {
+    my ($self, $callback) = @_;
+    foreach my $child ( @{$self->{children}} ) {
+        $child->postOrderTraverse($callback);
+    }
+    $_ = $self;
+    $callback->();
+}
+
+sub breadthFirst {
+    my ($self, $callback) = @_;
+    push @Node::QUEUE, $self;
+    while ( @Node::QUEUE ) {
+        $_ = shift @Node::QUEUE;
+        $callback->(); 
+        foreach my $child ( @{$_->{children}} ) {
+            push @Node::QUEUE, $child;
+        }
+    }
+}
+
+sub assignLeftRightIDs {
+    my ($self) = @_;
+    $self->{left_id} = $Node::ID++;
+    foreach my $child ( @{$self->{children}} ) {
+        $child->assignLeftRightIDs()
+    }
+    $self->{right_id} = $Node::ID++;
+}
+
+sub assignIDs {
+    my ($self) = @_;
+    $Node::ID = 0;
+    $self->breadthFirst( sub { $_->{id} = $Node::ID++ } );
+    $Node::ID = 0;
+    $self->assignLeftRightIDs();
+}
+
+
+package main;
+
+my $rootNode;
+my $indent;
+
+my @stack;
+
+while ( <> ) {
+    chomp;
+    s/\s+$//;
+    next if /^\s*\#/;
+    next if /^\s+$/;
+
+    print STDERR "$_\n";
+
+    # find root
+    if ( /^\S/ ) {
+        $indent = 0;
+        push @stack, ($rootNode = Node->new("root"));
+        next;
+    }
+
+    /^(\s*)(.+)$/;
+    my ($space, $label) = ($1, $2);
+    my $newindent = length($space);
+    my ($required, $opt) = ('f', 'f');
+    if ( $label =~ s/\s*\((\d),\s*(\d)\)$// ) {
+        $required = 't' if $1;
+        $opt = 't' if $2;
+    }
+
+    my $node = Node->new($label);
+    $node->{required} = $required;
+    $node->{opt} = $opt;
+    print STDERR "indent: $indent -> $newindent\n";
+    die "incorrect indentation at line $." if ($newindent - $indent > 2) or ($newindent - $indent) % 2;
+
+#    print "$_\n";
+#    print "newindent: $newindent, indent: $indent\n";
+    if ($newindent > $indent ) {
+        $stack[-1]->add($node);
+        push @stack, $node;
+    }
+    elsif ( $newindent == $indent ) {
+        pop @stack;
+        $stack[-1]->add($node);
+        push @stack, $node;
+    }
+    else {
+      foreach ( 1 .. ($indent - $newindent)/2 + 1 ) {
+#        print "Stack: @stack\n";
+        pop @stack;
+      }
+#      print "final stack: @stack\n";
+      $stack[-1]->add($node);
+      push @stack, $node;
+    }
+    $indent = $newindent;
+}
+
+$rootNode->assignIDs();
+
+if ( 0 ) {
+    use Data::Dumper;
+    print Dumper($rootNode);
+}
+
+if ( 0 ) {
+    print "digraph G {\n";
+    print "  rankdir=LR;\n";
+    print "  node [shape=plaintext];\n";
+    $rootNode->preOrderTraverse(
+                           sub {
+                               my $this = $_->{id};
+                               foreach my $kid ( @{$_->{children}} ) {
+                                   print "\"$this\" -> \"$kid->{id}\"\n";
+                               }
+                           } );
+    print "}";
+}
+
+if ( 1 ) {
+    print "$rootNode->{id}\t\\N\t$rootNode->{left_id}\t$rootNode->{right_id}\t\\N\t\\N\t$rootNode->{label}\n";
+    $rootNode->breadthFirst(
+                             sub {
+                                 my $parent = $_->{id};
+                                 foreach my $kid ( @{$_->{children}} ) {
+                                     my $label = $kid->{label};
+                                     my $opt = 'f';
+                                     $opt = 't' if $label =~ s/^\*//;
+                                     print "$kid->{id}\t$parent\t$kid->{left_id}\t$kid->{right_id}\t$kid->{required}\t$kid->{opt}\t$label\n";
+                                 }
+                             } );
+}

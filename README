@@ -1,0 +1,298 @@
+
+STAT -- Surgical Training Assessment Tool
+
+
+1. Introduction
+
+This tool serves two major goals: it allows trainees and their mentors
+to assess and track the trainee's performance at almost any arbitrary
+level of detail, and it proves to be an efficient communication
+medium providing immediate and focused feedback to the trainee.
+
+Upon completion of each case, the trainee and the attending log on to
+the system and make independent assessments of the trainee's
+performance. Additionally, both can record notes and comments
+pertaining to the case. The system is built around a hierarchy of
+surgical procedures in the form of a single-rooted tree
+(src/data/activity.tree). This tree provides a structured container
+for assessments and notes. The user interface is also tree-like: it
+allows the user to assess elementary activities, as well as larger
+operative units -- including the entire procedure. In other words, the
+system allows to capture very general assessments, such as
+
+  "This case has gone well",
+
+along with the more detailed ones:
+
+  "You've done exceptionally well, but this particular element needs
+  improvement",
+
+the latter requiring just a couple more mouse clicks to expand the
+tree to the level showing the element in point.
+
+Besides specific details of the case, the general capabilities of the
+trainee are also assessed, including knowledge, skill and
+independence. These general categories are structured as well,
+allowing more detailed assessment of different areas of knowledge, or
+different elements of skill, for example.
+
+
+
+2. System Architecture
+
+This implementation of STAT was designed as a web service based on
+Apache with postgres (a.k.a. PostgreSQL) as a data backend. The user
+interface was built in perl with HTML::Mason. This distribution can be
+deployed in any unix-like operating system, including linux, FreeBSD
+and Mac OS X. 
+
+A nested-set representation of the activity tree forms the core of the
+database. The tree serves as a single source of numeric identifiers
+for assessments and remarks. It contains outlines of all procedures
+performed within the training program. We recommend it be prepared in
+advance of deployment of STAT, because some of the later alterations
+to the tree may require extensive modification of the live database.
+The current version of the tree distributed in this package reflect
+the activities conducted in General Surgery at the University of
+Chicago Hospitals.
+
+  Note: this distribution includes a visual aid to understanding
+  the data. Running make in src/schema/ will generate a graphical
+  overview of the database, stat-schema.html, which can be opened in
+  any html browser. The diagram of the schema is hyper-linked to
+  descriptions of data elements. The attributes serving as keys are
+  highlighted in dark blue, the pale blue highlights references.
+
+The other two relations central to this database are "case" and
+"eval", encoding, respectively, the user's assessment of the case and
+details of the assessment in the form of numeric grades.
+
+The meaning of the grades is encoded in the class "rating", and
+because attendings and trainees use different systems of ratings, the
+software uses the class "rating_map" to choose the range of ratings
+appropriate for the user role and present them as choices in the
+menus.
+
+Please note that we have made a deliberate decision not to store any
+information that could be used to identify the actual operative
+case. The class "case" encodes only the user's assessment of the case,
+not the case itself. Each case can therefore generate one or more
+assessments: one by the trainee and one or more by his or her
+attendings, but their assessments will not be explicitly linked in the
+database. Instead, most of them (the error-free ones) can be linked
+computationally, based on the reported date of the case, identity of
+the trainee and attending(s), case type and sequence number. The
+sequence number -- entered by the user -- will only be necessary to
+distinguish between the cases of the same type done on the same
+day. No reference to the patient, operating room, or time of the day
+gets stored in the database. This design decision helped to keep the
+system focused on assessments and training.
+
+Another design decision aimed at simplification and better focus was
+not to do our own user management and authentication. Instead, we have
+linked our system to the institutional employee directory through
+LDAP. Instead of actually "logging in" to the system, the user
+undergoes authentication by the web server against the institutional
+directory. Upon successful authentication, the ID of the user is simply
+copied into the database from the server environment. Once the user's
+identity has been established, he or she uses the query capability of
+our case selection interface to obtain the ID of the teammate from the
+same directory. These two IDs are the only user-related information
+stored in the database, in the attributes "trainee", "attending" and
+"assessor" of the class "case". Such design not only simplifies the
+database and the user interface, but it also reduces the cost of
+management. The only concern for the manager of the program becomes to
+make sure that every participant has a valid directory entry. The only
+drawback of this approach we have experienced so far is that the users
+cannot "log out" without killing their browser application, but we
+find that to be a very small cost as compared to the cost of user
+management and developing additional code.
+
+
+
+3. Installation
+
+This distribution is pre-configured to install and run a demo of STAT,
+based on the following assumptions:
+
+  1. Installation is to be performed by a non-root user on
+     a machine running Apache.
+  2. The user's web space is mapped into his ~/public_html/ directory.
+  3. Scripts in that directory are served by suexec.
+  4. Apache configuration allows all overrides for ~/public_html.
+  5. OpenLDAP is installed on this machine, and the user is allowed to
+     run slapd on a user port.
+  6. Postgres is either installed on this machine or is within reach.
+  7. The user has a valid postgres account and is allowed to create
+     databases.
+  8. The user unpacks this archive somewhere within ~/public_html
+     and runs make. Make will complain about the missing dependencies;
+     if it runs to the end without problems, the system will be ready
+     to use.
+
+None of these assumptions is critical, and each can be adjusted by
+configuring the Makefile, installing the missing software or moving
+things around. The most likely changes to the Makefile will be in one
+or more of these variables:
+
+LDAP_PORT = 1666 # any port above 1023 will work, unless you know
+                 # that your slapd is already running and has the
+                 # right data -- then specify the port it uses and
+                 # remove 'ldap' from the 'deps' target
+ 
+
+LDAP_HOST = `hostname` # use this value if you want to allow this
+                       # Makefile to configure and start slapd
+                       # locally, or if you know it's already
+                       # running on this host; otherwise specify
+                       # where is running and remove 'ldap' from the
+                       #'deps' target
+ 
+
+LDAP_BASE = ou=people,dc=uchicago,dc=edu  # this is how it should be
+                       # configured to run the demo database; change
+                       # it for the real thing when deploying for
+                       # serious use
+
+LDAP_USER = mevans     # user name to use for LDAP directory access
+
+PG_HOST = localhost    # specifies where postmaster is running,
+PG_PORT = 10000        # including port, if non-standard
+
+PG_USER = $(USER)      # user name to login to postgres; your
+                       # unix user ID by default
+
+STAT_DB = stat-demo    # name of the postgres database for STAT data.
+                       # If the database exists and contains useful
+                       # data that you want to keep, remove 'test_pg'
+                       # from the 'test' target
+
+HTTP_PORT = 80         # the port Apache is listening to
+
+CGI_MODE = 700         # file access modes for your private
+HTML_MODE = 644        # web space (~/public_html); suexec requires
+                       # mode 700 for CGIs.
+
+export PATH := $(PATH):/usr/sbin:/sbin:./bin  # some executables will
+                       # be installed in the current dir
+
+PERL_PATH := `which perl` # replace this with your own perl if system
+                          # default is not good
+
+THIS_DIR := `echo $(PWD) | sed 's%.*public_html/%%'` # the path to
+                       # current dir relative to ~/public_html. Apple
+                       # users will likely need to replace
+                       # ~/public_html with ~/Sites
+
+BASE_URL := http://`hostname`:$(HTTP_PORT)/~$(USER)  # your web root
+
+STAT_URL := $(BASE_URL)/$(THIS_DIR)  # the URL your browser will use
+
+
+
+4. Demo version
+
+Successful completion of the make job, with the default settings, will
+create and launch the system initialized with a demo data set. In
+order to see how it works, you will need to log in as either attending
+or a trainee. The login screen in the demo version will list the user
+ids you can use and their roles.
+
+
+
+5. Deployment
+
+No change of code will be necessary to begin using the system in
+earnest, but it will need to be re-configured to use the correct
+data. The following steps will be necessary:
+
+ 1. Choose a permanent name for your STAT database. Let's assume
+    it will be 'stat', in the rest of this document.
+
+ 2. See instructions in src/schema/README for how to create
+    a blank database. Note the following: 
+
+       * It does not matter what user you run make as, as long you
+         have write access to the current directory. Make will create
+         the database schema for STAT.
+
+       * In order to install the schema, you will need to run postgres
+         client tools (dropdb, createdb, createlang and psql) as a
+         postgres user with database creation rights. By default,
+         the postgres tools assume your unix account name and your
+         postgres account name are the same, and they also assume that
+         postmaster is running on the local host at port 5432. If any
+         of this is not the case, you will need to supply the correct
+         information in command-line arguments to the tools, e.g.:
+
+           createdb -U $(PG_USER) -h $(PG_HOST) -p $(PG_PORT) stat
+
+         
+       * src/schema/README includes instructions on how to initialize
+         the activity tree. It may be useful to review the tree before
+         loading it, because if it turns out that it is not suitable
+         for the kinds of operations your service is conducting, it
+         will be more difficult to modify after a while. The
+         assessments linked to modified tree nodes are likely to
+         become invalid. Updating the tree without destroying the
+         assessments is a complicated affair, so be prepared to discard
+         your assessments once or twice during the initial trial
+         period, and use the experience you gain to design a suitable
+         tree.
+
+  3. Link your system with a real directory service. You will need to
+     indicate the address of the LDAP directory and its base name in
+
+       config/STAT.pm
+
+     Alternatively, you can set the related parameters in your
+     Makefile and have make generate both configuration files for you.
+     Then, go back to Step 2 and create a blank database.
+
+  4. If your institution requires SSL to access the directory service,
+     set edit file config/STAT.pm and set $STAT::ldap_ssl to a true value:
+
+        $STAT::ldap_ssl = undef;
+
+
+  5. Because the assessments of the same case made by the attendings
+     and the trainees can be linked, the linking information can be
+     used to send alerts to those participants whose teammates have
+     already submitted their assessments. We have found that such
+     alerts help people remember to enter their cases and increase the
+     accuracy of the reported data.
+
+     The alerts can be sent daily from any user account having access
+     to the STAT database, by registering the script
+
+        src/tool/linked_cases_alert
+
+     Running this script with the following command issued in the top
+     directory of STAT will give you an idea of the kind of
+     information that it will send:
+
+       ./src/tools/linked_cases_alert -test
+
+     It will require the perl module Mail::Sendmail.
+
+     Apparently, if moved to another user's account (possibly on
+     another machine), this script must undergo two kinds of
+     configuration. First, it needs to know where to get the data. In
+     the demo context, it will use variables from config/STAT.pm. To
+     continue using it this way from a different location, the "use
+     lib" declaration must be adjusted to point to STAT.pm, or the
+     correct path to it must be added to @INC. Alternatively, one can
+     go ahead and replace references to all $STAT:: variables (there
+     are not too many of them). Secondly, the script needs to know the
+     addresses of people to send the alerts to. The regular users are
+     taken care of by the directory service, and they will each
+     receive a standard message saying that they have a certain number
+     of cases to assess. In addition, the script sends summaries about
+     the total number of assessments pending to the program
+     administrators, whose addresses must be indicated
+     separately. Also, the From: and Reply-to: fields should be set to
+     something meaningful, in case people reply to alerts. Here at
+     UofC, we treat such replies trouble inquiries, and we direct them
+     to our issue tracking system. Just go through the script and make
+     sure that all To:, From: and Reply-to: fields make sense.
+

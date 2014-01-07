@@ -1,0 +1,313 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<%args>
+  $uid
+  $category
+  $node => undef
+  $month => undef
+  $year => undef
+</%args>
+<!-- begin <% $source %> -->
+  <map name="map_<% $category %>">
+    <% join("\n    ", @map) %>
+  </map>
+% if ( $r->header_in("User-Agent") =~ /msie/i ) {
+  <img border="0" id="graph_<% $category %>" alt="assessment time chart for <% $category %>" usemap="#map_<% $category %>" src="<% $src %>">
+% } else {
+  <img border="0" src="lib/icons/blank.gif" onload="load_one_image('<% $category %>', '<% $src %>')">
+  <table><tr><td><img border="0" id="graph_<% $category %>" alt="assessment time chart for <% $category %>" usemap="#map_<% $category %>" src="lib/icons/wait20trans.gif"></td>
+        <td><div id="message_<% $category %>"></div></td></tr></table>
+% }
+<!-- end <% $source %> --> \
+<%init>
+  my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/lib/plot_category.mason,v 2.4 2012/01/22 23:05:02 stat Exp $);
+
+$category = lc $category;
+
+my %label = (
+             overall => 0,
+             knowledge => "^knowledge.*understanding\$",
+             skill => "^skill\$",
+             independence => "^independence\$",
+            );
+
+my %tics = (
+            overall_trainee => 'F:30,D-:31,D:32,D+:33,C-:34,C:35,C+:36,B-:37,B:38,B+:39,A-:40,A:41,A+:42',
+            overall_attending => 'F:30,D-:31,D:32,D+:33,C-:34,C:35,C+:36,B-:37,B:38,B+:39,A-:40,A:41,A+:42',
+            knowledge_trainee => 'P:20,F:21,G:22,VG:23,E:24',
+            knowledge_attending => 'P:20,F:21,G:22,VG:23,E:24',
+            skill_trainee => 'P:20,F:21,G:22,VG:23,E:24',
+            skill_attending => 'P:20,F:21,G:22,VG:23,E:24',
+            independence_trainee => 'P:20,F:21,G:22,VG:23,E:24',
+            independence_attending => 'P:20,F:21,G:22,VG:23,E:24',
+            specific_trainee => 'C:10,I:11,A:12,P:13',
+            specific_attending => 'P:0,A:1,C:2,E:3',
+           );
+
+my @buf;
+my $query;
+
+# fill in the tick labels
+foreach my $role ( qw/attending trainee/ ) {
+  $query = qq(
+SELECT "desc", value
+  FROM rating, rating_map
+ WHERE role = '$role'
+   AND subtree = ?
+   AND value BETWEEN low AND high
+ ORDER BY value
+);
+  my $sth = $Dbh->prepare($query);
+  $Dbh->err and die $Dbh->errstr . "in: $query";
+
+  # get labels for specific assessments
+  $sth->execute('Specific') or die "can't execute query for (subtree = 'Specific'): $query; " . $Dbh->errstr;
+  my $res = $sth->fetchall_arrayref;
+  $Dbh->err and die $Dbh->errstr . "while fetching results of: $query";
+  $tics{"specific_$role"} = join ",", map {"$_->[0]:$_->[1]"} @$res;
+
+  # get labels for general competencies
+  $sth->execute('General Capabilities') or die "can't execute query for (subtree = 'General Capabilities'): $query; " . $Dbh->errstr;
+  $res = $sth->fetchall_arrayref;
+  $Dbh->err and die $Dbh->errstr . "while fetching results of: $query";
+  foreach my $category ( qw/knowledge skill independence/ ) {
+    $tics{"${category}_$role"} = join ",", map {"$_->[0]:$_->[1]"} @$res;
+  }
+}
+
+# select individual cases; DISTINCT merges information about the cases
+# from the trainee and from the attendings' records
+if ( $month ) {
+  my ($year, $mon) = split ":", $month;
+  $query = qq(
+SELECT DISTINCT date, case_no, activity
+  FROM "case"
+ WHERE trainee = '$uid'
+ AND extract(YEAR FROM "date") = $year
+ AND extract(MONTH FROM "date") = $mon
+ ORDER BY date, case_no;
+);
+}
+elsif ( $year ) {
+  my $year_start = $Model->config('year_start');
+  my $start = sprintf("'%4d-01-01'::timestamptz + '%d days'", $year, $year_start);
+  my $end = sprintf("'%4d-01-01'::timestamptz + '%d days'", $year + 1, $year_start);
+  my $date_constraint = qq("date" BETWEEN $start AND $end);
+  $query = qq(
+SELECT DISTINCT date, case_no, activity
+  FROM "case"
+ WHERE trainee = '$uid'
+ AND $date_constraint
+ ORDER BY date, case_no;
+);
+}
+else {
+  $query = qq(
+SELECT DISTINCT date, case_no, activity
+  FROM "case"
+ WHERE trainee = '$uid'
+ ORDER BY date, case_no;
+);
+}
+my $cases = $Dbh->selectall_arrayref($query);
+$Dbh->err and die $Dbh->errstr . "in: $query";
+
+
+# select all assessments for each case
+foreach my $c ( @$cases ) {
+  my ($date, $case_no, $activity) = @$c;
+  my $tuple = {self => undef, attending => []};
+
+  # ****************************** S E L F - A S S E S S M E N T S ****************************
+  # determine the record ID of self-assessment for this case
+  my $query = qq(
+SELECT id FROM "case"
+ WHERE date = '$date'
+   AND case_no = $case_no
+   AND activity = $activity
+   AND trainee = '$uid'
+   AND assessor = trainee
+);
+  my $assessment_id = $Dbh->selectcol_arrayref($query);
+  $Dbh->err and die $Dbh->errstr . "in: $query";
+#  die "case ($date, $case_no, $activity) has multiple self-assessments: (@$assessment_id)"
+#    if @$assessment_id > 1;
+
+  my $avg = 0;
+  if ( $assessment_id->[0] ) { # not all cases have self-assessments
+    my $query;
+    if ( $category eq 'overall' ) {
+      my $id_of_overall = Util::id_of_overall($Dbh);
+      $query = qq(
+SELECT assessment FROM eval
+ WHERE "case" = $assessment_id->[0]
+   AND activity = $id_of_overall;
+);
+    }
+    elsif ( $category eq 'specific' ) {
+      $query = qq(
+SELECT avg(eval.assessment) FROM eval, "case"
+ WHERE eval.assessment != -1
+   AND eval."case" = $assessment_id->[0]
+   AND eval."case" = "case".id
+   AND eval.activity IN (
+     SELECT t1.id
+       FROM activity AS t1, activity AS t2
+      WHERE t1.left_id BETWEEN t2.left_id AND t2.right_id
+        AND t2.id = "case".activity
+   );
+);
+    }
+    else {
+      $query = qq(
+SELECT avg(assessment) FROM eval
+ WHERE "case" = $assessment_id->[0]
+   AND activity IN (
+     SELECT t1.id
+       FROM activity AS t1, activity AS t2
+      WHERE t1.left_id BETWEEN t2.left_id AND t2.right_id
+        AND t2.label ~* '$label{$category}'
+   )
+);
+    }
+
+    ( $avg ) = $Dbh->selectrow_array($query);
+    $Dbh->err and die $Dbh->errstr . "in: $query";
+    $avg = sprintf("%5.2f", $avg);
+    $avg *= 1; # to get rid of extra spaces and zeroes
+    $tuple->{self} = $avg;
+  }
+
+
+  # ****************** A S S E S S M E N T S   B Y   A T T E N D I N G S *******************
+  # determine the record ID(s) of assessment by attendings
+  $query = qq(
+SELECT id FROM "case"
+ WHERE date = '$date'
+   AND case_no = $case_no
+   AND activity = $activity
+   AND assessor != trainee
+);
+  $assessment_id = $Dbh->selectcol_arrayref($query);
+  $Dbh->err and die $Dbh->errstr . "in: $query";
+
+  foreach my $assessment ( @$assessment_id ) {
+    my $avg = 0;
+    my $query;
+    if ( $category eq 'overall' ) {
+      my $id_of_overall = Util::id_of_overall($Dbh);
+      $query = qq(
+SELECT assessment FROM eval
+ WHERE "case" = $assessment
+   AND activity = $id_of_overall
+);
+    }
+    elsif ( $category eq 'specific' ) {
+      $query = qq(
+SELECT avg(eval.assessment) FROM eval, "case"
+ WHERE eval.assessment != -1
+   AND eval."case" = $assessment_id->[0]
+   AND eval."case" = "case".id
+   AND eval.activity IN (
+     SELECT t1.id
+       FROM activity AS t1, activity AS t2
+      WHERE t1.left_id BETWEEN t2.left_id AND t2.right_id
+        AND t2.id = "case".activity
+   )
+);
+    }
+    else {
+      $query = qq(
+SELECT avg(assessment) FROM eval
+ WHERE "case" = $assessment
+   AND activity IN (
+     SELECT t1.id
+       FROM activity AS t1, activity AS t2
+      WHERE t1.left_id BETWEEN t2.left_id AND t2.right_id
+        AND t2.label ~* '$label{$category}'
+   )
+);
+    }
+    ( $avg ) = $Dbh->selectrow_array($query);
+    $Dbh->err and die $Dbh->errstr . "in: $query";
+    $avg = sprintf("%5.2f", $avg);
+    $avg *= 1; # to get rid of extra spaces and zeroes
+    push @{$tuple->{attending}}, $avg;
+  }
+  push @$c, $tuple; # the first three elements are date, case_no and activity
+}
+
+# get the hash of ratings
+$query = qq(SELECT value, symbol FROM rating);
+my $res   = $Dbh->selectall_arrayref($query);
+$Dbh->err and die $Dbh->errstr . "in: $query";
+my %rating;
+foreach my $row ( @$res ) {
+  my ($value, $symbol) = @$row;
+  $rating{$value} = $symbol;
+}
+
+# form tracks for graphing
+my @self_data;
+my @attending_data;
+my @map;
+my $npoints = @$cases;
+my $width = 564; # these numbers should be parameters (!)
+my $height = 201;
+my $margin = 126;
+my $area_width = ($width - 2*$margin)/($npoints + 1);
+my $start = $margin + 0.5*$area_width;
+foreach my $c ( @$cases ) {
+  push @self_data, $c->[3]->{self} || 'x';
+  my $avg = undef;
+  my $n = 0;
+  foreach my $val ( @{$c->[3]->{attending}} ) {
+    if ( $val ) {
+      $n++;
+      $avg += $val;
+    }
+  }
+  if ( $n ) {
+    $avg /= $n;
+  }
+  else {
+    $avg = 'x';
+  }
+  push @attending_data, $avg;
+  my $s = sprintf("%d", $start);
+  my $e = sprintf("%d", $start + $area_width);
+  my $query = qq(SELECT label FROM activity WHERE "id" = $c->[2]);
+  my ( $activity ) = $Dbh->selectrow_array($query);
+  my $tooltip = "$c->[0] ($c->[1]), $activity";
+  $Dbh->err and die $Dbh->errstr . "in: $query";
+  push @map, qq(<area shape="rect" coords="$s,0,$e,$height" href="assessment_details.html?trainee=$uid;date=$c->[0];case_no=$c->[1];activity=$c->[2]" alt="$tooltip" title="$tooltip">);
+  $start += $area_width;
+}
+
+# mask the attendings' assessments ahead of the last assessment by the trainee
+if ( $User->role eq 'trainee' ) {
+  foreach my $i ( reverse 0 .. $#attending_data ) {
+    last if $self_data[$i] ne 'x';
+    $attending_data[$i] = 'x';
+  }
+}
+
+my $encoded = "yes";
+if ( $r->header_in("User-Agent") =~ /msie/i ) {
+  $encoded = "no";
+}
+
+my $src = $m->scomp("url.mason", path => 'assessment_graph.html', query => {legend => $category, self_tics => $tics{(lc $category) . "_trainee"},  attending_tics => $tics{(lc $category) . "_attending"}, self => join(",", @self_data), attending => join(",", @attending_data), encoded => $encoded});
+</%init>

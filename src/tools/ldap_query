@@ -1,0 +1,11 @@
+#!/usr/bin/perl -w
+
+use strict;
+use lib qw(./interface/lib/perl ./lib/perl config);
+use Util;
+use STAT;
+use Data::Dumper;
+
+my $uid = shift @ARGV;
+
+print Dumper(Util::ldap_entry($uid));

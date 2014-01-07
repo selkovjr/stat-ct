@@ -1,0 +1,34 @@
+0. We thank Joe Selko ("SQL for Smarties") and Vadim Tropashko for the
+   explanation of the various designs of database trees:
+
+     http://searchoracle.techtarget.com/tip/1,289483,sid13_gci537290,00.html
+     http://www.developersdex.com/gurus/articles/112.asp?Page=3
+
+     http://www.dbazine.com/oracle/or-articles/tropashko4
+     http://www.dbazine.com/oracle/or-articles/tropashko5
+
+1. The original Javascript tree menu was written by Marcelino Alves
+   Martins (martins@hks.com). Its version used in STAT was modified
+   to allow arbitrary post- and pre-fixes in the tree nodes, and to
+   generalize the handling of selections. The original code can be
+   found at: 
+
+     http://www.treeview.net/
+
+2. The idea and fragments of code implementing the <span>-based radio
+   buttons were borrowed form Shailesh N. Humbad:
+
+     "HTML And CSS Table Border Style Wizard",
+     http://www.somacon.com/p141.php
+
+3. The original MSIE behavior fix circumpassing M$ hover style bugs
+   was written by Peter Nederlof. The current code is adapted from 
+   csshover.htc, found at:
+
+     "Whatever:Hover"
+     http://www.xs4all.nl/~peterned/csshover.html
+
+4. Autocompletion of teammates' names is done in javascript using
+   WICK,
+
+     http://wick.sourceforge.net/

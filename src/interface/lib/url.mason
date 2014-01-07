@@ -1,0 +1,68 @@
+%#   http://www.masonbook.com/book/chapter-8.mhtml
+%#
+%# this component handles the construction of properly escaped URLs of arbitrary complexity
+%#
+<%args>
+ $scheme   => 'http'
+ $username => undef
+ $password => ''
+ $host     => undef
+ $port     => undef
+ $path
+ %query    => ()
+ $fragment => undef
+</%args>
+<%init>
+# $Id: url.mason,v 2.4 2010-06-01 12:00:12 stat Exp $
+
+my $uri;
+if ( defined $STAT::path ) {
+  $uri = URI->new($STAT::path);
+}
+else {
+  $uri = URI->new;
+}
+
+if ($host) {
+  $uri->scheme($scheme);
+
+  if (defined $username) {
+    $uri->authority( "$username:$password" );
+  }
+
+  $uri->host($host);
+  $uri->port($port) if $port;
+}
+
+# Sometimes we may want to put in a query string as part of the path
+# but the URI module will escape the question mark.
+my $q;
+if ( $path =~ s/\?(.*)$// ) {
+  $q = $1;
+}
+
+if ( defined $STAT::path ) {
+  $path = $uri->path . "/$path";
+}
+$uri->path($path);
+
+# If there was a query string, we integrate it into the query
+# parameter.
+if ($q) {
+  %query = ( %query, split /[&=]/, $q );
+}
+
+$query{session_id} = $STAT::Session->{_session_id};
+
+# $uri->query_form doesn't handle hash ref values properly
+while ( my ( $key, $value ) = each %query ) {
+  $query{$key} = ref $value eq 'HASH' ? [ %$value ] : $value;
+}
+
+$uri->query_form(%query) if %query;
+
+$uri->fragment($fragment) if $fragment;
+my $ret = $uri->canonical;
+$ret =~ s/\&/;/g;
+</%init>
+<% $ret | n %>\

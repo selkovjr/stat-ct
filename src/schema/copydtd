@@ -1,0 +1,2 @@
+#!/bin/sh
+grep -v DOCTYPE ../nearfar/metadata.dtd | grep -v \]\> | perl -npe 's/\r//g' > metadata.dtd

@@ -1,0 +1,3 @@
+DirectoryIndex index.cgi
+Allow from all
+Satisfy Any

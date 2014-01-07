@@ -1,0 +1,775 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+# ******************** A t t r i b u t e ***********************
+package Attribute;
+
+sub new {
+  my ($class, %arg) = @_;
+  return bless \%arg, $class;
+}
+
+sub val {
+  my ($self) = @_;
+  return $self->{val};
+}
+
+# ******************** C o m p o n e n t  **********************
+package Component;
+
+sub new {
+  my ($class) = @_;
+  my $self = {};
+  return bless $self, $class;
+}
+
+# declares the interface for all objects in the composition
+# implements default behavior for the interface
+# declares an interface for managing its child components 
+#    (this hardly makes any sense in perl)
+sub add ($) {};
+sub gi ($) {};
+sub elements {};
+
+# (optionally) defines an interface for accessing a component's parent
+#    and implements it if appropriate
+
+# *********************** P C D a t a **************************
+package PCData;
+@PCData::ISA = qw/Component/;
+
+sub new {
+  my ($class, $data) = @_;
+  my $self = {content => $data};
+  return bless $self, $class;
+}
+
+sub content {
+  my ($self) = @_;
+  return $self->{content};
+}
+# represents leaf objects in the composition.
+# defines behavior for primitive objects
+
+
+# ********************* C o m p o s i t e **********************
+package Composite;
+@Composite::ISA = qw/Component/;
+
+sub new {
+  my ($class, $gi) = @_;
+  my $self = {data => [], gi => $gi};
+  return bless $self, $class;
+}
+
+sub gi {
+  my ($self) = @_;
+  return $self->{gi};
+}
+
+sub elements {
+  my ($self) = @_;
+  return @{$self->{data}};
+}
+
+# defines behavior for components having children
+# stores child components
+# implements chid-related operations
+sub add {
+  my ($self, $component) = @_;
+  push @{$self->{data}}, $component;
+  return $self;
+}
+
+sub attr {
+  my ($self, $att_ref) = @_;
+
+  if ($att_ref) {
+    foreach my $key (keys %$att_ref) {
+      $self->{attr}->{$key} = $att_ref->{$key};
+    }
+  } else {
+    return $self->{attr};
+  }
+}
+
+
+# ******************************* H T M L a b e l ****************************
+package HTMLabel;
+
+sub new {
+  my ($class, $dbclass) = @_;
+  my $self = {class => $dbclass};
+  return bless $self, $class;
+}
+
+sub render {
+  my ($self, $basename) = @_;
+  my $classname = $self->{class}->attr->{NAME}->val;
+  my $label = <<END
+<
+<table border="0" cellborder="1" cellspacing="0">
+  <tr> <td href="$basename-meta.html#class:$classname" bgcolor="#808080"><font color="white" face="helvetica bold">$classname</font></td> </tr>
+END
+    ;
+
+  my @att_list = grep {$_->gi eq 'ATTRIBUTE'} $self->{class}->elements; # ignore descriptions, etc.
+
+  # first see if the table will be built with OIDs, and if so,
+  # construct a description for an oid and add it to the list
+  if ( $self->{class}->attr->{OID} ) {
+    my $oid = Composite->new("ATTRIBUTE");
+    $oid->add(Composite->new("DESCRIPTION")->add(PCData->new("Built-in database object ID")));
+    $oid->attr({
+		'NAME' => Attribute->new(type => 'CDATA', val => 'oid'),
+		'TYPE' => Attribute->new(type => 'CDATA', val => 'oid'),
+	       });
+    unshift @att_list, $oid;
+  }
+
+  # now add the declared attributes
+  foreach my $attribute ( @att_list ) {
+    my $attrname = my $attrlabel = $attribute->attr->{NAME}->val;
+    my ($color, $port);
+    if ( $attribute->attr->{PKEY} ) {
+      my $text = $attribute->attr->{SEQUENCE} ? "$attrname (+)" : $attrname;
+      $color = '#8282F4';
+      $port = " port=\"$attrname\"";
+      $attrlabel = qq(<font color="white">$text</font>);
+    } elsif ( $attribute->attr->{LINK} ) {
+      $color = '#F0E0E0';
+      $port = " port=\"$attrname\"";
+    } elsif ( $attribute->attr->{REF} ) {
+      $color = '#D0E0FF';
+      $port = " port=\"$attrname\"";
+    } elsif ( $attribute->attr->{TYPE}->val eq 'oid') {
+      $color = '#C0FFC0';
+      $port = '';
+    } else {
+      $color = 'white';
+      $port = '';
+    }
+
+    $label .= <<END
+  <tr> <td href="$basename-meta.html#$classname:$attrname" align="left" bgcolor="$color"$port>$attrlabel</td> </tr>
+END
+      ;
+  }
+
+  $label .= <<END
+</table>
+>
+END
+    ;
+  return $label;
+}
+
+# ************************** G r a p h B u i l d e r *************************
+package GraphBuilder;
+
+use GraphViz;
+
+sub new {
+  my ($class, $root) = @_;
+  my $g = GraphViz->new(
+                        node => {
+                                 shape => 'plaintext',
+                                 fontsize  =>'14',
+                                },
+                        edge => {
+                                 fontsize  =>'12',
+                                }
+                       );
+  my $self = {root => $root, g => $g};
+  bless $self, $class;
+}
+
+sub render {
+  my ($self, $basename) = @_;
+
+  foreach my $class (($self->{root}->elements)[0]->elements) {
+    my $classname = $class->attr->{NAME}->val;
+    print STDERR "$classname\n";
+    $self->{g}->add_node({ 
+                          name => $classname,
+                          label => HTMLabel->new($class)->render($basename),
+                         });
+
+    my %foreign_key_ref;
+    my %foreign_ref;
+    foreach my $attribute ( grep {$_->gi eq 'ATTRIBUTE'} $class->elements ) { # ignore descriptions, etc.
+      my $attrname = $attribute->attr->{NAME}->val;
+      my $pkey = $attribute->attr->{PKEY} ? '*' : '';
+      if ( $attribute->attr->{REF} ) {
+        my $ref = $attribute->attr->{REF}->val;
+        # strip the foreign key list
+        $ref =~ s/\(.+\)//;
+        print STDERR "\t$pkey$attrname => $ref\n";
+        push @{$foreign_key_ref{$classname}->{$ref}}, $attrname;
+      }
+      elsif ( $attribute->attr->{LINK} ) {
+        my $ref = $attribute->attr->{LINK}->val;
+        # strip the foreign ref list
+        $ref =~ s/\(.+\)//;
+        print STDERR "\t$pkey$attrname -> $ref\n";
+        push @{$foreign_ref{$classname}->{$ref}}, $attrname;
+      } else {
+        print STDERR "\t$pkey$attrname\n";
+      }
+    }
+
+    foreach my $cl ( keys %foreign_key_ref ) {
+      foreach my $r ( keys %{$foreign_key_ref{$cl}} ) {
+        my @keys = @{$foreign_key_ref{$cl}->{$r}};
+        my $label;
+        if ( @keys > 1 ) {
+          $label = join("<comma>", @keys);
+        } else {
+          $label = $keys[0];
+        }
+        $self->{g}->add_edge($cl => $r, label => $label);
+      }
+    }
+    foreach my $cl ( keys %foreign_ref ) {
+      foreach my $r ( keys %{$foreign_ref{$cl}} ) {
+        my @keys = @{$foreign_ref{$cl}->{$r}};
+        my $label;
+        if ( @keys > 1 ) {
+          $label = join("<comma>", @keys);
+        } else {
+          $label = $keys[0];
+        }
+        $self->{g}->add_edge({from => $cl, to => $r, style => 'dashed', label => $label});
+      }
+    }
+  }
+
+  my $output = $self->{g}->as_canon;
+
+  # unescape quotes and newlines
+  $output =~ s/label=\"\\N\", //m;
+  $output =~ s/\\\n//gm;
+  $output =~ s/label=\"/label=/gm;
+  $output =~ s/\"\];/\];/gm;
+  $output =~ s/\\n/\n/gm;
+  $output =~ s/\\//gm;
+
+  return $output;
+}
+
+# ************************** T a b l e B u i l d e r **********************
+
+package TableBuilder;
+
+sub new {
+  my ($class, $root) = @_;
+  my $self = {root => $root};
+  bless $self, $class;
+}
+
+
+sub render {
+  my ($self, $basename) = @_;
+
+  my $text;
+  foreach my $class (sort
+                     {
+                       $a->attr->{GROUP}->val cmp $b->attr->{GROUP}->val
+                     } ($self->{root}->elements)[0]->elements) {
+    my $classname = $class->attr->{NAME}->val;
+    my $group = $class ->attr->{GROUP}->val;
+    print STDERR "$classname\n";
+
+    # -----------------------------------------------------------
+    # Header
+    $text .= <<END
+<p>
+  <a name="class:$classname">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>$classname</b> / $group</font></td> </tr>
+END
+      ;
+
+    # -----------------------------------------------------------
+    # Present all non-attribute components; also exclude <init> and <load>
+    $text .= <<END
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+END
+      ;
+    foreach my $item ( grep {$_->gi ne 'ATTRIBUTE' and $_->gi ne 'INIT' and $_->gi ne 'LOAD'} $class->elements ) {
+      my $gi = ucfirst lc $item->gi;
+      my $content =  $item->elements ? ($item->elements)[0]->content : '&nbsp;';
+      $content =~ s/^([\n\t ]|\\n|\\011)+//m;
+      $content =~ s/([\n\t ]|\\n|\\011)+$//m;
+      $content =~ s/([\n\t ]|\\n|\\011)+/ /gm;
+      $text .= <<END
+          <tr>
+            <td valign="top">
+              <font color="#808080">$gi:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">$content</td>
+          </tr>
+END
+        ;
+    }
+    $text .= <<END
+       </table>
+END
+      ;
+
+    # ------------------------------------------------------------
+    # now do the attributes
+
+    my @att_list = grep {$_->gi eq 'ATTRIBUTE'} $class->elements;
+
+    # first see if the table will be built with OIDs, and if so,
+    # construct a description for an oid and add it to the list
+    if ( $class->attr->{OID} ) {
+      my $oid = Composite->new("ATTRIBUTE");
+      $oid->add(Composite->new("DESCRIPTION")->add(PCData->new("Built-in database object ID")));
+      $oid->attr({
+		  'NAME' => Attribute->new(type => 'CDATA', val => 'oid'),
+		  'TYPE' => Attribute->new(type => 'CDATA', val => 'oid'),
+		 });
+      unshift @att_list, $oid;
+    }
+
+    # now add the declared attributes
+    foreach my $attribute ( @att_list ) {
+      use Data::Dumper;
+      print Dumper($attribute);
+      my $attrname = my $attrlabel = $attribute->attr->{NAME}->val;
+      my $bgcolor;
+      if ( $attribute->attr->{PKEY} ) {
+        $bgcolor = '#8282F4';
+        my $text = $attribute->attr->{SEQUENCE} ? "$attrname (+)" : $attrname;
+        $attrlabel = "<font color=white><b>$text</b></font>";
+      } elsif ( $attribute->attr->{REF} ) {
+        $bgcolor = '#D0E0FF';
+      } elsif ( $attribute->attr->{TYPE}->val eq 'oid') {
+        $bgcolor = '#C0FFC0';
+      } else {
+        $bgcolor = 'white';
+      }
+      my $type = $attribute->attr->{TYPE}->val;
+      my $length = $attribute->attr->{LENGTH} ? $attribute->attr->{LENGTH}->val : '&nbsp;';
+      my $desc_table = <<END
+         <table border="0" cellborder="1" cellspacing="0">
+END
+        ;
+      foreach my $item ( $attribute->elements ) {
+        my $gi = ucfirst lc $item->gi;
+        my $content =  $item->elements ? ($item->elements)[0]->content : '&nbsp;';
+        $content =~ s/^([\n\t ]|\\n|\\011)+//m;
+        $content =~ s/([\n\t ]|\\n|\\011)+$//m;
+        $content =~ s/\\\\N/\\N/gm;
+        if ( $gi =~ /example|format/i ) {
+          $content = "<code>$content</code>";
+        } elsif ( $gi =~ /values/i ) {
+          my $val_table = <<END
+                <table border="0" cellborder="1" cellspacing="0">
+END
+            ;
+          foreach my $line ( split /\n|\\n/, $content ) {
+            $line =~ s/^([\n\t ]|\\n|\\011)+//m;
+            $line =~ s/([\n\t ]|\\n|\\011)+$//m;
+            my ( $val, $desc ) = split /\t|\\011/, $line;
+            $val_table .= <<END
+                  <tr> <td valign="top"> <code>$val </td> <td>&nbsp;</td> <td valign="top"> <em>$desc</em> </td> </tr>
+END
+              ;
+          }
+          $val_table .= <<END
+                </table>
+END
+            ;
+          $content = $val_table;
+        } else {
+          $content =~ s/([\n\t ]|\\n|\\011)+/ /mg;
+        }
+
+        my $label_color = "#808080";
+        if ( $gi =~ /objection/i) {
+          $label_color =  "brown";
+          $gi = "<b>$gi</b>";
+        }
+
+        # process the content for links
+        $content =~ s/(http:([^ ,;:]+))/<a href="$1">$1<\/a>/g;
+        $desc_table .= <<END
+            <tr>
+              <td valign="top">
+                <font color="$label_color">$gi:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">$content</td>
+            </tr>
+END
+          ;
+      }
+      $desc_table .= <<END
+         </table>
+END
+        ;
+      $text .= <<END
+    <tr>
+      <td href="$basename-meta.html#$classname:$attrname" align="left" valign="top" bgcolor="$bgcolor">
+        <a name="$classname:$attrname"> $attrlabel
+      </td>
+      <td valign="top"> $type </td>
+      <td valign="top"> $length </td>
+      <td valign="top">
+$desc_table 
+      </td>
+    </tr>
+END
+        ;
+    }
+
+    # ------------------------------------------------------------
+    # append initial values, if any are given
+    #
+    if ( my $item = (grep {$_->gi eq 'INIT' or $_->gi eq 'LOAD'} $class->elements)[0] ) {
+      $text .= <<END
+    <tr>
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="2">
+END
+        ;
+      my $content =  ($item->elements)[0]->content ? ($item->elements)[0]->content : '&nbsp;';
+      $content =~ s/^([\n\t ]|\\n|\\011)+//m;
+      $content =~ s/([\n\t ]|\\n|\\011)+$//m;
+      $content =~ s/\\\\\\\\/\\\\/mg; # replace four escaped '\' from nsgmls with just two
+      foreach my $line ( split /\n|\\n/, $content ) {
+        $line =~ s/^([\n\t ]|\\n|\\011)+//m;
+        $line =~ s/([\n\t ]|\\n|\\011)+$//m;
+        $line =~ s/\\\\N/\\N/gm;
+        $line =~ s/<%/&lt;%/gm;
+        $line =~ s/%>/%&gt;/gm;
+        my @col = split /\t|\\011/, $line;
+        $text .= "          <tr> <td valign=\"top\"> <code>" . join ("</code> </td> <td>&nbsp;</td> <td valign=\"top\"> <code>", @col) . " </code> </td> </tr> \n";
+      }
+      $text .= <<END
+        </table>
+      </td>
+    </tr>
+END
+        ;
+    }
+    $text .= <<END
+  </table>
+</p>
+END
+      ;
+  }
+  return $text;
+}
+
+
+# ************************** S Q L B u i l d e r **********************
+
+package SQLBuilder;
+
+sub new {
+  my ($class, $root) = @_;
+  my $self = {root => $root};
+  bless $self, $class;
+}
+
+
+sub render {
+  my ($self, $basename) = @_;
+
+  my $text;
+  my $constraint;
+  my %reference;
+
+  # find all required sequences and define them first
+  foreach my $class (sort
+                     {
+                       $a->attr->{GROUP}->val cmp $b->attr->{GROUP}->val}
+                     ($self->{root}->elements)[0]->elements
+                    ) {
+    foreach my $attribute ( grep {$_->gi eq 'ATTRIBUTE'} $class->elements ) {
+      if ( $attribute->attr->{SEQUENCE} ) {
+        my $seq = $attribute->attr->{SEQUENCE}->val;
+        $text .= "CREATE SEQUENCE $seq;\n\n";
+      }
+    }
+  }
+
+
+  # ----------------------------------------------------------------------------
+  # define classes
+
+  foreach my $class (sort
+                     {
+                       $a->attr->{GROUP}->val cmp $b->attr->{GROUP}->val}
+                     ($self->{root}->elements)[0]->elements
+                    ) {
+    my $classname = $class->attr->{NAME}->val;
+    my $group = $class ->attr->{GROUP}->val;
+    print STDERR "$classname\n";
+
+    # -----------------------------------------------------------
+    # Header
+    $text .= <<END
+CREATE TABLE "$classname" \(
+END
+      ;
+
+    # ------------------------------------------------------------
+    # Attributes
+    my @attrdef;
+    my @attrlist;
+    my @pkey;
+
+    foreach my $attribute ( grep {$_->gi eq 'ATTRIBUTE'} $class->elements ) {
+      my $attrname = $attribute->attr->{NAME}->val;
+      my $attrtype = uc $attribute->attr->{TYPE}->val;
+      my $not_null = '';
+      my $default = '';
+      if ( $attrtype =~ /char/i ) {
+        my $len = $attribute->attr->{LENGTH}->val;
+        $attrtype = "$attrtype($len)";
+      }
+
+      if ( $attribute->attr->{PKEY} ) {
+        $not_null = ' NOT NULL';
+        push @pkey, $attrname;
+      }
+
+      if ( $attribute->attr->{SEQUENCE} ) {
+        my $seq = $attribute->attr->{SEQUENCE}->val;
+        $not_null = " DEFAULT nextval('$seq')";
+      }
+
+      if ( $attribute->attr->{REF} ) {
+        my $ref = $attribute->attr->{REF}->val;
+        if ( $ref =~ /"?([^\(]+)"?\(([^\(]+)\)/ ) {
+          my $ftable = $1; 
+          my $fkey = $2;
+          push @{$reference{$classname}->{$ftable}}, [$attrname, $fkey];
+        } else {
+          my $ftable = $ref;
+          push @{$reference{$classname}->{$ftable}}, [$attrname, undef];
+        }
+      }
+
+      push @attrdef, qq(  "$attrname" $attrtype$not_null$default);
+      push @attrlist, $attrname;
+    }
+
+    $text .= join(",\n", @attrdef) . "\n";
+
+    if ( $class->attr->{OID} ) {
+      $text .= <<END
+\) WITH OIDS;
+
+END
+	;
+    } else {
+      $text .= <<END
+\);
+
+END
+    }
+
+    if ( @pkey ) {
+      my $keys = join(", ", map { qq("$_") } @pkey);
+      $text .= <<END
+ALTER TABLE ONLY "$classname"
+   ADD CONSTRAINT "${classname}_pkey" PRIMARY KEY \( $keys \);
+
+END
+        ;
+    }
+
+    # ------------------------------------------------------------
+    # append initial values, if any are given
+    #
+    if ( my $item = (grep {$_->gi eq 'INIT'} $class->elements)[0] ) {
+      my $attributes = join(", ", map {qq("$_")} @attrlist);
+      $text .= <<END
+COPY "$classname" \( $attributes \) FROM stdin;
+END
+        ;
+      my $content =  ($item->elements)[0]->content ? ($item->elements)[0]->content : '&nbsp;';
+      $content =~ s/^([\n\t ]|\\n|\\011)+//m;
+      $content =~ s/([\n\t ]|\\n|\\011)+$//m;
+      foreach my $line ( split /\n|\\n/, $content ) {
+        $line =~ s/\'/<tick>/g;
+        $line =~ s/<tick>/'/g;
+        $line =~ s/\\\\N/\\N/g;
+        $line =~ s/^([\n\t ]|\\n|\\011)+//m;
+        $line =~ s/([\n\t ]|\\n|\\011)+$//m;
+        my @col = split /\t|\\011/, $line;
+        $text .= join ("\t", @col) . "\n";
+      }
+      $text .= <<END
+\\.
+
+END
+        ;
+    }
+
+    # ------------------------------------------------------------
+    # table-level constraints
+    #
+    foreach my $item (grep {$_->gi eq 'CONSTRAINT'} $class->elements ) {
+      my $attributes = join(", ", map {qq("$_")} @attrlist);
+      my $content =  ($item->elements)[0]->content ? ($item->elements)[0]->content : '**ERROR**';
+      $content =~ s/\\n/\n/g;
+      $constraint .= "$content\n";
+    }
+
+
+  }
+
+  # specify foreign key constraints
+  foreach my $class ( keys %reference ) {
+    my $constraint_no = 0;
+    foreach my $ftable ( keys %{$reference{$class}} ) {
+      my @keys;
+      my @fkeys;
+      $constraint_no++;
+
+      foreach my $ref ( @{$reference{$class}->{$ftable}} ) {
+        push @keys, $ref->[0];
+        push @fkeys, $ref->[1] if defined $ref->[1];
+      }
+
+      if ( @fkeys and  @fkeys != @keys ) {
+        die "foreign key mismatch for $class: ( @keys ) <=> ( @fkeys )";
+      }
+
+      if ( @fkeys ) {
+        # Two situations are possible. If @fkeys contains copies of the same key,
+        # we're dealing with multiple constraints based on the same key. Otherwise,
+        # it's one multi-key constraint.
+        my %unique;
+        foreach my $k (@fkeys) {
+          $unique{$k}++;
+        }
+        my @fk = keys %unique;
+        if ( @fk == 1 ) {
+          # There is only one unique foreign key for this class
+          foreach my $k ( @keys ) {
+            $constraint .= <<END
+ALTER TABLE ONLY "$class"
+   ADD CONSTRAINT "\$$constraint_no" FOREIGN KEY ("$k") REFERENCES "$ftable"("$fk[0]") ON DELETE CASCADE;
+
+END
+              ;
+            $constraint_no++ if @fkeys > 1;
+          }
+        } else {
+          # there is many unique foreign keys; assume composite key. Leave more
+          # complicated cases (multiple simple/composite constraints) untreated
+          my $fkeys = join(", ", map {qq("$_")} @fkeys);
+          my $keys = join(", ", map {qq("$_")} @keys);
+          $constraint .= <<END
+ALTER TABLE ONLY "$class"
+   ADD CONSTRAINT "\$$constraint_no" FOREIGN KEY ($keys) REFERENCES "$ftable"($fkeys) ON DELETE CASCADE;
+
+END
+            ;
+        }
+      } else {
+        # single fkey
+        foreach my $k ( @keys ) {
+          $constraint .= <<END
+ALTER TABLE ONLY "$class"
+   ADD CONSTRAINT "\$$constraint_no" FOREIGN KEY ("$k") REFERENCES "$ftable" ON DELETE CASCADE;
+
+END
+            ;
+          $constraint_no++ if @keys > 1;
+        }
+      }
+    }
+  }
+
+  my $functions;
+  foreach my $item (grep {$_->gi eq 'FUNCTIONS'} $self->{root}->elements ) {
+    my $content = ($item->elements)[0]->content ? ($item->elements)[0]->content : '';
+    $content =~ s/\\n/\n/g;
+    $functions .= "$content\n";
+  }
+  return $text . $constraint . $functions;
+}
+
+
+# **************************************************************************
+package main;
+my %attr;
+my @stack;
+my $root;
+
+my $basename = shift || 'noname';
+
+while ( defined ($_ = <> ) ) {
+  next if /^A.+IMPLIED$/;
+
+  last if /^C$/;
+
+  # attribute
+  if ( /^A(\S+)\s+(\S+)\s+(.+)$/ ) {
+    $attr{$1} = Attribute->new(type => $2, val => $3);
+  }
+
+  # start-tag
+  elsif ( /^\((.+)$/ ) {
+    my $component = Composite->new($1);
+    if ( %attr ) {
+      # copy attributes
+      $component->attr(\%attr);
+      undef %attr;
+    }
+    if ( @stack ) {
+      # if this is not the root element, add it to
+      # the current top component on the stack
+      $stack[-1]->add($component);
+    }
+    push @stack, $component;
+  }
+
+  # end-tag
+  elsif ( /^\)(.+)$/ ) {
+    if ( @stack == 1 ) {
+      # there must be just the root element left
+      $root  = $stack[-1];
+    }
+    pop @stack;
+  }
+
+  # content
+  elsif ( /^-(.+)$/ ) {
+    my $component = PCData->new($1);
+    $stack[-1]->add($component);
+  }
+
+  # default
+  else {
+    print STDERR "ERROR: $_\n";
+  }
+}
+
+my $builder = GraphBuilder->new($root);
+open DOT, ">$basename-schema.dot";
+print DOT $builder->render($basename);
+close DOT;
+
+$builder = TableBuilder->new($root);
+open HTML, ">$basename-meta.html";
+print HTML $builder->render($basename);
+close HTML;
+
+$builder = SQLBuilder->new($root);
+open SQL, ">$basename-schema.sql";
+print SQL "BEGIN TRANSACTION;\n\n", $builder->render($basename), "\nEND TRANSACTION;\n";
+close SQL;

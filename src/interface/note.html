@@ -1,0 +1,373 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+
+% if ( $submit_pearl ) {
+%   Util::submit_pearl($Dbh, $User, $nodeID, $base_path, $text);
+%   delete @ARGS{qw/submit_pearl text element/};
+%   $m->comp( "lib/redirect.mason", path => "note.html", query => \%ARGS );
+% }
+% elsif ( $submit_feedback ) {
+%   Util::submit_feedback($Dbh, $User, $nodeID, $base_path, $text);
+    <p style="margin-top: 1.5em; margin-bottom: 1.5em">
+      Your message regarding "<em><% $element %></em>" has been sent
+      to <a href="mailto:<% $STAT::contact %>"><% $STAT::contact %></a>
+    </p>
+    <hr>
+% }
+% else {
+    <p style="margin-top: 1em;"></p>
+%   if ( $mode eq 'display' ) {
+        <% join "\n        ", @table %>
+%   } else {
+    <form name="pearlform" id="pearlform" action="note.html" method="POST">
+      <fieldset>
+        <legend>Add a pearl or report a problem to developers related to this element of the case</legend>
+        <input type="hidden" name="nodeID" value="<% $nodeID %>">
+        <% join "\n        ", @table %>
+      </fieldset>
+    </form>
+%   }
+    <% join "\n", @output %>
+% }
+<%args>
+  $nodeID
+  $submit_pearl => undef
+  $submit_feedback => undef
+  $text => undef
+  $element => undef
+  $mode => undef
+</%args>
+<%init>
+use Sub::Recursive;
+
+my $uid = $User->uid;
+
+sub last_index {
+  my ( $key, @list ) = @_;
+  my $index = 0;
+  my $seen = undef;
+  foreach my $element ( @list ) {
+    $seen++ if index($element, $key) == 0;
+    return $index if $seen and index ($element, $key) != 0;
+    $index++;
+  }
+  return undef if not $seen;
+  return $index;
+}
+
+my @ancestors = $Model->path_to_node($nodeID);
+shift @ancestors; # remove 'root' and 'Specific'
+shift @ancestors;
+my $base_path = join '|', @ancestors;
+my $path_length = @ancestors;
+
+my @table;
+my $label_style = $mode eq 'display' ? ' class="title"' : ''; # there is going to be only one row in @table if mode is 'display', because display mode in only requested from the index page
+
+foreach my $i ( 0 .. $path_length - 1 ) {
+  my $tr = '<table border="0"><tr>' . ('<td width="12p"></td>' x $i) . qq(<td colspan="2"><span$label_style>$ancestors[$i]</span></td>) . "</tr></table>";
+  push @table, $tr;
+}
+my $input = <<END
+            <td>
+              <table>
+                <tr>
+                  <td>
+                    <textarea name="text" id="text" cols="80" rows="5"></textarea>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <input type="hidden" name="element" value="$ancestors[-1]">
+                    <input type="submit" name="submit_pearl" value="Add a pearl" onclick="return validate('note')">
+                    <input type="submit" name="submit_feedback" value="Report a problem" onclick="return validate('message')">
+                  </td>
+                </tr>
+              </table>
+            </td>
+END
+;
+
+unless ( $mode eq 'display' ) {
+  push @table, '<table border="0"><tr>' . ('<td width="12p"></td>' x $path_length) . "\n$input          </tr>\n        </table>"
+}
+
+my @output;
+
+# Find prior pearls under the current node ($base_path). This is done by matching $base_path against
+# the start of the path string stored in the "note" table. Because the tree structure can change
+# after pearls are written, some pearls matching $base_path may not attach themselves to any
+# existing node. We will dislpay them anyway.
+
+my %prior_pearls;
+if ( my @pearls = $Model->pearls_by_path($uid, $base_path) ) {
+  foreach ( @pearls ) {
+    my %pearl_data = $_->get_columns;
+    $pearl_data{user} = $pearl_data{'"user"'};
+    my $path = delete $pearl_data{path};
+    push @{$prior_pearls{$path}}, \%pearl_data;
+  }
+
+  push @output, "<h4>Prior pearls:</h4>" unless $mode eq 'display';
+
+  # collect pearls for this node
+  my $out;
+  if ( my $pearls = delete $prior_pearls{$base_path} ) {
+    $out =  '    <table><tr><td><ul>';
+    foreach my $pearl ( sort {$a->{ts} <=> $b->{ts}} @$pearls ) {
+      $out .= $m->scomp('lib/ts_list_item.mason', text => $pearl->{text}, user => $pearl->{user}, timestamp => $pearl->{date});
+    }
+    $out .= '</ul></td></tr></table>';
+  }
+  push @output, $out;
+
+  # Now traverse the children of the current node, attaching all pearls that
+  # can be attached to them. The unattached pearls will remain in %prior_pearls
+  my @path = ();
+  my @tree;
+  my %attached_pearls;
+  my $traverse = recursive {
+    my ($nodeID) = @_;
+    foreach my $child ( $Model->children_of($nodeID) ) {
+      push @path, $child->label;
+      my $path = join('|', $base_path, @path);
+      push @tree, [$child->id, $path];
+      if ( $prior_pearls{$path} ) {
+        $attached_pearls{$path} = delete $prior_pearls{$path};
+      }
+      $REC->( $child->id );
+    }
+    pop @path;
+  };
+
+  $traverse->($nodeID);
+
+  # find the lowest-ranking parent for each unattached note
+  foreach my $key ( keys %prior_pearls ) {
+    my @key = split /\|/, $key;
+    my $index;
+    foreach my $i ( 1 .. $#key ) {
+      pop @key;
+      my $partial_key = join '|', @key;
+      if ( $index = last_index($partial_key, @tree) . ": " . $key ) {
+        splice @tree, $index, 0, [undef, $key];
+        last;
+      }
+    }
+  }
+
+  # form the output
+  my $prior_path = $base_path;
+  my @case_buffer;
+  my $caseID;
+  my $buffer = \@output;
+  foreach my $p ( @tree ) {
+    my ($activity, $path) = @$p;
+    my $color = $prior_pearls{$path} ? '#FF4040' : '#808080'; # at this point stuff in %prior_pearls is unattached
+    my $label_style = qq( style="color: $color");
+
+    # if prior path is included (is parent), replace it with blanks
+    if ( substr( $path, $prior_path ) == 0 ) {
+      my @p = split /\|/, $path;
+      my $level = @p;
+      my $count = "";
+      if ( $level == 2 ) {
+	$buffer = \@case_buffer;
+        if ( grep /<ul>/, @case_buffer ) { # this is an awful kludge, but an easy one to write
+	  push @output, @case_buffer;
+	}
+	else {
+	  push @output, $case_buffer[0];
+	}
+	@case_buffer = ();
+	push @output, '    <p style="margin-left: 1.5em">______________________________________________________</p>';
+	my $n = $Model->cases_like_this($User->uid, $activity)->count;
+	$count = $n ? " [$n]" : "";
+	$color = $n ? $color : "#bbb";
+	$label_style = qq( class="title" style="color: $color");
+      }
+      elsif ( $level < 2 ) {
+	$buffer = \@output;
+      }
+      my $label = pop @p;
+      push @$buffer, '    <table border="0"><tr>' . ('<td width="12p"></td>' x @p) . qq(<td colspan="2"><span$label_style>$label$count</span></td>) . "</tr></table>";
+      if ( my $notes = $attached_pearls{$path} ) {
+        my $out = '    <table border="0"><tr>' . ('<td width="12p"></td>' x @p) . '<td><ul>';
+        foreach my $note ( sort {$a->{ts} <=> $b->{ts}} @$notes ) {
+          $out .= $m->scomp('lib/ts_list_item.mason', text => $note->{text}, user => $note->{user}, timestamp => $note->{date});
+        }
+        push @$buffer, $out . '</ul></td></tr></table>';
+      }
+      if ( my $notes = $prior_pearls{$path} ) {
+        push @$buffer, '    <table border="0"><tr>' . ('<td width="12p"></td>' x @p) . '<td><ul><font color="brown">';
+        foreach my $note ( sort {$a->{ts} <=> $b->{ts}} @$notes ) {
+          push @$buffer, $m->scomp('lib/ts_list_item.mason', text => $note->{text}, user => $note->{user}, timestamp => $note->{date});
+        }
+        push @$buffer, '</font></ul></td></tr></table>';
+      }
+    }
+    $prior_path = $path;
+  }
+  push @output, @case_buffer if  grep /<ul>/, @case_buffer; # this is an awful kludge, but an easy one to write;
+}
+</%init>
+<%method title>STAT Pearls</%method>
+<%method page_title>Pearls</%method>
+<%method file_info> <% Util::print_revision(q$Id: note.html,v 2.12 2010-03-04 20:14:08 selkovjr Exp $) %> </%method>
+<%method jshead>
+    <script type="text/javascript">
+      function validate(msgtype) {
+        var text  = document.getElementById("text").value;
+        if ( text.length == 0 || text == null ) {
+          alert("Will not submit an empty " + msgtype);
+          return false;
+        }
+        return true;
+      }
+    </script>
+</%method>
+<%method help>
+  <%args>
+    $mode => undef
+  </%args>
+  <%init>
+    my $index_page = qq(<a href="/$STAT::application">Index Page</a>);
+    my $assessment_page;
+    if ( $mode eq 'display' ) {
+      $assessment_page = q(<span style="text-decoration: underline">Assessment page</span>);
+    } else {
+      $assessment_page = qq(<a href="javascript:history.go(-2)">Assessment Page</a>);
+    }
+    my $role = $User->role;
+  </%init>
+
+    <h3>Recording notes and sending feedback</h3>
+
+    <h4>What are pearls?</h4>
+
+    <p>
+      One important activity this tool supports is recording
+      case-related notes (the authors like to call them
+      <em>pearls</em>) in a structured manner. If taxonomy of surgical
+      cases is similar to a tree, your notes can be thought of as
+      leaves on that tree. They can be attached anywhere &mdash; to
+      the entire case, or to any of its components, large or
+      small. The pearl entry form shows the full path from the root
+      node of the case to the current node, to give you a reference
+      for where it will be attached.
+    </p>
+
+    <h4>Entering pearls</h4>
+    <p>
+      Clicking on a pearl icon (<span
+      class="pearl">&nbsp;&nbsp;&nbsp;&nbsp</span>) next to an item on the <%
+      $assessment_page %> will open a form, which you can use to write
+      down any wisdom you learned during the case, or anything
+      noteworthy related to this item. If you have already entered
+      notes for this item in the past, it will be marked with a black
+      pearl (<span class="blackpearl">&nbsp;&nbsp;&nbsp;&nbsp</span>). There is no
+      limit on how many notes you can enter for any given item.
+    </p>
+
+    <p>
+      We believe the best time to enter pearls is while you are
+      assessing the case and while your memory is fresh. For this
+      reason, we have linked the pearl entry form to the assessment
+      form. But you do not have to be assessing the case in order to
+      enter a random pearl any time you want. Just follow the steps
+      you would normally take to assess a case, and click on a pearl
+      in the assessment form. When done, simply navigate away from the
+      page without submitting the assessment. Pearls and assessments
+      are entered independently, but we have combined them on the same
+      page for expediency.
+    </p>
+
+    <h4>The distinction between pearls and remarks</h4>
+    <p>
+      If the note you would like to enter is of general nature
+      &mdash; something that applies to all cases of the same type, we
+      refer to it as a pearl and recommend that you enter it as
+      such. If it applies to the case as a whole, click on the pearl
+      next to the case heading set in bold on the <% $assessment_page
+      %>. However, if you want to add a note pertaining to a
+      particular instance of the case &mdash; the instance you are
+      assessing &mdash; then enter it using the <code>Remark</code>
+      box on the same page.
+    </p>
+
+    <h4>Viewing pearls</h4>
+    <p>
+      When entered into the database, the pearls are timestamped, so
+      they can be organized  in time, or grouped by the
+      case type, or by individual phases of the case, or by any
+      combination of these criteria.
+    </p>
+
+% if ( $mode eq 'display' ) {
+    <p>
+      If you have entered any pearls, you will see a black pearl icon
+      (<span class="blackpearl">&nbsp;&nbsp;&nbsp;&nbsp</span>) next
+      to each category on the <a href=<% "/$STAT::application" %>>front page
+      of STAT</a> that has cases with pearls attached to them. When
+      you expand a category, you will see which case types in that
+      category have received a pearl. Click on the pearl icon, and you
+      will see all your pearls organized according to the structure of
+      the case. If you click on a pearl in a top-level category, you
+      will see all pearls entered for the cases in that category
+      listed on the same page.
+    </p>
+% } else {
+    <p>
+      All earlier pearls you may have entered for the current
+      node and all its subordinate nodes will be listed on this page
+      under <b>Prior pearls</b>, with node labels set in faint color
+      to provide context.
+    </p>
+
+    <p>
+      This page will only list the pearls for the current node and its
+      descendants. To see more pearls linked to the case you are
+      assessing, <a href="javascript:history.go(-2)">step back</a> and
+      and click on another pearl icon. To access all of your
+      pearls, use the <% $index_page %>.
+    </p>
+%}
+
+    <h4>Reporting Problems</h4>
+    <p>
+      The problem-reporting facility comes piggyback on the pearl
+      mechanism. Please use it when you want to report any problems or
+      have questions <em>regarding particular elements of the case
+      you're assessing</em>. Instead of sending us email with a
+      description of where you've found a problem, you can simply
+      leave your report attached to the tree branch in question, and
+      we will find it there.
+    </p>
+
+    <p>
+      Please press <code>Add a pearl</code> to leave a note for
+      yourself, and press <code>Report a problem</code> to let us know
+      of anything misplaced, misnamed, or in any way inaccurate. If
+      you think that a necessary item is missing, attach your report
+      to an existing item next to where you think the missing item
+      should be.
+    </p>
+
+    <p>
+      To report a more general problem, or any problem not related to
+      the case taxonomy, please write to the email address at the
+      bottom of this page.
+    </p>
+</%method>

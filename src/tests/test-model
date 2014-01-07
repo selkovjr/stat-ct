@@ -1,0 +1,75 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings FATAL => qw( all );
+use feature qw/state say/;
+use 5.010;
+
+use lib qw{../../config ../interface/lib/perl};
+use STAT;
+use STAT::Schema;
+use STAT::Model;
+use Person;
+use Data::Dumper;
+use POSIX;
+use Util;
+use Plot;
+
+$ENV{PATH} = "/opt/local/bin:$ENV{PATH}" unless $ENV{PATH} =~ m%/opt/local/bin%;
+$ENV{DBIC_TRACE} = 1;
+
+our $Schema = STAT::Schema
+  ->connect(
+	    "dbi:Pg:dbname=$STAT::stat_db;host=$STAT::pg_host;port=$STAT::pg_port",
+	    $STAT::pg_user,
+	    "",
+	    {AutoCommit => 1, RaiseError => 1}
+	   );
+
+our $Model = STAT::Model->set_schema($Schema);
+
+print Dumper($Model->range_of_dates);
+print Dumper($Model->range_of_dates(trainee => 'roach'));
+
+print Dumper($Model->range_of_dates(
+                                    trainee => 'tbabrowski',
+                                    date => { '>' => '2008-01-01' }
+                                   ));
+print Dumper($Model->range_of_academic_years);
+print Dumper($Model->range_of_academic_years(trainee => 'tbabrowski'));
+print Dumper($Model->range_of_academic_years(
+                                    trainee => 'tbabrowski',
+                                    date => { '>' => '2008-01-01' }
+                                   ));
+
+
+say join("\n", $Model->trainees_in_year(2006));
+
+say 'First academic month: ' . $Model->first_academic_month;
+say 'Current academic year: ' . $Model->current_academic_year;
+__END__
+
+print Dumper([$Model->academic_months(2006)]);
+print Dumper([$Model->academic_months(2011)]);
+print Dumper([$Model->academic_months(2012)]);
+
+say 'Total number of cases: ' . $Model->number_of_cases;
+
+
+$Model->cache_directory_entry(
+                              {
+                               uid => 'bshakhsheer',
+                               domain => 'uchicago.edu',
+                               dirtype => 'LDAP',
+                               cn => 'Baddr Ahed Shakhsheer',
+                               givenName => 'Baddr',
+                               sn => 'Shakhsheer',
+                               password => undef,
+                               mail => 'bshakhsheer@uchicago.edu',
+                               department => undef,
+                              }
+                             );
+
+print Dumper($Model->query_directory_cache({uid => 'bshakhsheer'}));
+
+print Dumper($Model->months_hit());

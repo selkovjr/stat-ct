@@ -1,0 +1,39 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin <% $source %> -->
+             <p></p>
+% if ( $role eq 'trainee' ) {
+             <p>
+               <a href="https://www.oplog.org/sso/index.htm">SSO Operative Data Collection System</a>
+             </p>
+             <p>
+               <a href="https://www.acgme.org/residentdatacollection">ACGME Resident Case Log System</a>
+             </p>
+% }
+
+% if ( $role eq 'attending' ) {
+            <p>
+              <a href="http://www.facs.org/members/pbls.html">ACS Practice-Based Learning</a>
+            </p>
+% }
+            <!-- end <% $source %> -->
+<%init>
+my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/links.html,v 2.1 2009-02-20 14:51:32 selkovjr Exp $);
+my $role = $User->role;
+</%init>
+<%method title>STAT Links</%method>
+<%method page_title>Links</%method>
+<%method menu_handle>Links</%method>
+<%method file_info> <% Util::print_revision(q$Id: links.html,v 2.1 2009-02-20 14:51:32 selkovjr Exp $) %> </%method>

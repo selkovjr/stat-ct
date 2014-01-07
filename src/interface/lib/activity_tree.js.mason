@@ -1,0 +1,244 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin <% $source %> -->
+    <script type="text/javascript">
+/*jslint white: true, browser: true, safe: true, onevar: true, undef: true, nomen: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, newcap: true, immed: true, strict: true, indent: 2 */
+
+/*global USETEXTLINKS: true, STARTALLOPEN: true, USEFRAMES: true, USEICONS: true, WRAPTEXT: true, PRESERVESTATE: true, HIGHLIGHT: true, ICONPATH: true, parent: false, lb: true, rating_np: true, reasons: true, reasonText: true, node: true, foldersTree: true, required: true, gFld: false */
+
+// Environment variables are usually set at the top of this file.
+USETEXTLINKS = 1;
+STARTALLOPEN = <% $startAllOpen %>;
+USEFRAMES = 0;
+USEICONS = 0;
+WRAPTEXT = 0;
+PRESERVESTATE = <% $preserveState %>;
+HIGHLIGHT = 0;
+ICONPATH = 'lib/icons/';
+<% join("\n", @JSOUT) %>
+    </script>
+    <!-- end <% $source %> -->
+<%args>
+  $procedure => undef
+</%args>
+<%init>
+my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/lib/activity_tree.js.mason,v 2.24 2013/06/24 08:34:18 stat Exp $);
+
+my $role = $User->role;
+my $uid = $User->uid;
+
+my $query;
+
+use Sub::Recursive;
+
+my $startAllOpen = $r->header_in('User-Agent') =~ /msie|microsoft/i ? 1 : 0;
+# my $preserveState = $r->header_in('User-Agent') =~ /msie|microsoft/i ? 0 : 1;
+my $preserveState = 0;
+
+my $head_category;
+my $overall_category;
+$head_category = 'General Capabilities';
+$overall_category = 'Overall Case Assessment';
+
+my @JSOUT;
+push @JSOUT, q(
+var lb,);
+
+##################################################################################################
+# fill the ratings
+my %ratingSymbol = $Model->rating_symbol_hash;
+my %ratingTitle = $Model->rating_desc_hash;
+
+my %lobmysGnitar = reverse %ratingSymbol;
+push @JSOUT, qq(  rating_np = '$lobmysGnitar{NP}',);
+
+##################################################################################################
+# fill the reasons for Non-Participatory
+my @reasons = $Model->np_codes;
+my %np_desc = $Model->np_description_hash;
+push @JSOUT, "  reasons = [" . join(', ', map {"\"$_\""} @reasons) . "],
+  reasonText = {";
+foreach my $k ( @reasons ) {
+  push @JSOUT, qq(    $k: "$np_desc{$k}",);
+}
+chop($JSOUT[-1]); # remove the last comma
+push @JSOUT, '  },';
+
+##################################################################################################
+# begin the JS output for the tree
+push @JSOUT, qq(  node = {},
+  required = [];
+
+foldersTree = gFld("");
+foldersTree.xID = "root";);
+
+
+##################################################################################################
+# Traverse all nodes
+
+###################################### S U B R O U T I N E   S E C T I O N #######################################
+my $level = 1;
+my $traverse = recursive {
+  my ($parent, $ratings, $useNP, $addSuffix, $addPrefix) = @_;
+  undef $addSuffix unless $role eq 'trainee';
+
+  my $id;
+
+  $level++;
+
+  foreach my $node ( $Model->children_of($parent, extra_data => 'yes, please', user => $uid) ) {
+    my %node = $node->get_columns;
+
+    $node{label} =~ s/\"/\\"/g;              #" <- this quotation mark makes font-lock happy
+
+    my $prefix;
+    if ( $addPrefix ) {
+      $prefix = $m->scomp(
+        "ratings_button_group.js.mason",
+        nodeID => $node{id},
+        ratings => $ratings,
+        label => \%ratingSymbol,
+        title => \%ratingTitle,
+        useNP => $useNP,
+        reasonOrder => \@reasons,
+        reasonText => \%np_desc,
+        isOptional => $node{opt},
+        level => $level,
+      );
+    }
+    else {
+      $prefix = '';
+    }
+
+    my $htLabel = $node{label};
+    if ( $node{opt} or $node{required} ) {
+      $htLabel = qq(<span class=\\"opt\\">$node{label}<\\/span>) if $node{opt};
+      $htLabel = qq(<span class=\\"mand\\">$node{label}<\\/span>) if $node{required};
+      $htLabel = qq(<span class=\\"omand\\">$node{label}<\\/span>) if $node{opt} and $node{required};
+    }
+
+    my $nonleaf =  $Model->nonleaf($node{id});
+    my $js_tree_insert = $nonleaf ?
+      qq[insFld(node[$parent], gFld("$htLabel", "javascript:STAT.toggleText(node[$node{id}])"))] :
+      qq[insDoc(node[$parent], gLnk("S", "$htLabel", "javascript:op($node{id})"))]; # insDoc() and insFld are identical;
+                                                                                      # the difference is between gFld() and gLnk()
+    push @JSOUT, qq(
+lb = "$node{label}";
+node[$node{id}] = $js_tree_insert;
+node[$node{id}].prependHTML = "$prefix";
+node[$node{id}].xID = "$node{id}";
+node[$node{id}].label = lb;) . ($role eq 'trainee' and $node{pearl_count} ? qq(
+node[$node{id}].hasPearls = true;) : "") . ($role eq 'trainee' and $node{pearl_count_in_children} ? qq(
+node[$node{id}].containsPearls = true;) : "");
+
+    if ( $node{opt} ) {
+      push @JSOUT, qq(node[$node{id}].opt = true;
+node[$node{id}].rating = -1;
+node[$node{id}].ratingSymbol = 'NP');
+    }
+
+    $REC->($node{id}, $ratings, $useNP, $addSuffix, $addPrefix) if $nonleaf;
+
+    if ( $node{required} ) {
+      push @JSOUT, qq(        required[$node{id}] = "$node{label}");
+    }
+  }
+  $level--;
+};
+
+##################################################################################################
+# Traverse all nodes in $head_category
+
+my $category_id = $Model->id_of($head_category);
+
+push @JSOUT, qq(
+lb = "$head_category";
+node[$category_id] = insFld(foldersTree, gFld("<b>"+lb+"<\\/b>", "javascript:STAT.toggleText(node[$category_id])"));
+node[$category_id].xID = "$category_id";
+node[$category_id].label = lb;);
+$traverse->(
+             $category_id,
+             [$Model->range_of_ratings_for(subtree => $head_category, role => $role)],
+             undef,  # no NP buttons
+             undef,  # no suffix
+             1       # prefix
+           );
+
+##################################################################################################
+# Traverse all nodes starting with $startNode.
+
+# find the start node
+my ( $startNode, $startNodeLabel ) = split ':', $procedure;
+$startNodeLabel =~ s/\+/ /g;
+
+my $useNP;
+
+my $components = [$Model->components_for(subtree => $startNodeLabel)];
+
+##################################################################################################
+# Insert the transition/decision points grid
+
+my $prefix = $m->scomp(
+                "ferguson_ptd.mason",
+		procedure => $startNodeLabel,
+                components => $components,
+                role => $role
+               );
+
+push @JSOUT, qq(
+tdFld = insFld(foldersTree, gFld("<b>Component performance / Transition and Decision points<\\/b>", "javascript:op()"));
+tdFld.label = "Component performance / Transition and Decision points";
+tdFld.xID = "tdFld";
+node.tdGrid = insDoc(tdFld, gLnk("S", "", "javascript:op()"));
+node.tdGrid.prependHTML = '$prefix';
+node.tdGrid.xID = "td";);
+
+##################################################################################################
+# Insert the remarks area
+
+$prefix = '<td><textarea name=\"remark\" cols=\"80\" rows=\"2\"><\\/textarea><\\/td>';
+
+push @JSOUT, qq(
+remarksFld = insFld(foldersTree, gFld("<b>General remarks<\\/b>", "javascript:op()"));
+remarksFld.xID = "remarksFld";
+remarksFld.label = "General remarks";
+node.remarks = insDoc(remarksFld, gLnk("S", "", "javascript:op()"));
+node.remarks.prependHTML = "$prefix";
+node.remarks.xID = "remarks";);
+
+##################################################################################################
+# Add a branch for the overall grade
+$prefix = $m->scomp(
+                    "ratings_button_group.js.mason",
+                    nodeID => "overall",
+                    ratings => [$Model->range_of_ratings_for(subtree => $overall_category, role => $role)],
+                    label => \%ratingSymbol,
+                    title => \%ratingTitle,
+                    level => 2
+                   );
+
+ push @JSOUT, qq(
+lb = "$overall_category";
+overallFld = insFld(foldersTree, gFld("<b>"+lb+"<\\/b>", "javascript:op()"));
+overallFld.xID = "overallFld";
+overallFld.label = lb;
+node["overall"] = insDoc(overallFld, gLnk("S", "", "javascript:op()"));
+node["overall"].prependHTML = "$prefix";
+node["overall"].xID = "overall";);
+
+</%init>
+<%flags>
+  inherit => '/syshandler'
+</%flags>

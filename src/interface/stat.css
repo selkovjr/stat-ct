@@ -1,0 +1,383 @@
+/* $Id: stat.css,v 2.10 2013/11/16 18:16:37 stat Exp $ */
+
+p {
+  font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+}
+
+pre {
+  font-family: "Courier New", Courier, monospace;
+}
+
+.title
+{
+  font-variant: small-caps;
+  font-size: <% $font_size_big %>;
+}
+
+/* styles for WICK */
+.floater {
+position:absolute;
+z-index:2;
+bottom:0;
+right:0;
+display:none;
+padding:0;
+}
+
+.floater td {
+font-family: Gill, Helvetica, sans-serif;
+background-color:white;
+border:1px inset #979797;
+color:black;
+}
+
+.matchedSmartInputItem {
+padding: 5px 10px 1px 5px;
+margin:0;
+cursor:pointer;
+}
+
+.selectedSmartInputItem {
+color:white;
+background-color:#3875D7;
+}
+
+
+/* navigation bar */
+.navlink {
+  font-weight:bold;
+  font-size: <% $navlink_font_size %>;
+  line-height:16px;
+}
+
+.navbar {
+  margin-top:3px;
+  margin-right:10px;
+  margin-left:10px;
+  margin-bottom:4px;
+  font-size: <% $navlink_font_size %>;
+}
+
+/* -- no-underline links -- */
+.noLINE a:link { text-decoration : none ; color : #06538A ; }
+.noLINE a:visited { text-decoration : none ; color : #06538A ; }
+.noLINE a:hover { text-decoration : underline ; color : #06538A ; }
+.noLINE a:active { text-decoration : none ; color : #06538A ; }
+
+/* compact inline forms and buttons */
+.inlineform {
+  border: 1px;
+  display: inline;
+  margin: 0px;
+  padding: 0px;
+}
+
+.smallbutt {
+  margin-top: 1px;
+  margin-bottom: 1px;
+  margin-left: -1px;
+  margin-right: -1px;
+  padding: 0px;
+  font-size: 9pt;
+}
+
+.compacttd {
+  padding-left: 1em;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.compacttdright {
+  padding-left: 1em;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.compacttdcenter {
+  padding-left: 1em;
+  white-space: nowrap;
+  text-align: center;
+}
+
+
+/* front-page overlay */
+
+.inset-container {
+  background-color: #ECEFFB;
+  border: 1px solid #9EA8C6;
+  border-radius: 3px;
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.25);
+  font: 14px/1.4 'PT Sans','DejaVu Sans','Bitstream Vera Sans',Verdana,sans-serif;
+}
+
+.inset-container .inset-header {
+  background-color: #B6BFDA;
+  color: #30418C;
+  font-size: 120%;
+  font-weight: bold;
+  padding: 0.2em 0.5em 0.3em;
+  border-radius: 2px 2px 0 0;
+}
+
+.inset-container .inset-footer {
+  background-color: #DFE3F5;
+  padding: 0.4em 0.6em 0.5em;
+  border-radius: 0 0 2px 2px;
+}
+
+.inset-container .rating-symbol {
+  font-weight: bold;
+}
+
+.inset-container .rating-desc {
+  white-space: nowrap;
+}
+
+.inset-container td {
+  vertical-align: top;
+  padding: 3px;
+}
+
+.yui3-overlay-content td {
+  padding: 4px;
+}
+
+.yui3-overlay-content {
+  background-color: #ECEFFB;
+  border: 1px solid #9EA8C6;
+  border-radius: 3px;
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.25);
+  font: 14px/1.4 'PT Sans','DejaVu Sans','Bitstream Vera Sans',Verdana,sans-serif;
+}
+
+.yui3-overlay-content .yui3-widget-hd {
+  background-color: #B6BFDA;
+  color: #30418C;
+  font-size: 120%;
+  font-weight: bold;
+  padding: 0.2em 0.5em 0.3em;
+  border-radius: 2px 2px 0 0;
+}
+
+.yui3-overlay-content .yui3-widget-ft {
+  background-color: #DFE3F5;
+  padding: 0.4em 0.6em 0.5em;
+  border-radius: 0 0 2px 2px;
+}
+
+.yui3-overlay-content .rating-symbol {
+  font-weight: bold;
+}
+
+.yui3-overlay-content td {
+  padding: 4px;
+}
+
+/* styles for the tree */
+span.TreeviewSpanArea A {
+  font-size: <% $font_size %>;
+  font-family: verdana, helvetica, sans-serif;
+  text-decoration: none;
+  color: black;
+  /* background-color: white; */
+}
+
+span.TreeviewSpanArea A:hover {
+  color: #820082;
+  background-color: white
+}
+
+span.pearl {
+  margin-left: 0.25em;
+  background-position: 0 60%;
+  background-repeat: no-repeat;
+  background-image: url("lib/icons/pearl15p.png");
+}
+
+span.blackpearl {
+  margin-left: 0.25em;
+  background-position: 0 60%;
+  background-repeat: no-repeat;
+  background-image: url("lib/icons/pearl-dark15p.png");
+}
+
+span.opt {
+  color: #888;
+}
+
+span.mand {
+  text-decoration: underline;
+}
+
+span.omand {
+  text-decoration: underline;
+  color: #888;
+}
+
+span.depressed {
+  border-style: inset;
+  border-width: 1px;
+  border-color: #CCCCCC;
+  color: white;
+  background-color: #404040;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  padding: 1px 4px 1px 4px;
+  line-height: 1.5em;
+}
+
+span.raised {
+  border-style: outset;
+  border-width: 1px;
+  border-color: #CCCCCC;
+  color: black;
+  background-color: #d0d0d0;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  padding: 1px 4px 1px 4px;
+  line-height: 1.5em;
+}
+
+span.example {
+  border-style: outset;
+  border-width: 1px;
+  border-color: #CCCCCC;
+  color: black;
+  background-color: #d0d0d0;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  padding: 1px 4px 1px 4px;
+  line-height: 1.5em;
+}
+
+span.q {
+  cursor: <% $cursor %>;
+}
+
+span.raised.l1 {
+  /* span buttons should not occur at this level */
+  /* background-color: #d0d0d0; */
+  background-color: #fafafa;
+}
+
+span.raised.l2 {
+  /* background-color: #dcdcdc; */
+  background-color: #ececec;
+}
+
+span.raised.l3 {
+  /* background-color: #ececec; */
+  background-color: #dcdcdc;
+}
+
+span.raised.l4 {
+  /* background-color: #fafafa; */
+  background-color: #cacaca;
+}
+
+span.depressed:hover {
+  cursor: <% $cursor %>;
+  color: white;
+  background-color: #404040;
+}
+
+span.raised:hover {
+  cursor: <% $cursor %>;
+  color: inherit;
+  background-color: #FFFF00;
+}
+
+/* rest of the document */
+body {<% $behavior %>
+  color: black;
+  background-image: url(lib/graphics/background.jpg);
+  background-repeat: repeat-y;
+}
+
+td {
+  font-size: <% $font_size %>;
+  font-family: verdana, helvetica, sans-serif;
+}
+
+.ferguson_components tr {
+  background-color: #eee;
+}
+
+.ferguson_components .odd {
+  background-color: #ddd;
+}
+
+.ferguson_components th {
+  white-space: nowrap;
+  font-weight: normal;
+  font-size: 80%;
+  background-color: #888;
+  color: white;
+}
+
+.ferguson_components td {
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+.ferguson_components .suggestion-collector {
+  width: 100%;
+  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+  filter: alpha(opacity=50);
+  -moz-opacity: 0.6;
+  -khtml-opacity: 0.6;
+  opacity: 0.6;
+}
+
+/* styles for Text::Diff::HTML */
+.file .fileheader, .file .hunkheader {color: #888; }
+.file .hunk .ctx { background: #eee;}
+.file .hunk ins { background: #dfd; text-decoration: none; /*display: block;*/ }
+.file .hunk del { background: #fdd; text-decoration: none; /*display: block;*/ }
+
+/* for YUI TabView */
+.yui3-skin-sam .yui3-tabview-panel {
+  background: none repeat scroll 0 0 #D0D0D0 !important;
+}
+
+.yui3-overlay-content .yui3-widget-hd {
+  background-color: #B6BFDA;  
+  color: #30418C;
+  font-size: 100%;
+  font-weight: bold;
+  padding: 0.2em 0.5em 0.3em;
+  border-radius: 2px 2px 0 0;
+}
+.yui3-overlay-content .yui3-widget-bd td {
+  font-size: 8pt;
+  vertical-align: top;
+}
+
+.table-group-header {
+  padding-top: 12px !important;
+  padding-left: 20px !important;
+  font-weight: bold;
+}
+<%init>
+  $r->content_type('text/css');
+
+  # For some reason IE seems to make fonts look bigger.
+  my $font_size = "10pt";
+  my $font_size_big = "11pt";
+  my $navlink_font_size = "9pt";
+  $font_size = "9pt" if $r->header_in("User-Agent") =~ m/MSIE/;
+  $font_size_big = "10pt" if $r->header_in("User-Agent") =~ m/MSIE/;
+  $navlink_font_size = "8pt" if $r->header_in("User-Agent") =~ m/MSIE/;
+
+  my $cursor = "pointer";
+  $cursor = "hand" if $r->header_in("User-Agent") =~ m/MSIE/;
+  my $behavior = "";
+  $behavior = qq(\n  behavior: url("csshover.htc");) if $r->header_in("User-Agent") =~ m/MSIE/;
+</%init>
+
+<%flags>
+  inherit => undef
+</%flags>

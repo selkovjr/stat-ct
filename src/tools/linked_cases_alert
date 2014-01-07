@@ -1,0 +1,272 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use DBI;
+use Net::LDAPS;
+use lib qw/config/;
+use STAT;
+
+
+sub ldap_entry {
+  my ($uid) = @_;
+
+  # ldapsearch -H ldaps://ldap.uchicago.edu -D uid=selkovjr,ou=people,dc=uchicago,dc=edu -x -W -b ou=people,dc=uchicago,dc=edu uid=davel
+  my $dir;
+  if ( $STAT::ldap_ssl ) {
+    $dir = Net::LDAPS->new("$STAT::ldap_host:$STAT::ldap_port") or die "$@";
+  }
+  else {
+    $dir = Net::LDAP->new("$STAT::ldap_host:$STAT::ldap_port") or die "$@";
+  }
+
+  my $res = $dir->bind;
+  $res->code and die $res->error;
+
+  $res = $dir->search (
+                       base => "$STAT::ldap_base",
+                       filter => "(uid=$uid)",
+                       attrs  => ['sn', 'cn']
+                      );
+  $dir->unbind;
+
+
+  $res->code and die $res->error;
+  if ( $res->entries ) {
+    my $entry = $res->entry(0);
+    return {uid => $uid, sn => $entry->get_value('sn'), cn => $entry->get_value('cn')};
+  }
+  else {
+    return {uid => $uid, sn => "[$uid]", cn => "[$uid]"}
+  }
+}
+
+
+my $test = grep /test/, @ARGV;
+
+
+my $dbname = "stat";
+my $dbuser = "selkovjr";
+my $Dbh = DBI->connect(
+		    "dbi:Pg:dbname=$STAT::stat_db;host=$STAT::pg_host;port=$STAT::pg_port",
+		    $STAT::pg_user,
+		    "",
+		    {AutoCommit => 0, RaiseError => 1}
+		   );
+
+die "DBI: Can't connect to $dbname as $dbuser -- $DBI::errstr" if $DBI::state;
+
+my %reciprocal = (
+                  attending => 'trainee',
+                  trainee => 'attending'
+                 );
+
+my %total_cases = (
+                   attending => 0,
+                   trainee => 0
+                  );
+
+my %total_cases_pending = (
+                   attending => 0,
+                   trainee => 0
+                  );
+
+my %total_persons = (
+                     attending => 0,
+                     trainee => 0
+                    );
+my %age;
+my @ages;
+
+foreach my $role ( qw/attending trainee/ ) {
+  # get the number of assessments in the last 24 hours
+  my $query = qq(
+SELECT count(*)
+  FROM "case"
+ WHERE "timestamp" > current_date - interval '24 h'
+   AND "assessor" = "$role"
+);
+  ( $total_cases{$role} ) = $Dbh->selectrow_array($query);
+  $Dbh->err and die $Dbh->errstr . "in query: [$query]";
+
+  # get the list of persons in this role
+  $query = qq(SELECT DISTINCT $role FROM "case");
+  my $persons = $Dbh->selectcol_arrayref($query);
+  $Dbh->err and die $Dbh->errstr . "in query: [$query]";
+
+  foreach my $person ( @$persons ) {
+    next if $person =~ /mkfergus|mgarfink|jaycock|kathleen.romanowski/;
+    my $pile;
+    my $query = qq(
+SELECT DISTINCT "$reciprocal{$role}", "date", 'now'::date - "date", "case_no", "activity", "label"
+  FROM "case", "activity"
+ WHERE "case".activity = "activity".id
+   AND "$role" = '$person'
+   AND "assessor" = "$reciprocal{$role}"
+   AND ("date", "case_no", "activity") NOT IN (
+         SELECT DISTINCT "date", "case_no", "activity"
+           FROM "case"
+          WHERE "$role" = '$person'
+            AND "assessor" = '$person'
+       )
+   AND ("$reciprocal{$role}", "date", "case_no", "activity") NOT IN (
+         SELECT "$reciprocal{$role}", "date", "case_no", "activity"
+           FROM "case"
+          WHERE "id" IN (
+                  SELECT "case"
+                    FROM "case_to_ignore"
+                   WHERE "assessor" = '$person'
+                )
+       )
+   AND "date" > '2006-09-01'
+ ORDER BY "date", "case_no";
+);
+
+    $pile = $Dbh->selectall_arrayref($query);
+    $Dbh->err and die $Dbh->errstr . "in query: [$query]";
+
+    # scan the result to determine the number of teammates
+    my %teammate;
+    foreach my $case ( @$pile ) {
+      $teammate{$case->[0]}++;
+    }
+
+    # replace counts with full names
+    foreach my $uid ( keys %teammate ) {
+      my $ldap = ldap_entry($uid);
+      $teammate{$uid} = $ldap->{cn};
+    }
+
+    # grab matching case IDs
+    foreach my $case ( @$pile ) {
+      my ($uid, $date, $age, $case_no, $activity, $label) = @$case;
+      my $query = qq(
+SELECT "id"
+  FROM "case"
+ WHERE "$reciprocal{$role}" = '$uid'
+   AND "date" = '$date'
+   AND "case_no" = '$case_no'
+   AND "activity" = '$activity'
+);
+      my $res = $Dbh->selectall_arrayref($query);
+      $Dbh->err and die $Dbh->errstr . "in query: [$query]";
+      my $ids = join(",", map {$_->[0]} @$res);
+      push @$case, $ids;
+    }
+
+    my $plural_cases = @$pile > 1;
+    my $plural_trainees = keys %teammate > 1;
+
+    if ( @$pile > 0 ) {
+      foreach my $case ( @$pile ) {
+        my ($uid, $date, $age, $case_no, $activity, $label) = @$case;
+        $age{$role}->{$person}->{$age}++;
+        push @ages, $age;
+      }
+      $total_persons{$role}++;
+      $total_cases_pending{$role} += @$pile;
+
+      # my $name = ldap_entry($person)->{sn};
+      my $message = "You have " . ( $plural_cases ? @$pile . ' cases ' : 'one case ' ) . "in the STAT system waiting for your assessment since $pile->[0]->[1].\n";
+
+
+      $message .= qq(
+You can assess or reject ) . ( $plural_cases ? 'these cases' : 'this case') . qq( at
+
+  https://cci.uchicago.edu/stat
+
+If you need help, please write to stat-issues\@issue-tracker.your.institution, or reply to this message.
+);
+      my %mail = (
+                  To => "$person\@your.institution", # attending or trainee to be alerted of pending assessments by the teammate
+		  From => 'stat-alert@your.institution', # the address they will recognize as a valid source
+		  'Reply-to' => 'stat-issues@issue-tracker.your.institution', # if you use an issue tracking system (e.g., RT),
+                                                                              # it may be a good receptacle for their requests
+                  Subject => ($plural_cases ? scalar @$pile . ' Cases are ' : 'One case is ') . 'awaiting your assessment',
+                  Message => $message,
+                 );
+
+      if ( $test ) {
+        use Data::Dumper;
+        print Dumper(\%mail);
+      }
+      else {
+	require Mail::Sendmail;
+        sendmail(%mail) or die $Mail::Sendmail::error;
+      }
+    }
+  }
+}
+
+my @output;
+my %inactive;
+foreach my $role ( qw/trainee attending/ ) {
+  my $symbol = $role eq 'trainee' ? 'T00' : 'A00';
+  foreach my $person ( sort {scalar keys %{$age{$role}->{$a}} <=> scalar keys %{$age{$role}->{$b}}} keys %{$age{$role}} ) {
+    $symbol++;
+    my @ages = sort {$a <=> $b} keys %{$age{$role}->{$person}};
+    if ( $ages[0] > 15 ) {
+      $inactive{$role}++;
+      next; # $person
+    }
+    my $oldest;
+    for my $i (0 .. $#ages) {
+      $oldest = $ages[$i];
+      last if $oldest > 15;
+    }
+    my $graph = "  $symbol ";
+#    foreach my $i (0 .. $oldest) {
+    foreach my $i (0 .. 15) {
+      if ( $age{$role}->{$person}->{$i} ) {
+        $graph .= $age{$role}->{$person}->{$i};
+      }
+      else {
+        $graph .= '.';
+      }
+    }
+    push @output, $graph;
+  }
+  push @output, '';
+}
+
+# send summary to Jonathan
+
+my $total = $total_cases_pending{trainee} + $total_cases_pending{attending};
+my $total24 = $total_cases{trainee} + $total_cases{attending};
+my $message = qq(
+Assessments submitted in the last 24 hours:
+
+  Total:     $total24
+  Trainee:   $total_cases{trainee}
+  Attending: $total_cases{attending}
+
+Cases in queue:
+
+  Total:        $total
+  By trainee:   $total_cases_pending{trainee} \($total_persons{trainee} trainees);
+$message .= "; $inactive{trainee} inactive)" if $inactive{trainee};
+$message .= qq(
+  By attending: $total_cases_pending{attending} \($total_persons{attending} attendings);
+$message .= "; $inactive{attending} inactive)" if $inactive{attending};
+
+$message .= "\n  In the past two weeks:\n" . join("\n", '', @output, '');
+
+my %mail = (
+            To => 'program_manager@your.institution,other_important_people@your.institution', # people who want to receive summaries
+            From => 'stat-alert@your.institution', # the address they will recognize as a valid source
+            'Reply-to' => 'stat-issues@issue-tracker.your.institution', # if you use an issue tracking system (e.g., RT),
+                                                                        # it may be a good receptacle for their requests
+            Subject => 'Daily STAT report',
+            Message => $message,
+           );
+
+if ( $test ) {
+  use Data::Dumper;
+  print Dumper(\%mail);
+}
+else {
+  sendmail(%mail) or die $Mail::Sendmail::error;
+}
+
+$Dbh->disconnect;
+

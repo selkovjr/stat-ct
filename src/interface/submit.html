@@ -1,0 +1,239 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<%args>
+  $case_no => undef
+  $case_id => undef
+  $date
+  $teammate => undef
+  $procedure
+  $remark => undef
+  $role => undef
+</%args>
+<%init>
+  my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/submit.html,v 2.11 2013/11/16 23:46:39 stat Exp $);
+  my $user = $User->uid;
+  my @paired;
+
+  # check arguments
+  if ( $STAT::application =~ /^hipec/i ) {
+    die "required argument 'case_id' not defined" unless $case_id;
+  }
+  else {
+    die "required argument 'teammate' not defined" unless $teammate;
+    $role = $User->role; # it is defined in args for HIPEC use
+  }
+
+  my ($procID, $procName) = split ':', $procedure;
+  $procName =~ s/\+/ /g;
+
+  my ($attending, $trainee, $assessor);
+
+  my ($uid, $name, $department) = split ':', $teammate;
+  if ( $role eq 'attending' ) {
+    $attending = $assessor = $User->uid;
+    $trainee = $uid;
+  }
+  elsif ( $role eq 'trainee' ) {
+    $trainee = $assessor = $User->uid;
+    $attending = $uid;
+  }
+ 
+
+  #***************************************************************************
+  # register the case
+  my $case;
+  $case_no ||= 1;
+  @paired = Util::find_paired($Dbh, $User->uid, $date, $case_no, $procID, $trainee, $attending);
+  $case = $case_no; # integer type
+  my $query = qq(\
+INSERT INTO "case" (date,    timestamp, case_no,  activity, trainee,     attending,   assessor)
+  VALUES           ('$date', 'now',     $case, $procID,  '$trainee', '$attending', '$assessor')
+);
+  $Dbh->do($query);
+  die $Dbh->errstr . "in query: $query" if $Dbh->err;
+
+  my $caseno_subquery;
+  $caseno_subquery = qq((
+   SELECT max(case_no)
+     FROM "case"
+     WHERE activity = $procID
+     AND trainee = '$trainee'
+     AND attending = '$attending'
+     AND assessor = '$assessor'
+     AND date = '$date'
+  )
+);
+  $query = qq(
+SELECT id
+  FROM "case"
+  WHERE case_no = $caseno_subquery
+    AND activity = $procID
+    AND trainee = '$trainee'
+    AND attending = '$attending'
+    AND assessor = '$assessor'
+    AND date = '$date'
+);
+
+  my ( $caseID ) = $Dbh->selectrow_array($query);
+  die $Dbh->errstr if $Dbh->err;
+
+  #****************************************************************************
+  # write down the ratings
+  my $id_of_overall = Util::id_of_overall($Dbh);
+
+  my $query_string = qq(
+INSERT INTO eval ("case", activity, assessment, np_reason)
+VALUES (?, ?, ?, ?)
+);
+  my $insert_q = $Dbh->prepare($query_string);
+  foreach ( grep(/^rating_[0-9]/, keys %ARGS) ) {
+    (undef, my $activity) = split /_/;
+    my $rating = $ARGS{"rating_$activity"};
+    next unless $rating and $rating gt "";
+    my $npReason = $ARGS{"rating_${activity}_np"} || undef;
+    if ( defined ref($npReason) and ref($npReason) eq 'ARRAY' ) {
+      $npReason = shift @$npReason; # this fixes the problem caused by the old Microsoft browsers inserting a duplicate input into the tree
+    }
+    $insert_q->execute($caseID, $activity, $rating, $npReason);
+    die $Dbh->errstr . "in query: $query_string; while inserting ($caseID, $activity, $rating, $npReason)" if $Dbh->err;
+  }
+
+  if ( exists $ARGS{rating_overall} ) {
+    $insert_q->execute($caseID, $id_of_overall, $ARGS{rating_overall}, undef);
+  die $Dbh->errstr . "in query: $query_string; while inserting ($caseID, 0, $ARGS{rating_overall}, undef)" if $Dbh->err;
+  }
+
+  # Ferguson component ratings
+  $query_string = qq(
+INSERT INTO performance ("case", procedure, seq, level, tp, dp, tp_np_reason, dp_np_reason)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+);
+  $insert_q = $Dbh->prepare($query_string);
+  foreach ( grep(/^performance_rating_[0-9]/, sort keys %ARGS) ) {
+    (undef, undef, my $seq) = split /_/;
+
+    my $level = $ARGS{"performance_rating_$seq"};
+    my $tp = $ARGS{"tp_rating_$seq"};
+    my $dp = $ARGS{"dp_rating_$seq"};
+
+    next unless
+      (
+        $level and
+        $level gt "" and
+        $level > -2
+      ) or
+      (
+        $tp and
+        $tp gt "" and
+        $tp > -2
+      ) or
+      (
+        $dp and
+        $dp gt "" and
+        $dp > -2
+      );
+
+    # Get rid of empty strings
+    $level ||= undef;
+    $tp ||= undef;
+    $dp ||= undef;
+
+    my $tpNpReason = $ARGS{"tp_rating_${seq}_np"} || undef;
+    if ( defined ref($tpNpReason) and ref($tpNpReason) eq 'ARRAY' ) {
+      $tpNpReason = shift @$tpNpReason; # this fixes the problem caused by the old Microsoft browsers inserting a duplicate input into the tree
+    }
+    my $dpNpReason = $ARGS{"dp_rating_${seq}_np"} || undef;
+    if ( defined ref($dpNpReason) and ref($dpNpReason) eq 'ARRAY' ) {
+      $dpNpReason = shift @$dpNpReason; # this fixes the problem caused by the old Microsoft browsers inserting a duplicate input into the tree
+    }
+
+    $insert_q->execute($caseID, $procName, $seq, $level, $tp, $dp, $tpNpReason, $dpNpReason);
+
+    die $Dbh->errstr . "in query: $query_string; while inserting ($caseID, $procName, $seq, $level, $tp, $dp, $tpNpReason, $dpNpReason)" if $Dbh->err;
+  }
+
+  # Ferguson component suggestions
+  $query_string = qq(
+INSERT INTO component_suggestion ("user", procedure, seq, text) VALUES (?, ?, ?, ?);
+);
+  $insert_q = $Dbh->prepare($query_string);
+  foreach ( grep(/^component_suggestion_[0-9]/, sort keys %ARGS) ) {
+    (undef, undef, my $seq) = split /_/;
+
+    my $text = $ARGS{"component_suggestion_$seq"};
+    next if $text =~ /^\s*$/; # the form sets the field to '' if it does not change from default
+    $text = Util::trim_blanks(Util::pg_escape_apostrophe($text));
+
+    $insert_q->execute($user, $procName, $seq, $text);
+
+    die $Dbh->errstr . "in query: $query_string; while inserting ($user, $procName, $seq, $text)" if $Dbh->err;
+  }
+
+  # Ferguson transition point suggestions
+  $query_string = qq(
+INSERT INTO tp_suggestion ("user", procedure, seq, text) VALUES (?, ?, ?, ?);
+);
+  $insert_q = $Dbh->prepare($query_string);
+  foreach ( grep(/^tp_suggestion_[0-9]/, sort keys %ARGS) ) {
+    (undef, undef, my $seq) = split /_/;
+
+    my $text = $ARGS{"tp_suggestion_$seq"};
+    next if $text =~ /^\s*$/; # the form sets the field to '' if it does not change from default
+    $text = Util::trim_blanks(Util::pg_escape_apostrophe($text));
+
+    $insert_q->execute($user, $procName, $seq, $text);
+
+    die $Dbh->errstr . "in query: $query_string; while inserting ($user, $procName, $seq, $text)" if $Dbh->err;
+  }
+
+  # Ferguson decision point suggestions
+  $query_string = qq(
+INSERT INTO dp_suggestion ("user", procedure, seq, text) VALUES (?, ?, ?, ?);
+);
+  $insert_q = $Dbh->prepare($query_string);
+  foreach ( grep(/^dp_suggestion_[0-9]/, sort keys %ARGS) ) {
+    (undef, undef, my $seq) = split /_/;
+
+    my $text = $ARGS{"dp_suggestion_$seq"};
+    next if $text =~ /^\s*$/; # the form sets the field to '' if it does not change from default
+    $text = Util::trim_blanks(Util::pg_escape_apostrophe($text));
+
+    $insert_q->execute($user, $procName, $seq, $text);
+
+    die $Dbh->errstr . "in query: $query_string; while inserting ($user, $procName, $seq, $text)" if $Dbh->err;
+  }
+
+  #****************************************************************************
+  # enter remarks
+  if ( $remark ) {
+    $remark = Util::trim_blanks(Util::pg_escape_apostrophe($remark));
+    if ( $remark gt '' and not $remark =~ /^\s+$/ ) {
+      $query_string = qq(INSERT INTO "remark" ("case", "text") VALUES ($caseID, ?));
+      my $query = $Dbh->prepare($query_string);
+      $query->execute($remark);
+      die $Dbh->errstr . "in query: $query; while inserting this remark: '$remark'" if $Dbh->err;
+    }
+  }
+
+  #****************************************************************************
+  # alert the teammate
+  if (  $Model->config("alerts") eq 'yes' ) {
+    Util::send_alert($User, $teammate, $caseID, $procName, $date, $role) unless @paired;
+  }
+
+  $Dbh->commit;
+
+  $m->comp( "lib/redirect.mason", path => "success.html", query => \%ARGS);
+</%init>

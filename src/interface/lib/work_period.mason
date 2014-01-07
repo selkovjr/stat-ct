@@ -1,0 +1,26 @@
+<%args>
+  $n
+  $oid
+  $in
+  $out => undef
+  $interval => undef
+  $err_in => undef
+  $err_out => undef
+  $debug => undef
+</%args>
+<tr bgcolor="<% $bgcolor %>">
+% if ( $debug ) {
+                  <td class="compacttd"> <% $oid %> </td>
+% }
+                  <td class="compacttd"> <input type="image" name="del_<% $oid %>" src="lib/icons/button-minus.png"> </td>
+                  <td class="compacttd"> <input type="text" style="background-color: <% $in_bgcolor %>; color: <% $in_color %>" name="in_<% $oid %>" value="<% $in %>" onkeypress="return submit_on_enter(event, this.form)"> </td>
+                  <td class="compacttd"> <input type="text" style="background-color: <% $out_bgcolor %>; color: <% $out_color %>" name="out_<% $oid %>" value="<% $out %>" onkeypress="return submit_on_enter(event, this.form)"> </td>
+                  <td class="compacttdright"> <span style="margin-right: 1em"> <% $interval %> </span> </td>
+                </tr>
+<%init>
+  my $bgcolor = $n % 2 ? '#F0F0F0' : '#FEFEFE';
+  my $in_bgcolor = $err_in ? 'brown' : $bgcolor;
+  my $in_color = $err_in ? 'white' : 'black';
+  my $out_bgcolor = $err_out ? 'brown' : $bgcolor;
+  my $out_color = $err_out ? 'white' : 'black';
+</%init>

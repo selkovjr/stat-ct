@@ -1,0 +1,113 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin <% $source %> -->
+% if ( $role =~ /trainee|attending/ ) {
+%   if ( $role eq 'attending' ) {
+            <& assessments_by_trainee.mason &>
+%   } else {
+            <& assessments_by_attending.mason &>
+%   }
+            <a name="new_case_form"></a>
+            <form name="registerform" id="registerform" method="POST" action="verify_data.html" onsubmit="return preprocess()" autocomplete="off">
+              <fieldset>
+                <legend> <% $User->uid %> </legend>
+                <input type="hidden" name="procedure">
+                <input type="hidden" name="case_to_ignore" id="case_to_ignore" value="$case_to_ignore">
+                <input type="hidden" id="role" value="<% $User->role %>">
+                <table cellspacing="0" cellpadding="5">
+                  <tr>
+                    <td colspan="2">
+                      <font color="#8B3A3A">
+			<b>Please note</b>: Once you have entered your
+			assessment, a reminder referring to this date and case type will be sent to
+			your teammate, prompting him or her to enter a complementary assessment of
+			the same case.
+                        <br><br>
+                      </font>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td id="date-container" valign="top">
+                      <label for="date">Procedure ended:</label>
+                      <select name="date" id="date" style="vertical-align: middle">
+                        <& date_menu_options.mason, selected => $date &>
+                      </select>
+                    </td>
+                    <td id="attending-input-container" style="padding-left: 2em">
+                      <div class="autocomplete" title="Hit Tab or Enter to complete, Esc to cancel">
+                        <label for="name_or_id"><% ucfirst $reciprocal{$role} %>:</label>
+                        <input name="name_or_id" type="text" id="teammate" class="wickEnabled" value="<% $teammate %>">
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="2">
+                      <input type="submit" name="submit" value="Proceed >>">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td id="tree_menu_container" colspan="2">
+                      <!-- <% $source %>  insertion -->
+                      <& tree_menu.mason &>
+                      <!-- <% $source %>  continues -->
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="2">
+                      <input type="submit" name="submit" value="Proceed >>">
+                    </td>
+                  </tr>
+                </table>
+              </fieldset>
+            </form>
+% } else { # neither attending nor trainee
+            <p style="margin-top: 1em">Welcome <% $User->cn %>,</p>
+
+            <p>Your role (<em><% $User->role %></em>) does not allow
+            you to enter assessments. Please select other options in
+            the menu.</p>
+
+% }
+            <!-- end <% $source %> --> \
+<%args>
+  $date => undef
+  $teammate => undef
+  $case_to_ignore => undef
+</%args>
+<%init>
+  my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/lib/new_case.mason,v 2.8 2013/11/16 22:19:17 stat Exp $);
+
+  if ( $case_to_ignore ) {
+    my ($reason, $cases) = split ":", $case_to_ignore;
+    my $uid = $User->uid;
+    foreach my $case ( split ",", $cases ) {
+      my $query = qq(
+INSERT INTO case_to_ignore
+         ("assessor", "case", "reason")
+  VALUES ('$uid', $case, '$reason')
+);
+      $Dbh->do($query);
+      $Dbh->err and die $Dbh->errstr . "in query: [$query]";
+      $Dbh->commit;
+    }
+  }
+
+  my %reciprocal = (
+    trainee => 'attending',
+    attending => 'trainee',
+  );
+
+  my $role = $User->role;
+</%init>

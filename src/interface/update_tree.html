@@ -1,0 +1,317 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin <% $source %> -->
+            <& lib/alert.mason, message => $message &>
+            <% $body %>
+            <!-- end <% $source %> -->
+<%args>
+  $node => undef
+  $other_node => undef
+  $add => undef
+  $edit => undef
+  $cut => undef
+  $copy => undef
+  $reparent => undef
+  $paste => undef
+  $up => undef
+  $down => undef
+  $compare => undef
+  $commit => undef
+  $cancel => undef
+  $command => undef
+</%args>
+<%init>
+  use strict;
+  use warnings;
+
+  my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/update_tree.html,v 2.1 2009-02-20 14:51:32 selkovjr Exp $);
+  my $message;
+  my $body;
+
+  my $activity_table = Util::activity_table($Dbh);
+
+  # every action except 'compare' touches the database, so the tree must be copied
+  unless ( $compare or $commit ) {
+    unless ( Util::clone_exists($Dbh) ) {
+      my $query = q(SELECT * INTO "activity_clone" FROM "activity");
+      $Dbh->do($query);
+      die $Dbh->errstr if $Dbh->err;
+      $query = q(CREATE INDEX activity_clone_id_ix ON activity_clone USING btree (id));
+      $Dbh->do($query);
+      die $Dbh->errstr if $Dbh->err;
+      $query = q(CREATE INDEX activity_clone_parent_ix ON activity_clone USING btree (parent));
+      $Dbh->do($query);
+      die $Dbh->errstr if $Dbh->err;
+      $query = q(CREATE INDEX activity_clone_right_id_ix ON activity_clone USING btree (right_id));
+      $Dbh->do($query);
+      die $Dbh->errstr if $Dbh->err;
+      $query = q(CREATE INDEX activity_clone_left_id_ix ON activity_clone USING btree (left_id));
+      $Dbh->do($query);
+      die $Dbh->errstr if $Dbh->err;
+    }
+  }
+
+  # copy and cut operations will put the data in a buffer
+  if ( $copy or $cut or $reparent) {
+    if ( Util::copy_buffer_exists($Dbh) ) {
+      my $query = q(DROP TABLE "copy_buffer");
+      $Dbh->do($query);
+      die $Dbh->errstr if $Dbh->err;
+    }
+#     my $query = q(SELECT * INTO "copy_buffer" FROM "activity" LIMIT 0);
+#     $Dbh->do($query);
+#     die $Dbh->errstr if $Dbh->err;
+  }
+
+  #============================ A D D  /  E D I T =============================
+  if ( $add or $edit) {
+    $message = $add ? "adding to node[$node]" : "editing node[$node]";
+    my $lbl = Util::node_label_in_clone($Dbh, $node);
+    $message .= qq(, "$lbl");
+    $command = $add ? 'add' : 'edit';
+    my ($label, $opt, $required) = ('', 0, 0);
+
+    # determine whether this node is in the General category
+    my $general = Util::is_general($node, $Dbh, $activity_table);
+
+    # If editing, pass current values as defaults; if adding a node,
+    # passing same values (except for the lable) will have a meaning of
+    # inheriting the values from the parent
+    my $query = qq(SELECT required, opt, label FROM "$activity_table" WHERE id = $node);
+    ($required, $opt, $label) = $Dbh->selectrow_array($query);
+    die $Dbh->errstr if $Dbh->err;
+
+    $body = $m->scomp(
+      'lib/edit_node.mason',
+      node => $node,
+      required => $required,
+      optional => $opt,
+      label => $edit ? $label : '',
+      general => $general,
+      command => $command,
+      message => $message
+    );
+  }
+
+  # ============================================================================
+  elsif ( $copy or $cut ) {
+print STDERR ">>> copy or cut";
+    # copy the branch rooted at $node to copy_buffer
+    my $query = qq(
+SELECT t1.*
+  INTO copy_buffer
+  FROM "$activity_table" AS t1, "$activity_table" AS t2
+ WHERE t1.left_id BETWEEN t2.left_id AND t2.right_id
+   AND t2.id = $node
+);
+    print STDERR $query;
+    $Dbh->do($query);
+    die $Dbh->errstr if $Dbh->err;
+
+    # Replace link to parent with NULL. It will later be used to identify
+    # the top node for the branch in the buffer
+    $query = qq(UPDATE copy_buffer SET parent = NULL WHERE id = $node);
+    $Dbh->do($query);
+    die $Dbh->errstr if $Dbh->err;
+
+    if ( $cut ) {
+      # ---------------------------- C u t ------------------------------------
+      my $query = qq(SELECT delete_subtree($node));
+      my $res = $Dbh->do($query);
+      die $Dbh->errstr if $Dbh->err;
+      # -----------------------------------------------------------------------
+    }
+    else {
+      # --------------------------- C o p y -----------------------------------
+      $message = "Subtree copied to the paste buffer";
+      # if the subtree was copied, ids in the buffer must be changed
+      my $query = "SELECT id FROM copy_buffer ORDER BY id";
+      my $res = $Dbh->selectcol_arrayref($query);
+      die $Dbh->errstr if $Dbh->err;
+      foreach my $id ( @$res ) {
+        my $new_id = Util::next_available_id($Dbh);
+        $query = "UPDATE copy_buffer SET id = $new_id WHERE id = $id";
+        $Dbh->do($query);
+        die $Dbh->errstr if $Dbh->err;
+        $query = "UPDATE copy_buffer SET parent = $new_id WHERE parent IS NOT NULL AND parent = $id";
+        $Dbh->do($query);
+        die $Dbh->errstr if $Dbh->err;
+      }
+      # -----------------------------------------------------------------------
+    }
+    $Dbh->commit;
+    $m->comp( "lib/redirect.mason", path => "manage.html");
+  } # End Copy/Cut
+
+  elsif ( $paste or $up or $down or $reparent ) {
+    my $query;
+    if ( $paste ) {
+      $query = "SELECT append_buffer_to($node)";
+    }
+    elsif ( $reparent ) {
+      $query = "SELECT reparent($node)";
+    }
+    elsif ( $up ) {
+      $query = "SELECT move_to_the_left_of($other_node, $node)";
+    }
+    else { # Down
+      $query = "SELECT move_to_the_left_of($node, $other_node)";
+    }
+    $Dbh->do($query);
+    die $Dbh->errstr if $Dbh->err;
+    $Dbh->commit;
+    $m->comp( "lib/redirect.mason", path => "manage.html");
+  }
+
+  elsif ( $compare ) {
+    $message = "cloned activity tree vs. original";
+    my $clone = $m->scomp('lib/render_tree.mason', tree => 'activity_clone');
+    my $orig = $m->scomp('lib/render_tree.mason', tree => 'activity');
+
+    use Text::Diff qw(diff);
+    my $output = diff \$orig, \$clone, { STYLE => 'Text::Diff::HTML' };
+    $body = "<pre>\n$output</pre>\n";
+  }
+
+  elsif ( $commit ) {
+    # file the current version in the archive
+    my $query = q(
+SELECT "version", 
+       to_char("when", 'YYYY-MM-DD-HH24-MI'),
+       to_char("when", 'MM/DD/YYYY HH24:MI'),
+       "who"
+  FROM activity_change_log
+ WHERE version = (SELECT max(version) FROM activity_change_log)
+);
+    my ($version, $file_suff, $when, $who) = $Dbh->selectrow_array($query);
+    die $Dbh->errstr if $Dbh->err;
+    my $hdr = "# Version: $version\n# Modified by: $who\n# Date $when";
+    my $tree = $m->scomp('lib/render_tree.mason', tree => 'activity');
+    my $file_name = "activity_tree.$file_suff.$who";
+    mkdir $STAT::tree_archive unless -d $STAT::tree_archive;
+    open ARCHIVE, ">$STAT::tree_archive/$file_name" or die $!;
+    print ARCHIVE "$hdr\n$tree";
+    close ARCHIVE;
+
+    # update the tree
+    my $uid = $User->uid;
+    my @queries = (
+                   "DELETE FROM activity",
+                   "INSERT INTO activity SELECT * FROM activity_clone",
+                   "DROP TABLE activity_clone",
+                   qq(INSERT INTO activity_change_log ("when", "who") VALUES ('now', '$uid')),
+                   );
+    foreach my $q (@queries) {
+      $Dbh->do($q);
+      die $Dbh->errstr if $Dbh->err;
+    }
+    if ( Util::copy_buffer_exists($Dbh) ) {
+      my $query = "DROP TABLE copy_buffer";
+      $Dbh->do($query);
+      die $Dbh->errstr if $Dbh->err;
+    }
+    $Dbh->commit;
+    $message = "Submission succeeded. Old version filed as $file_name";
+  }
+
+  elsif ( $cancel ) {
+    my $changed = undef;
+    if ( Util::clone_exists($Dbh) ) {
+      my $query = "DROP TABLE activity_clone";
+      $Dbh->do($query);
+      die $Dbh->errstr if $Dbh->err;
+      $changed++;
+    }
+    if ( Util::copy_buffer_exists($Dbh) ) {
+      my $query = "DROP TABLE copy_buffer";
+      $Dbh->do($query);
+      die $Dbh->errstr if $Dbh->err;
+      $changed++;
+    }
+    $Dbh->commit if $changed;
+    $m->comp( "lib/redirect.mason", path => "manage.html");
+  }
+
+  #============================ A C T I O N ===============================
+  elsif ( $command ) {
+    if ( $command =~ /edit|add/ ) {
+      # get table attributes
+      my $query = qq(
+SELECT attname, pg_catalog.format_type(atttypid, atttypmod)
+  FROM pg_catalog.pg_attribute
+ WHERE attrelid IN (
+      SELECT oid
+        FROM pg_catalog.pg_class 
+       WHERE relname = '$activity_table'
+   )
+   AND attnum > 0
+   AND NOT attisdropped
+);
+      my %attrType;
+      my $res = $Dbh->selectall_arrayref($query) or die $Dbh->errstr;
+      foreach my $row ( @$res ) {
+        $attrType{$row->[0]} = $row->[1]; 
+      }
+
+      my $node_to_update = $node;
+      if ( $command  eq 'add' ) {
+        # make room for the new node
+        my $query = "SELECT append_node_to($node)";
+        ($node_to_update) = $Dbh->selectrow_array($query);
+        die $Dbh->errstr if $Dbh->err;
+      }
+
+      # update the table with values from %ARGS with matching names
+      foreach my $k ( grep {$attrType{$_}} keys %ARGS ) {
+        my ($current_value) = $Dbh->selectrow_array(qq(SELECT "$k" FROM "$activity_table" WHERE id = $node_to_update));
+        die $Dbh->errstr if $Dbh->err;
+        my $query;
+        if ( $attrType{$k} =~ /int/ ) {
+           next if $current_value and $current_value == $ARGS{$k};
+           $query = qq(UPDATE "$activity_table" SET "$k" = $ARGS{$k} WHERE id = $node_to_update);
+        }
+        if ( $attrType{$k} =~ /text|string|char/ ) {
+           next if $current_value and $current_value eq $ARGS{$k};
+	   my $text = $ARGS{$k};
+	   $text =~ s/\'/<apo>/g;
+	   $text =~ s/<apo>/''/g;
+           $query = qq(UPDATE "$activity_table" SET "$k" = '$text' WHERE id = $node_to_update);
+        }
+        if ( $attrType{$k} =~ /bool/ ) {
+           next if $current_value and $current_value == 0 and $ARGS{$k} eq 'f';
+           next if $current_value and $current_value != 0 and $ARGS{$k} eq 't';
+           $query = qq(UPDATE "$activity_table" SET "$k" = '$ARGS{$k}' WHERE id = $node_to_update);
+        }
+        $Dbh->do($query) or die $Dbh->errstr;
+      }
+
+      $Dbh->commit;
+      $m->comp( "lib/redirect.mason", path => "manage.html");
+    } # end Edit/Add command
+
+    else {
+      $message = "unknown command:\n<pre>\n" . Dumper(\%ARGS) . "</pre>";
+    }
+  } # end action
+
+  else {
+    $message = "unknown command:\n<pre>\n" . Dumper(\%ARGS) . "</pre>";
+  }
+
+  unless ( $compare ) {
+    $Dbh->commit;
+  }
+</%init>
+<%method file_info> <% Util::print_revision(q$Id: update_tree.html,v 2.1 2009-02-20 14:51:32 selkovjr Exp $) %> </%method>

@@ -1,0 +1,27 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin <% $source %> -->
+                      <label for="token">Case token:</label>
+                      <input type="text" id="token" name="token" width="10" value="<% $token %>">
+                      <!-- end <% $source %> --> \
+<%init>
+  my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/lib/case_token.mason,v 2.1 2010-09-17 12:06:35 stat Exp $);
+  my $value = $Model->case_token % (26*26*26*26); # wrap around, eventually
+  my $byte4 = int($value/(26*26*26));
+  my $byte3 = int(($value - 26*26*26*$byte4)/(26*26));
+  my $byte2 = int(($value - 26*26*26*$byte4 - 26*26*$byte3)/26);
+  my $byte1 = $value - 26*26*26*$byte4 - 26*26*$byte3 - 26*$byte2;
+  my $token = join('', map { chr(97 + $_) } ($byte4, $byte3, $byte2, $byte1));
+</%init>

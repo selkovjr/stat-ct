@@ -1,0 +1,32 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin <% $source %> -->
+            <table width="100%" cellpadding="5">
+              <tr>
+                <td bgcolor="white" style="width: 31bpx; border-top:1px black dashed; border-bottom:1px black dashed; color: brown;">
+                  <img src="lib/icons/stopsign.gif" alt="(X)">
+                </td>
+                <td bgcolor="white" style="border-top:1px black dashed; border-bottom:1px black dashed; color: brown;">
+                  <% $message %>
+                </td>
+              </tr>
+            </table>
+            <!-- end <% $source %> --> \
+<%args>
+  $message
+</%args>
+<%init>
+  my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/lib/error.mason,v 2.2 2009-03-11 21:39:53 selkovjr Exp $);
+</%init>

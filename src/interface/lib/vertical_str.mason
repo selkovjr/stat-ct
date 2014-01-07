@@ -1,0 +1,9 @@
+<pre>
+<% $ret %>
+</pre>
+<%args>
+  $str
+</%args>
+<%init>
+  my $ret = join("\n", split('', $str));
+</%init>

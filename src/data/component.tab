@@ -1,0 +1,87 @@
+Major lung resection	1	Knowledge	h	\N	\N
+Major lung resection	2	Preparation	h	Positioning and choice of incision(s)	\N
+Major lung resection	3	Dissect levels 4, 5/6, 7, 8, 9	m	Carina, esophagus, [SVC, trachea, azygos vein] or [aorta/PA] identified	N2 disease present
+Major lung resection	4	Dissect, divide pulmonary vein	m	Pulmonary vein to remain in place identified	Common pulmonary vein; how to control venous bleeding
+Major lung resection	5	Dissect, divide pulmonary artery branches	h	Differentiate between branches to affected lobe vs other lobes	How to control arterial bleeding
+Major lung resection	6	Complete fissure(s)	m	Avoid impinging on other lobes	Fissure involved by cancer
+Major lung resection	7	Conclusion	m	\N	\N
+Thymectomy	1	Knowledge	h	\N	\N
+Thymectomy	2	Preparation	h	Positioning and choice of incision(s)	\N
+Thymectomy	3	Opening pleura adjacent to ipsilateral phrenic nerve	l	Identify phrenic nerve and internal thoracic vein	\N
+Thymectomy	4	Dissection of pericardium	m	Identify the plane between the thymus and pericardium	\N
+Thymectomy	5	Dissection of upper poles	m	Identify upper poles	\N
+Thymectomy	6	Dissection and division of venous branches	h	Identify innominate vein	\N
+Thymectomy	7	Completion of dissection with preservation of contralateral phrenic nerve	h	Identify contralateral phrenic nerve	\N
+Thymectomy	8	Conclusion	m	\N	\N
+Radical pleurectomy/decortication	1	Knowledge	h	\N	\N
+Radical pleurectomy/decortication	2	Preparation	h	Positioning and choice of incision(s)	\N
+Radical pleurectomy/decortication	3	Separation of lung from pleura	m	Identify pleural plane	\N
+Radical pleurectomy/decortication	4	LN dissection	m	\N	\N
+Radical pleurectomy/decortication	5	Dissection of upper poles	m	Identify of upper poles	\N
+Radical pleurectomy/decortication	6	Excision and reconstruction of diaphragm	h	Identify the plane between the diaphragm and peritoneum	\N
+Radical pleurectomy/decortication	7	Excision and reconstruction of pericardium	h	Identify the plane between the pericardium and epicardium	\N
+Radical pleurectomy/decortication	8	Conclusion	m	\N	\N
+Esophagectomy	1	Knowledge	h	\N	\N
+Esophagectomy	2	Preparation	h	Positioning and choice of incision(s)	\N
+Esophagectomy	3	Mobilization of stomach	m	Identify gastroepiploic arcade	\N
+Esophagectomy	4	LN dissection	h	Identify left gastric vessels	\N
+Esophagectomy	5	Creation of a gastric tube	m	Identify angulus	\N
+Esophagectomy	6	Gastric emptying procedure	m	Identification of pylorus	\N
+Esophagectomy	7	J tube insertion	m	Identify insertion site 30-40 cm from LOT	\N
+Esophagectomy	8	Creation of a gastric tube	m	Identify angulus	\N
+Esophagectomy	9	Division of pleura	l	\N	\N
+Esophagectomy	10	Mobilization of infra-azygos esophagus	m	Identify aorta, azygos, thoracic duct, contralateral pleura, pulmonary veins, airways	\N
+Esophagectomy	11	Division of azygos and mobilization of upper thoracic esophagus	m	Identify recurrent laryngeal nerves	\N
+Esophagectomy	12	Nodal dissection	m	\N	\N
+Esophagectomy	13	Anastomosis	h	Identify correct locations on gastric tube and esophagus	\N
+Esophagectomy	14	Conclusion	m	\N	\N
+Diaphragm (hiatal) hernia repair	1	Knowledge	h	\N	\N
+Diaphragm (hiatal) hernia repair	2	Preparation	h	Positioning and choice of incision(s)	\N
+Diaphragm (hiatal) hernia repair	3	Dissection and excision of sac	h	Identify peritoneal plane and hiatal margins	\N
+Diaphragm (hiatal) hernia repair	4	Esophageal mobilization	m	Identify aorta and pleura	\N
+Diaphragm (hiatal) hernia repair	5	Performance of a lengthening procedure	h	Diagnosis of esophageal shortening	\N
+Diaphragm (hiatal) hernia repair	6	Hiatal closure	m	\N	\N
+Diaphragm (hiatal) hernia repair	7	Gastric wrap	m	Determination of the type of wrap to perform	\N
+Diaphragm (hiatal) hernia repair	8	Conclusion	m	\N	\N
+Lung transplant implant	1	Knowledge	h	\N	\N
+Lung transplant implant	2	Preparation	h	Positioning and choice of incision(s)	\N
+Lung transplant implant	3	\N	\N	\N	\N
+Lung transplant implant	4	\N	\N	\N	\N
+Lung transplant implant	5	\N	\N	\N	\N
+Lung transplant implant	6	Conclusion	m	\N	\N
+Initiating CPB	1	Knowledge	h	\N	\N
+Initiating CPB	2	Preparation	h	Positioning and choice of incision(s)	\N
+Initiating CPB	3	Aortic cannulation	m	Selection of site	\N
+Initiating CPB	4	Venous cannulation	m	Selection of site(s) and cannula(e)	\N
+Initiating CPB	5	Institution of bypass	m	\N	\N
+Initiating CPB	6	Cross clamp and cardioplegia	h	Selection of site and plan for plegia	\N
+Initiating CPB	7	Conclusion	m	\N	\N
+Separation from CPB	1	Knowledge	h	\N	\N
+Separation from CPB	2	Preparation	h	Knowledge of appropriate timing	\N
+Separation from CPB	3	Rewarming	m	Identify appropriate timing	\N
+Separation from CPB	4	De-airing and volume administration	m	\N	\N
+Separation from CPB	5	Rhythm assessment/need for pacing	m	\N	\N
+Separation from CPB	6	Cannulae removal and heparin reversal	m	\N	\N
+Separation from CPB	7	Conclusion	m	\N	\N
+CABG	1	Knowledge	h	\N	\N
+CABG	2	Preparation	h	Positioning and choice of incision(s) and conduit(s)	\N
+CABG	3	Mammary takedown	m	\N	\N
+CABG	4	Target identification and exposure	h	Establish angiographic and anatomic correlates	\N
+CABG	5	Distal anastomosis	h	\N	\N
+CABG	6	Proximal anastomosis	m	\N	\N
+CABG	7	Conclusion	m	\N	\N
+AVR	1	Knowledge	h	\N	\N
+AVR	2	Preparation	h	Positioning and choice of incision(s)	\N
+AVR	3	Aortotomy	m	Identify appropriate location	\N
+AVR	4	Leaflet removal/decalcification	h	Identify mitral apparatus at risk	\N
+AVR	5	Suture placement	m	Identify conduction system at risk	\N
+AVR	6	Valve sizing and seating	h	\N	\N
+AVR	7	Aortic closure	m	\N	\N
+AVR	8	Conclusion	m	\N	\N
+MV Repair	1	Knowledge	h	\N	\N
+MV Repair	2	Preparation	h	Positioning and choice of incision(s)	\N
+MV Repair	3	Atriotomy	m	Identify appropriate location	\N
+MV Repair	4	Leaflet remodeling	h	Identify components of mitral apparatus at risk	\N
+MV Repair	5	Annuloplasty 	m	Identify conduction system at risk	\N
+MV Repair	6	Atriotomy closure	m	\N	\N
+MV Repair	7	Conclusion	m	\N	\N

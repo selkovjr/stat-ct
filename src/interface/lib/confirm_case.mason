@@ -1,0 +1,138 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin <% $source %> -->
+            <& caution.mason, message => "This may be a duplicate case assessment" &>
+            <table cellpadding="5">
+              <tr>
+                <td colspan="2">
+                  <% $intro %> has already been recorded.
+                  The last assessment of this type of case was submitted on <b><% $timestamp %></b>.
+% if ( $STAT::application =~ /^hipec/i ) {
+                  If you want to alter your previous assessment, please proceed.
+% } else {
+                  If the data you are about to submit refers to another <% " (<b>" . $numeral{$case_exists + 1} . "</b>)" || "" %> case of 
+                  <% $procName %> you had on the same day, please proceed.
+% }
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  Otherwise, please go back and verify your input.
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <form action="index.html" method="POST">
+% if ( $STAT::application =~ /^hipec/i ) {
+                    <input type="hidden" name="case_id" value="<% $case_id %>">
+% } else {
+                    <input type="hidden" name="teammate" value="<% $uid %>">
+% }
+                    <input type="hidden" name="role" value="<% $role %>">
+                    <input type="hidden" name="date" value="<% $date %>">
+                    <input type="hidden" name="procedure" value="<% $procName %>">
+                    <input type="submit" value="&lt;&lt; Go back">
+                  </form>
+                </td>
+                <td align="right">
+                  <form action="submit.html" method="POST">
+% if ( $STAT::application =~ /^hipec/i ) {
+                    <input type="hidden" name="case_id" value="<% $case_exists %>">
+% } else {
+                    <input type="hidden" name="case_no" value="<% $case_exists + 1 %>">
+                    <input type="hidden" name="teammate" value="<% $teammate %>">
+% }
+                    <input type="hidden" name="procedure" value="<% $procedure %>">
+                    <input type="hidden" name="date" value="<% $date %>">
+                    <input type="hidden" name="remark" value="<% $remark %>">
+% foreach my $r ( grep /rating_/, keys %ARGS ) {
+                    <input type="hidden" name="<% $r %>" value="<% $ARGS{$r} %>">
+% }
+% foreach my $s ( grep /suggestion_/, keys %ARGS ) {
+                    <input type="hidden" name="<% $s %>" value="<% $ARGS{$s} %>">
+% }
+                    <input type="submit" value="&gt;&gt; Proceed">
+                  </form>
+                </td>
+              </tr>
+            </table>
+            <!-- end <% $source %> -->
+<%args>
+  $case_exists => undef
+  $case_id => undef
+  $date
+  $teammate => undef
+  $procedure
+  $remark => undef
+  $role => undef
+  $timestamp
+</%args>
+<%init>
+  my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/lib/confirm_case.mason,v 2.2 2009-03-09 14:33:14 selkovjr Exp $);
+
+  # check arguments
+  if ( $STAT::application =~ /^hipec/i ) {
+    die "required argument 'case_id' not defined" unless $case_id;
+  }
+  else {
+    die "required argument 'teammate' not defined" unless $teammate;
+    $role = $User->role;
+  }
+
+
+  my %numeral = (
+    1 => 'first',
+    2 => 'second',
+    3 => 'third',
+    4 => 'fourth',
+    5 => 'fifth',
+    6 => 'sixth',
+    7 => 'seventh',
+    8 => 'eighth',
+    9 => 'ninth',
+    10 => 'tenth',
+    11 => 'eleventh',
+    12 => 'twelfth',
+    13 => 'thirteenth',
+    14 => 'fourteenth',
+    15 => 'fifteenth',
+    16 => 'sixteenth',
+    17 => 'seventeenth',
+    18 => 'eighteenth',
+    19 => 'nineteenth',
+    20 => 'twentieth',
+  );
+
+  my ($procID, $procName) = split ':', $procedure;
+  my $intro;
+  my $uid;
+  if ( $STAT::application =~ /^hipec/i ) {
+    $intro = qq(Your assessment of the case <b>$case_id</b> on <b>$date</b>);
+  }
+  else {
+    ($uid, my $name, my $department) = split ':', $teammate;
+    my ($attending, $trainee, $assessor);
+    if ( $role eq 'attending' ) {
+      $attending = $assessor = $User->uid;
+      $trainee = $name;
+      $intro = qq(Your assessment of <b>Dr. $name</b>\'s performance in the case of <b>$procName</b> on <b>$date</b>);
+    }
+    elsif ( $role eq 'trainee' ) {
+      $trainee = $assessor = $User->uid;
+      $attending = $teammate;
+      $intro = qq(Your self-assessment of the case of <b>$procName</b> on <b>$date</b>, with <b>Dr. $name</b> attending,);
+    }
+  }
+</%init>

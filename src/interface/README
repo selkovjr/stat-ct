@@ -1,0 +1,5 @@
+Building the component graph
+
+  cd interface/
+  ../tools/comp_tree index.html | dot -T png > callgraph.png
+

@@ -1,0 +1,22 @@
+Building the schema:
+
+  make
+
+Importing the schema
+
+  dropdb stat
+  createdb stat
+  createlang plpgsql stat
+  psql stat < stat-schema.sql
+
+
+Importing the tree:
+
+  ../tools/import_tree activity.tree > activity.tab
+  psql stat -c "DELETE FROM activity"
+  psql stat -c "\\copy activity from 'activity.tab'"
+
+Cleaning up:
+
+  make clean
+  rm activity.tab

@@ -1,0 +1,41 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<%init>
+  my $query = q(
+SELECT "version", 
+       to_char("when", 'YYYY-MM-DD-HH24-MI'),
+       to_char("when", 'MM/DD/YYYY HH24:MI'),
+       "who"
+  FROM activity_change_log
+ WHERE version = (SELECT max(version) FROM activity_change_log)
+);
+  my ($version, $file_suff, $when, $who) = $Dbh->selectrow_array($query);
+  die $Dbh->errstr if $Dbh->err;
+  my ($hdr, $file_name);
+  if ($version) {
+    $hdr = "# Version: $version\n# Modified by: $who\n# Date $when";
+    $file_name = "activity_tree.$file_suff.$who";
+  }
+  else { # activity_change_log empty
+    $hdr = "# Version: initial";
+    $file_name = "activity_tree";
+  }
+  my $tree = $m->scomp('lib/render_tree.mason', tree => 'activity');
+  $m->clear_buffer;
+  $r->content_type("application/x-download");
+  $r->header_out("Content-disposition" => ("attachment; filename=$file_name"));
+  $m->print("$hdr\n$tree");
+  $m->abort(200);
+</%init>

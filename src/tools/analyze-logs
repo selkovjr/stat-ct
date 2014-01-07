@@ -1,0 +1,49 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use Date::Manip qw/ParseDate DateCalc Delta_Format/;
+
+my $logs = join ' ', map {"/var/log/httpd/ssl_access_log$_"} qw/.4 .3 .2 .1/, '';
+my $cmd = qq(grep "GET /stat" $logs);
+my $REGEX = q(^([^:]+):(\S+) (\S+) (\S+) \[([^]]+)\] "(\w+) (\S+).*" (\d+) (\S+));
+
+open LOG, "$cmd |" or die $!;
+
+my %time;
+while (<LOG>) {
+  my ($logfile, $host, $rfc931, $user, $date, $request, $url, $status, $bytes) = m/$REGEX/o;
+  next if $user eq '-';
+  next unless $url =~ /(eval|submit).html/;
+  if ( $url =~ /eval.html/ ) {
+    push @{$time{$user}}, ['begin', $date];
+  }
+  if ( $url =~ /submit.html/ ) {
+    push @{$time{$user}}, ['end', $date];
+  }
+}
+
+my @interval;
+# find intervals (remove evals not followed by submits)
+foreach my $person ( keys %time ) {
+  my $prior_event;
+
+  # discard ends of missig periods
+  while ( @{$time{$person}} ) {
+    $prior_event = shift @{$time{$person}};
+    last if $prior_event->[0] ne 'end';
+  }
+
+  foreach my $event ( @{$time{$person}} ) {
+    # discard all but the most recent attempts to load the form
+    next if $event->[0] eq 'begin' and $prior_event->[0] eq 'begin';
+    if ( $event->[0] eq 'end' and $prior_event->[0] eq 'begin' ) {
+      my $date_begin = ParseDate($prior_event->[1]);
+      my $date_end = ParseDate($event->[1]);
+      my $interval = Delta_Format(DateCalc($date_begin, $date_end), 1, "%st");
+      $interval =~ s/\.0//;
+      print "$person\t$interval\n" if $interval < 1000;
+    }
+    $prior_event = $event;
+  }
+}

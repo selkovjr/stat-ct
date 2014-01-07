@@ -1,0 +1,89 @@
+<!-- begin <% $source %> -->
+    <script type="text/javascript">
+      // You can find instructions for this script at http://www.treeview.net
+
+      // Environment variables are usually set at the top of this file.
+      USETEXTLINKS = 1
+      STARTALLOPEN = 1
+      USEFRAMES = 0
+      USEICONS = 0
+      WRAPTEXT = 1
+      PRESERVESTATE = 1
+      HIGHLIGHT = 1
+      ICONPATH = 'lib/icons/'
+
+      var lb; \
+      <% join("\n", @JSOUT) %>
+    </script>
+    <!-- end <% $source %> -->
+<%init>
+my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/lib/library_tree.js.mason,v 2.2 2012/05/13 09:04:20 stat Exp $);
+
+use Sub::Recursive;
+
+my $dbh = DBI->connect(
+                    'dbi:Pg:dbname=rogginlib',
+                    "selkovjr",
+                    "",
+                    {AutoCommit => 0, RaiseError => 1}
+                   );
+die $DBI::errstr if $DBI::state;
+
+my @JSOUT;
+
+##################################################################################################
+# begin the JS output for the tree
+push @JSOUT, qq(
+      var node = new Object;
+
+      foldersTree = gFld("All categories", "javascript:selectNode(0)");
+      node[0] = foldersTree;
+      foldersTree.xID = "root";
+      foldersTree.category = "All categories");
+
+
+# the following query will be used for traversal
+my $list_query = 'SELECT id, doc IS NULL FROM storage ORDER BY id';
+my $list = $dbh->selectall_arrayref($list_query);
+die $dbh->errstr if $dbh->err;
+
+my %node_exists;
+
+my $id = 0;
+foreach my $row (@$list) {
+  my ( $path, $failed ) = @$row;
+  $path =~ s/\"/\\"/g;
+  my @path = split "/", $path;
+  my $document = pop @path;
+  my $base_path = '';
+  foreach my $name ( @ path ) {
+    my $full_name = $base_path gt "" ? "$base_path/$name" : $name;
+    unless ( $node_exists{$full_name} ) {
+      my $htLabel = $name;
+      my $prefix = '';
+      my $parent = $base_path gt '' ? "node[$node_exists{$base_path}]" : "foldersTree";
+      $id++;
+      push @JSOUT, qq(
+      node[$id] = insFld($parent, gFld("$htLabel", "javascript:selectNode($id)"))
+      node[$id].xID = "$id"
+      node[$id].category = '$full_name');
+      $node_exists{$full_name} = $id;
+    }
+    $base_path = $full_name;
+  }
+  next;
+  my $htLabel = $document;
+  my $prefix = '';
+  $id++;
+  my $parent = $base_path gt '' ? "node[$node_exists{$base_path}]" : "foldersTree";
+  push @JSOUT, qq(
+        lb = "$document"
+        node[$id] = insDoc($parent, gLnk("S", "$htLabel", "javascript:op($id)"))
+        node[$id].prependHTML = "$prefix"
+        node[$id].xID = "$id"
+        node[$id].label = lb);
+}
+</%init>
+<%flags>
+  inherit => '/syshandler'
+</%flags>

@@ -1,0 +1,137 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin lib/navbar.mason -->
+<% $text %>
+                <!-- end lib/navbar.mason --> \
+<%args>
+  $title
+  $menu_handle
+</%args>
+<%init>
+  my $text = '';
+  my @data;
+  my %masked = (
+		'Verify Case' => ['Instructions'],
+		'Teammate' => ['Instructions'],
+		'Links' => ['Instructions'],
+	       );
+
+  if ( $title eq 'Pearls' ) { # nowhere to go from here; just close
+    @data = (
+	     {
+	      name => 'Help',
+	      path => $m->scomp("url.mason",  path => "help.html", query => {path => "note.html"}),
+	     },
+	     {
+	      name => 'Close',
+	      path => "javascript:window.close();",
+	     },
+	    );
+  }
+  else {
+    if ( $User and $User->role and $ARGS{path} !~ /login/ ) { # hide the menu at login?
+      @data = (
+	       {
+		name => 'Back',
+		path => 'javascript:history.back();',
+	       },
+	       {
+		name => 'New Case',
+		path => 'index.html',
+	       },
+	      );
+      if ( $m->request_comp->method_exists('help') ) {
+	push @data,
+	  {
+	   name => 'Help',
+	   path => $m->scomp("url.mason",
+			     path => "help.html",
+			     query => {path => $m->request_comp->path, %ARGS}),
+	  };
+      }
+
+      push @data, {
+		   name => 'Logout',
+		   path => 'logout.html',
+		  };
+
+      if ( $STAT::application =~ /^(gensurg|thoracic|obgyn)$/ ) {
+	splice @data, 2, 0, {
+			     name => 'Papers',
+			     path => 'rogginlib.html',
+			    };
+	splice @data, 2, 0, {
+			     name => 'Links',
+			     path => 'links.html',
+			    };
+      }
+
+      if ( $Model->config("work_hours_log") eq 'yes' ) {
+	splice @data, 2, 0, {
+			     name => 'Work Hours',
+			     path => "work_hours.html?uid=" . $User->uid,
+			    };
+      }
+
+      splice @data, 2, 0, {
+			   name => 'Overview',
+			   path => 'overview.html',
+			  }
+	if $User->can_see_overview;
+
+      splice @data, 2, 0, {
+			   name => 'Results',
+			   path => 'results.html',
+			  }
+	if $User->can_see_all_results or $Model->cases_done_by($User->uid) > 0;
+
+      splice @data, 2, 0, {
+			   name => 'Residents',
+			   path => 'residents.html',
+			  }
+	if $User->role eq 'admin' or $User->uid =~ /^jcs|roach$/;
+    }
+    else { # not logged in
+      if ( $m->request_comp->path =~ /help.html$/ ) {
+	push @data,
+	  {
+	   name => 'Back',
+	   path => "/$STAT::application",
+	  };
+      }
+      else {
+	push @data,
+	  {
+	   name => 'Help',
+	   path => $m->scomp("url.mason",  path => "help.html", query => {path => "login.html"}),
+	  };
+      }
+    }
+  } # not Pearls
+
+  my @linkset;
+  foreach my $link ( @data ) {
+    if ( lc $menu_handle eq lc $link->{name} or grep(/^$link->{name}$/, @{$masked{$title}}) ) {
+      push @linkset, qq(                ) . uc $link->{name};
+    }
+    else {
+      # drop the Back link for all pages except Instructions
+      #    next if $link->{name} eq 'Back' and $title !~ /instructions/i;
+      push @linkset, qq(                <a href="$link->{path}" class="navlink">) . uc $link->{name} . '</a>'
+    }
+  }
+
+  $text = join " | \n", @linkset;
+</%init>

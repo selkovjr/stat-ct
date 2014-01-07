@@ -1,0 +1,55 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+%# $Id: cases_logged_graph.html,v 2.3 2009-03-11 23:47:56 selkovjr Exp $
+<%args>
+  $attending
+  $self
+  $encoded
+</%args>
+<%once>
+use MIME::Base64 qw/encode_base64/;
+</%once>
+<%init>
+my @attending;
+my @self;
+
+foreach my $point ( split /\|/, $attending ) {
+  my ($date, $count) = split '=>', $point;
+  push @attending, [$date, $count];
+}
+foreach my $point ( split /\|/, $self ) {
+  my ($date, $count) = split '=>', $point;
+  push @self, [$date, $count];
+}
+
+my $image = Plot::plot_cases_logged(
+              -attending => \@attending,
+              -self => \@self,
+            );
+if ( $encoded eq 'yes' ) {
+  $r->content_type( "text/plain" );
+  $r->send_http_header;
+  $m->print("IMAGE:" . encode_base64($image));
+}
+else {
+  $r->content_type( "image/png" );
+  $r->send_http_header;
+  $m->print($image);
+}
+eval { $m->abort(200) };
+</%init>
+<%flags>
+  inherit => 'syshandler'
+</%flags>

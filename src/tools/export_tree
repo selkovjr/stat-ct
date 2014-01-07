@@ -1,0 +1,50 @@
+#!/usr/bin/perl -w 
+
+die "expecting one argument of the form: database.table" unless scalar @ARGV == 1 and $ARGV[0] =~ /^[^.]+\.[^.]+$/;
+
+my ($db, $tree) = split (/\./, $ARGV[0]);
+
+my $start = 0;
+my $with_id = undef;
+
+use DBI;
+
+$dbh = DBI->connect(
+                    "dbi:Pg:dbname=$db",
+                    "stat",
+                    ""
+                    );
+die $DBI::errstr if $DBI::state;
+
+
+my $rendering;
+my $query = qq(
+SELECT t1.id AS id,
+       repeat('  '::text, count(t2.label)::integer - 1) AS indent,
+       t1.label AS label,
+       t1.required AS required,
+       t1.opt AS opt
+   FROM $tree AS t1, $tree AS t2, $tree AS t3
+  WHERE t1.left_id BETWEEN t2.left_id AND t2.right_id
+    AND t2.left_id BETWEEN t3.left_id AND t3.right_id
+    AND t3.id = $start
+  GROUP BY t1.id, t1.left_id, t1.required, t1.opt, t1.label
+  ORDER BY t1.left_id;
+);
+
+my $res = $dbh->selectall_arrayref($query);
+die $dbh->errstr . $query if $dbh->err;
+
+my @rows;
+if ( $with_id ) {
+    @rows = map {"$_->[0]\t$_->[1]$_->[2]" . (($_->[3] or $_->[4]) ? " ($_->[3], $_->[4])" : "")} @$res;
+}
+else {
+    @rows = map {"$_->[1]$_->[2]" . (($_->[3] or $_->[4]) ? " ($_->[3], $_->[4])" : "")} @$res;
+}
+$rendering = join("\n", @rows);
+
+print "$rendering\n";
+
+
+

@@ -1,0 +1,2 @@
+ldapsearch -H ldaps://ldap.uchicago.edu  -x  -b ou=people,dc=uchicago,dc=edu cn="Andrew Cooper Trueblood"
+ldapsearch -H ldaps://ldap.uchicago.edu:636 -x -b ou=people,dc=uchicago,dc=edu uid=selkovjr

@@ -1,0 +1,104 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin <% $source %> -->
+    <script type="text/javascript">
+      // You can find instructions for this script at http://www.treeview.net
+
+      // Environment variables are usually set at the top of this file.
+      USETEXTLINKS = 1
+      STARTALLOPEN = 0
+      USEFRAMES = 0
+      USEICONS = 0
+      WRAPTEXT = 0
+      PRESERVESTATE = 1
+      HIGHLIGHT = 1
+      ICONPATH = 'lib/icons/'
+
+      var copyBufferExists = <% $copyBufferExists ? 'true' : 'false' %>;
+      var cloneExists = <% $cloneExists ? 'true' : 'false' %>;
+      var inputDisabled = new Array(); // button state hash
+
+      <% join("\n", @JSOUT) %>
+    </script>
+    <!-- end <% $source %> -->
+<%args>
+  $node => undef
+  $copyBufferExists => undef
+  $cloneExists => undef
+</%args>
+<%init>
+my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/lib/manage_tree.js.mason,v 2.3 2012/01/13 16:48:58 stat Exp $);
+
+use Sub::Recursive;
+
+my @JSOUT;
+
+open LOG, ">/tmp/log";
+##################################################################################################
+# Check / Prepare the tree clone
+#
+$cloneExists = Util::clone_exists($Dbh);
+$copyBufferExists = Util::copy_buffer_exists($Dbh);
+
+my $activity_table = $cloneExists ? 'activity_clone' : 'activity';
+
+##################################################################################################
+# begin the JS output for the tree
+push @JSOUT, qq(
+      var node = new Object;
+
+      foldersTree = gFld("", "javascript:undefined");
+      foldersTree.xID = "root";);
+
+
+###################################### S U B R O U T I N E   S E C T I O N #######################################
+my $traverse = recursive {
+  my ($parent) = @_;
+
+  foreach my $node ( $Model->children_of($parent, extra_data => 'yes') ) {
+    my %node = $node->get_columns;
+    my $id = $node{id};
+    $node{label} =~ s/\"/\\"/g;
+    my $htLabel = $node{label};
+    if ( $node{opt} or $node{required} ) {
+      $htLabel = qq(<span class=\\"opt\\">$node{label}<\\/span>) if $node{opt};
+      $htLabel = qq(<span class=\\"mand\\">$node{label}<\\/span>) if $node{required};
+      $htLabel = qq(<span class=\\"omand\\">$node{label}<\\/span>) if $node{opt} and $node{required};
+    }
+    if ( $Model->nonleaf($id) ) {
+      push @JSOUT, qq(
+      node[$id] = insFld(node[$parent], gFld("$htLabel", "javascript:selectNode($id)"))
+      node[$id].xID = "$id");
+
+      $REC->($id);
+    }
+    else {
+      push @JSOUT, qq(
+        node[$id] = insDoc(node[$parent], gLnk("S", "$htLabel", "javascript:selectNode($id)"))
+        node[$id].xID = "$id");
+    }
+  }
+};
+
+##################################################################################################
+# Traverse all nodes
+push @JSOUT, qq(
+      node[0] = insFld(foldersTree, gFld("<b>root<\\/b>", "javascript:selectNode(0, true)"))
+      node[0].xID = "0");
+$traverse->(0);
+</%init>
+<%flags>
+  inherit => '/syshandler'
+</%flags>

@@ -1,0 +1,98 @@
+<%once>
+  use lib qw{config lib/perl};
+  use STAT;
+  use STAT::Schema;
+  use STAT::Model;
+  use Person;
+  use URI;
+  use DBI;
+  use Data::Dumper;
+  use POSIX;
+  use Date::Manip;
+  use Util;
+  use Plot;
+  use Digest::SHA1;
+  use CGI::Cookie;
+  use Cache::FileCache;
+  $ENV{PATH} = "/opt/local/bin:$ENV{PATH}" unless $ENV{PATH} =~ m%/opt/local/bin%;
+#  $ENV{DBIC_TRACE} = 1;
+</%once>
+<%init>
+  # $Id: syshandler,v 2.14 2012/05/12 15:56:56 stat Exp $
+
+  # get the last user name from the cookie to see if we can allow the current
+  # user to re-use the request arguments
+  our $LastUserID;
+  my %cookies = fetch CGI::Cookie;
+  my $last_user_cookie_name = $STAT::application . "_user";
+  if ( exists $cookies{$last_user_cookie_name} ) {
+    my %user_info = $cookies{$last_user_cookie_name}->value;
+    if ( $user_info{username} ) {
+      $LastUserID = $user_info{username};
+    }
+    else {
+      die "syshandler: can't find username in last login cookie";
+    }
+  }
+  else {
+    #    print STDERR "cookie doesn't exist";
+  }
+
+  my $session_name = "${STAT::application}_session";
+  our $Cache = Cache::FileCache->new( { namespace  => $session_name,
+				       cache_root => '/tmp/sessions',
+				       default_expires_in  => '10 minutes',
+				       auto_purge_interval => '1 hour',
+				       auto_purge_on_set => 1 } );
+
+  $STAT::Session = $Cache->get($ARGS{session_id}) if exists $ARGS{session_id};
+  $STAT::Session ||= { _session_id => Digest::SHA1::sha1_hex( time, rand, $$ ) };
+
+  $Dbh = DBI->connect(
+		      "dbi:Pg:dbname=$STAT::stat_db;host=$STAT::pg_host;port=$STAT::pg_port",
+		      $STAT::pg_user,
+		      "",
+		      {AutoCommit => 0, RaiseError => 1}
+		     );
+  die $DBI::errstr if $DBI::state;
+
+  # Setting $STAT::Schema to make it visible in the un-instantiated Person class
+  our $Schema = $STAT::Schema = STAT::Schema
+  ->connect(
+	    "dbi:Pg:dbname=$STAT::stat_db;host=$STAT::pg_host;port=$STAT::pg_port",
+	    $STAT::pg_user,
+	    "",
+	    {AutoCommit => 1, RaiseError => 1}
+	   );
+
+  our $Model = STAT::Model->set_schema($Schema);
+
+  if ( $STAT::Session->{username} ) {
+    my @result = Person->search_by_uid($STAT::Session->{username});
+    if ( @result ) {
+      # die "multiple directory entries for '$UserID'" if @result > 1;
+      # ignore this for a while; let the last configured entry be authoritative
+      $User = pop @result;
+      $User->set_schema($Schema);
+    }
+  }
+
+  # Need to catch exceptions thrown in other components in order to let the 
+  # cache object save its data
+  eval { $m->call_next( %ARGS ) };
+  my $eval_error = $@;
+
+  $Cache->set( $STAT::Session->{_session_id} => $STAT::Session );
+
+  # now we can throw an exception
+  if ( $eval_error ) {
+    die $eval_error . " while calling " . $m->request_comp->path;
+  }
+</%init>
+<%flags>
+  inherit => undef
+</%flags>
+<%filter>
+  s/href="([^"]+)"/q(href=") . Util::add_session_id($1) . q(")/eg;
+  s/action="([^"]+)"/q(action=") . Util::add_session_id($1) . q(")/eg;
+</%filter>

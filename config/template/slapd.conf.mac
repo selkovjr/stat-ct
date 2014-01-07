@@ -1,0 +1,27 @@
+include         /etc/openldap/schema/core.schema
+include         /etc/openldap/schema/cosine.schema
+include         /etc/openldap/schema/nis.schema
+include         /etc/openldap/schema/inetorgperson.schema
+include         /etc/openldap/schema/misc.schema
+include         /etc/openldap/schema/samba.schema
+include         /etc/openldap/schema/apple.schema
+pidfile         /var/run/slapd.pid
+argsfile        /var/run/slapd.args
+allows          bind_v2
+schemacheck off
+
+database        netinfo
+datasource      DBDIR/local.nidb
+include         /etc/openldap/schema/netinfo.schema
+
+# Use crypt to hash the passwords
+password-hash {md5}
+
+#database        ldbm
+#directory	"DBDIR"
+pidfile		"TMPDIR/slapd.pid"
+suffix          "dc=uchicago,dc=edu"
+rootdn          "cn=root,dc=uchicago,dc=edu"
+# this rootpw is 'pass'; it can be generated with `slappasswd -h {md5}`
+rootpw          {MD5}Gh3JHJBzJcaScd3wyUS8cg==
+

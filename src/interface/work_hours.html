@@ -1,0 +1,495 @@
+<%args>
+  $uid => $User->uid
+</%args>
+% if ( exists $ARGS{weekly} or $ARGS{keywords} =~ /weekly/ ) {
+%   my @weeks = Util::sequence_of_weeks($earliest_date, $latest_date);
+            <p></p>
+            <p style="margin-top: 2em">
+%   if ( $earliest_date ) {
+              Work hours logged between <% (split " ", $earliest_date)[0] %> and <% (split " ", $latest_date)[0] %>
+%   } else {
+              No data
+%   }
+            </p>
+            <p>
+              <a href="work_hours.html?uid=<% $uid %>">Go to Time Log</a>
+            </p>
+            <hr>
+            <table border="0" cellspacing="0" cellpadding="4">
+              <tbody>
+                <tr bgcolor="#808080">
+                  <td align="left"><span style="color: white">Resident/Fellow</span></td>
+%   my $col = 0;
+%   foreach ( @weeks ) {
+%     $col++; 
+%     my ($first, $last) = split ":";
+%     my $color = $col % 2 ? '#707070' : "#808080";
+                  <td align="middle" bgcolor="<% $color %>"><span style="color: white"><% $first %><br><% $last %></span></td>
+%   }
+                </tr>
+%   my $row = 0;
+%   my @wk_int = Util::sequence_of_week_intervals($earliest_date, $latest_date, "%o");
+%   foreach my $trainee ( sort {$a->{sn} cmp $b->{sn}} @trainee ) {
+%     $row++;
+%     my $color = $row % 2 ? '#F0F0F0' : '#FEFEFE';
+                <tr bgcolor="<% $color %>">
+                  <td nowrap> <a><span title="<% $trainee->{uid} %>"><% $trainee->{cn} %></span></a> </td>
+%     my $col = 0;
+%     foreach ( @wk_int ) {
+%       my ($from, $to) = split ":";
+%       my $time = Util::work_hours($Dbh, $trainee->{uid}, $from, $to);
+%       $col++;
+%       my ( $fgcolor, $bgcolor, $uline );
+%       $bgcolor = $row % 2 ? ($col % 2 ? '#ECECEC' : '#F6F6F6') : ($col % 2 ? '#F8F8F8' : '#FEFEFE');
+%       if ( $time > 80 ) {
+%         $fgcolor = "brown";
+%         $uline = "; text-decoration: underline";
+%       } else {
+%         $fgcolor = "black";
+%         $uline = "";
+%       }
+                  <td bgcolor="<% $bgcolor %>" align="right"> <span style="color: <% $fgcolor %><% $uline %>"> <% $time %> </span> </td>
+%     }
+                </tr>
+%   }
+              </tbody>
+            </table>
+% } elsif ( exists $ARGS{monthly} or $ARGS{keywords} =~ /monthly/ ) {
+%     my @month = Util::sequence_of_months($earliest_year, $earliest_month, $latest_year, $latest_month);
+            <p></p>
+            <p style="margin-top: 2em">
+%   if ( $earliest_date ) {
+              Work hours logged between <% (split " ", $earliest_date)[0] %> and <% (split " ", $latest_date)[0] %>
+%   } else {
+              No data
+%   }
+            </p>
+            <p>
+              <a href="work_hours.html?uid=<% $uid %>">Go to Time Log</a>
+            </p>
+            <hr>
+            <table border="0" cellspacing="0" cellpadding="4">
+              <tbody>
+                <tr bgcolor="#808080">
+                  <td align="left"><span style="color: white">Resident/Fellow</span></td>
+%   my $col = 0;
+%   foreach ( @month ) {
+%     $col++; 
+%     my ($first, $last) = split ":";
+%     my $color = $col % 2 ? '#707070' : "#808080";
+%       my ($year, $mon) = split ":";
+                  <td align="middle" nowrap bgcolor="<% $color %>"><span style="color: white"><% $monthAbbr[$mon] %></span></td>
+%     }
+%     my $color = ++$col % 2 ? '#707070' : "#808080";
+                  <td align="middle" bgcolor="<% $color %>"><span style="color: white">Average</span></td>
+                </tr>
+%     my $row = 0;
+%     foreach my $trainee ( sort {$a->{sn} cmp $b->{sn}} @trainee ) {
+%       $row++;
+%       my $color = $row % 2 ? '#F0F0F0' : '#FEFEFE';
+                <tr bgcolor="<% $color %>">
+                  <td nowrap> <a><span title="<% $trainee->{uid} %>"><% $trainee->{cn} %></span></a> </td>
+%       my $col = 0;
+%       my $fgcolor = 'black';
+%       foreach ( @month ) {
+%         my ($year, $mon) = split ":";
+%         my $time = Util::work_hours_per_month($Dbh, $trainee->{uid}, $year, $mon);
+%         $col++;
+%         my ( $fgcolor, $bgcolor, $uline );
+%         $bgcolor = $row % 2 ? ($col % 2 ? '#ECECEC' : '#F6F6F6') : ($col % 2 ? '#F8F8F8' : '#FEFEFE');
+                  <td bgcolor="<% $bgcolor %>" align="right"> <span style="color: <% $fgcolor %><% $uline %>"> <% $time %> </span> </td>
+%       }
+%       $col++;
+%       my $bgcolor = $row % 2 ? ($col % 2 ? '#ECECEC' : '#F6F6F6') : ($col % 2 ? '#F8F8F8' : '#FEFEFE');
+                  <td bgcolor="<% $bgcolor %>" align="right"> <span style="color: <% $fgcolor %>"> <% Util::average_monthly_hours($Dbh, $trainee->{uid}) %></span></td>
+                </tr>
+%     }
+              </tbody>
+            </table>
+% } else {
+%   foreach my $row ( @$log ) {
+%     my $oid = $row->[0];
+%     if ( $err_in{$oid} ) {
+              <& lib/error.mason, message => $err_in{$oid} &>
+%     }
+%     if ( $err_out{$oid} ) {
+              <& lib/error.mason, message => $err_out{$oid} &>
+%     }
+%   }
+<form name="TimeForm" method="POST" action="work_hours.html">
+              <p style="margin-top: 2em">
+% if ( $ARGS{plot_work_hours} ) {
+%   if ( $r->header_in("User-Agent") =~ /msie/i ) {
+                <img border="0" alt="graph of cases logged during last month" src="plot_work_hours.html?trainee=<% $uid %>">
+                <br>
+%   } else {
+                <img border="0" src="lib/icons/blank.gif" onload="load_one_image('time_chart', 'plot_work_hours.html?trainee=<% $uid %>')">
+                <table>
+                  <tr>
+                    <td><img border="0" id="graph_time_chart" alt="time chart image" src="lib/icons/wait20trans.gif"></td>
+                    <td><div id="message_time_chart"></div></td>
+                  </tr>
+                </table>
+%   }
+                <input type="submit" name="remove_graph" value="Remove graph">
+% } else {
+                <input type="submit" name="plot_work_hours" value="Show graph">
+% }
+              </p>
+              <p>
+% my ($this_week_hours, $this_week_minutes) = split ":", $total_this_week;
+% my ($last_week_hours, $last_week_minutes) = split ":", $total_last_week;
+                This week: <% $this_week_hours %> hours <% $this_week_minutes %> minutes
+              </p>
+              <p>
+                Last week: <% $last_week_hours %> hours <% $last_week_minutes %> minutes
+              </p>
+              <p>
+                <a href="work_hours.html?weekly;uid=<% $uid %>">Weekly Summary</a>
+              </p>
+              <p>
+                <a href="work_hours.html?monthly;uid=<% $uid %>">Monthly Summary</a>
+              </p>
+              <hr>
+              <p style="margin-bottom: 1em">
+                <input type="submit" name="save" value="Save changes" style="width: 16em">
+              </p>
+              <table border="0" cellspacing="0" cellpadding="2">
+                <tr bgcolor="#808080">
+% if ( @debug_log ) {
+                  <td class="compacttd"><span style="color: white">oid</span></td>
+% }
+                  <td class="compacttd"><!-- input type="image" src="lib/icons/button-plus.png" name="check_in" --></td>
+                  <td class="compacttd"><input type="submit" name="check_in" value="Check in"></td>
+                  <td class="compacttd"><input type="submit" name="check_out" value="Check out" <% $checked_in ? '' : ' disabled' %>></td>
+                  <td class="compacttd"><span style="color: white">Work hours</span></td>
+                </tr>
+%   foreach my $n ( 0 .. @$log - 1) {
+%     my $row = $log->[$n];
+%     my $oid = $row->[0];
+%     my $err_in = exists $err_in{$oid};
+%     my $in = $err_in ? $ARGS{"in_$oid"} : $row->[1];
+%     my $err_out = exists $err_out{$oid};
+%     my $out = $err_out ? $ARGS{"out_$oid"} : $row->[2];
+%     my $interval = $row->[3];
+                <& lib/work_period.mason, n => $n, oid => $oid, in => $in, out => $out, interval => $interval, err_in => $err_in, err_out => $err_out, debug => @debug_log ? 1 : undef &>
+%   }
+              </table>
+              <input type="hidden" name="uid" value="<% $uid %>">
+            </form>
+% }
+% if ( @debug_log ) {
+            <table cellspacing="4">
+              <tr><td>timestamp</td><td>uid</td><td>total</td><td>err</td><td>action</td><td>error</td></tr>
+%   foreach my $row ( @debug_log ) {
+              <tr>
+%     foreach my $cell ( @$row ) {
+                <td nowrap> <% $cell %> </td>
+%     }
+              </tr>
+%   }
+            </table>
+% }
+<%method title>STAT: Work Hours</%method>
+<%method page_title>Work Hours</%method>
+<%method menu_handle>Work Hours</%method>
+<%method help>
+  <p style="margin-top: 1em">
+    This tool's basic function is similar to that of a stopwatch. It's
+    enough to push the "Check in" and "Check out" buttons to record your
+    work hours.
+  </p>
+
+  <p>
+    When you check in, the current time of the day is set as the start
+    of a new interval. You can also check in with the time in the
+    past, or insert an interval with both start and end times in the
+    past.
+  </p>
+
+  <p>
+    To check out with a time other than current, enter that time in
+    the blank "out" field of the top row and press the "Check out"
+    button.
+  </p>
+
+  <p>
+    To insert an interval with times in the past, create a new row by
+    pressing the "Check in" button and overwrite the start and end
+    times. Then, press "Save changes".
+  </p>
+
+  <p>
+    Dates and times can be entered in any valid format. The system can
+    recognize most date formats used on this planet.
+  </p>
+
+  <p>
+    If you omit the date part, the time part by itself
+  (<code>h</code>, <code>hh</code>, <code>h:mm</code>,
+  <code>hh:mm</code>) will be interpreted as time of the day today.
+  </p>
+
+  <p>
+    Pressing Enter on your keyboard after editing times is equivalent
+    to pressing the Save Changes button.
+  </p>
+</%method>
+<%init>
+use POSIX qw/strftime/;
+my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/work_hours.html,v 2.10 2010-05-31 18:27:20 stat Exp $);
+
+unless ($uid) {
+  my $message = qq(
+You were redirected here because the work hours page could not be loaded without a user ID.
+Please select Work Hours from the menu.
+);
+  my $errtext = $m->scomp(
+			  "lib/alert.mason",
+			  message => $message,
+			 );
+ $m->comp( "lib/redirect.mason", path => "index.html", query => {%ARGS, alert => $errtext} );
+}
+
+my @monthAbbr = qw/none Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec/;
+my @monthName = qw/none January February March April May June July August September October November December/;
+my @debug_log;
+my $debug = 0;
+my $del;
+my %err_in;
+my %err_out;
+my $log;
+my $checked_in;
+my $last;
+my $total_this_week;
+my $total_last_week;
+my @trainee;
+my ($earliest_date, $latest_date);
+my ($earliest_year, $latest_year);
+my ($earliest_month, $latest_month);
+$uid = $User->uid unless defined $uid;
+my $role = $User->role;
+$role = 'attending' if $uid =~ /roach|mezhir|avogel|mkirkwood|kbickenb/;
+
+sub update_log_display {
+  my $uid = shift;
+  my $log = Util::get_time_log_this_month($Dbh, $uid);
+  my $total_this_week = Util::get_hours_per_week($Dbh, $uid);
+  my $total_last_week = Util::get_hours_per_week($Dbh, $uid, -1);
+  my $checked_in = undef;
+  my $last = undef;
+  if ( @$log > 0 ) {
+    $checked_in = defined $log->[0]->[2] ? 0 : 1;
+    $last = $log->[0]->[0];
+  }
+  return ($log, $checked_in, $last, $total_this_week, $total_last_week);
+}
+
+($log, $checked_in, $last, $total_this_week, $total_last_week) = update_log_display($uid);
+
+if ( $checked_in and exists $ARGS{check_out} ) {
+  my $query = qq(UPDATE time_log SET "out" = 'now'::timestamp WHERE oid = $last);
+  $Dbh->do($query);
+  if ( $Dbh->err ) {
+    $debug and Util::change_log($Dbh, $uid, "check-out: update($last, out = now)", $Dbh->errstr);
+    die "can't execute query: $query, " . $Dbh->errstr;
+  } else {
+    $Dbh->commit;
+    $debug and Util::change_log($Dbh, $uid, "check-out: update($last, out = now)");
+  }
+  ($log, $checked_in, $last, $total_this_week, $total_last_week) = update_log_display($uid);
+}
+
+elsif ( exists $ARGS{check_in} ) {
+  my $query = qq(INSERT INTO time_log ("id", "in") VALUES ('$uid', 'now'::timestamp));
+  $Dbh->do($query);
+  if ( $Dbh->err ) {
+    $debug and Util::change_log($Dbh, $uid, "check-in: insert(in = now)", $Dbh->errstr);
+    die "can't execute query: $query, " . $Dbh->errstr;
+  } else {
+    $Dbh->commit;
+    $debug and Util::change_log($Dbh, $uid, "check-in: insert(in = now)");
+  }
+  ($log, $checked_in, $last, $total_this_week, $total_last_week) = update_log_display($uid);
+}
+
+elsif ( exists $ARGS{save} ) {
+  # check all dates;
+  my $query_in = qq(UPDATE time_log SET "in" = ? WHERE oid = ?);
+  my $sth_in = $Dbh->prepare($query_in);
+  my $query_out = qq(UPDATE time_log SET "out" = ? WHERE oid = ?);
+  my $sth_out = $Dbh->prepare($query_out);
+  foreach my $row ( @$log ) {
+    my $oid = $row->[0];
+    my ($in, $out) = @ARGS{"in_$oid", "out_$oid"};
+    if ( $in gt '' ) {
+      $sth_in->execute($in, $oid);
+      if ( $Dbh->err ) {
+	if ( $Dbh->errstr =~ /syntax|invalid|constraint|out of range/i ) {
+	  $err_in{$oid} = $Dbh->errstr;
+	}
+	else {
+	  $debug and Util::change_log($Dbh, $uid, "save: update($oid, in = $in)", $Dbh->errstr);
+	  die "can't execute query: $query_in for ($in, $oid), " . $Dbh->errstr if $Dbh->err;
+	}
+	$Dbh->rollback;
+      }
+      else {
+	$Dbh->commit;
+	$debug and Util::change_log($Dbh, $uid, "save: update($oid, in = $in)");
+      }
+    }
+    if ( $out gt '' ) {
+      # attempt to fix
+      $out = "$out:00" if $out =~ /^\d{1,2}$/;
+      $out = strftime("%e %b %Y ", localtime) . $out if $out =~ /^\d{1,2}:\d{1,2}$/;
+      $sth_out->execute($out, $oid);
+      if ( $Dbh->err ) {
+	if ( $Dbh->errstr =~ /syntax|invalid|constraint|out of range/i ) {
+	  $err_out{$oid} = $Dbh->errstr;
+	}
+	else {
+	  $debug and Util::change_log($Dbh, $uid, "save: update($oid, out = $out)", $Dbh->errstr);
+	  die "can't execute query: $query_out for ($in, $oid), " . $Dbh->errstr if $Dbh->err;
+	}
+	$Dbh->rollback;
+      }
+      else {
+	$Dbh->commit;
+	$debug and Util::change_log($Dbh, $uid, "save: update($oid, out = $out)");
+      }
+    }
+  }
+  ($log, $checked_in, $last, $total_this_week, $total_last_week) = update_log_display($uid);
+}
+
+elsif ( ($del) = grep /^del_/, keys %ARGS ) { # submission by an image type button results in two args (x, y)
+  $del =~ s/del_//;
+  $del =~ s/.[xy]$//;
+  my $query = qq(DELETE FROM time_log WHERE oid = $del);
+  $Dbh->do($query);
+  if ( $Dbh->err ) {
+    $debug and Util::change_log($Dbh, $uid, "delete($del)", $Dbh->errstr);
+    die "can't execute query: $query, " . $Dbh->errstr;
+  } else {
+    $Dbh->commit;
+    $debug and Util::change_log($Dbh, $uid, "delete($del)", $Dbh->errstr);
+  }
+  ($log, $checked_in, $last, $total_this_week, $total_last_week) = update_log_display($uid);
+}
+
+elsif ( exists $ARGS{monthly} or $ARGS{keywords} =~ /monthly/ ) {
+  # determine the range of dates
+  my $date_query;
+  if ( $role eq 'attending' or $User->can_see_all_results ) {
+    #$date_query = 'SELECT min("in"), max("out") FROM "time_log"';
+    $date_query = q(SELECT max("out") - '1 year'::interval, max("out") FROM "time_log");
+  }
+  else {
+    #$date_query  = qq(SELECT min("in"), max("out") FROM "time_log" WHERE "id" = '$uid');
+    $date_query  = qq(SELECT max("out") - '1 year'::interval, max("out") FROM "time_log" WHERE "id" = '$uid');
+  }
+  ($earliest_date, $latest_date) = $Dbh->selectrow_array($date_query);
+  $Dbh->err and die "can't execute query: $date_query, " . $Dbh->errstr;
+
+  if ( $earliest_date ) {
+    # list months in the date range
+    my $month_query = qq(
+SELECT extract(YEAR FROM '$earliest_date'::date),
+       extract(MONTH FROM '$earliest_date'::date),
+       extract(YEAR FROM '$latest_date'::date),
+       extract(MONTH FROM '$latest_date'::date)
+);
+    ($earliest_year, $earliest_month, $latest_year, $latest_month) = $Dbh->selectrow_array($month_query);
+    $Dbh->err and die "can't execute query: $month_query, " . $Dbh->errstr;
+
+    # get directory names for all trainees
+    my $one_trainee = ($role eq 'attending' or $User->can_see_all_results) ? qq(true) : qq("id" = '$uid');
+    my $trainee_query = qq(SELECT DISTINCT "id" FROM "time_log" WHERE "in" >= '$earliest_date' AND $one_trainee);
+    my $res = $Dbh->selectcol_arrayref($trainee_query);
+    $Dbh->err and die "can't execute query: $trainee_query, " . $Dbh->errstr;
+    @trainee = Person->map_uids(@$res);
+
+    # add local data to @trainee
+    foreach my $trainee ( @trainee ) {
+      my $query;
+      $query = qq(
+SELECT min("in"), CASE
+                   WHEN max("out") IS NOT NULL
+                   THEN max("out")
+                   ELSE now()
+                  END AS "out"
+  FROM "time_log"
+ WHERE "id" = '$trainee->{uid}'
+   AND "in" >= '$earliest_date'
+);
+
+      ($trainee->{first_assessed}, $trainee->{last_assessed}) = $Dbh->selectrow_array($query);
+      $Dbh->err and die $Dbh->errstr;
+
+      $query = qq(
+SELECT extract(YEAR FROM '$trainee->{first_assessed}'::date),
+       extract(MONTH FROM '$trainee->{first_assessed}'::date),
+       extract(YEAR FROM '$trainee->{last_assessed}'::date),
+       extract(MONTH FROM '$trainee->{last_assessed}'::date)
+);
+      ($trainee->{first_year}, $trainee->{first_month}, $trainee->{last_year}, $trainee->{last_month}) = $Dbh->selectrow_array($query);
+      $Dbh->err and die "error in query: $query; reason: " . $Dbh->errstr;
+    }
+  }
+}
+
+elsif ( exists $ARGS{weekly} or $ARGS{keywords} =~ /weekly/ ) {
+  # determine the range of dates
+  my $date_query;
+  if ( $role eq 'attending' or $User->can_see_all_results ) {
+    #$date_query = 'SELECT min("in"), max("out") FROM "time_log"';
+    $date_query = q(SELECT max("out") - '1 year'::interval, max("out") FROM "time_log");
+  }
+  else {
+    #$date_query  = qq(SELECT min("in"), max("out") FROM "time_log" WHERE "id" = '$uid');
+    $date_query  = qq(SELECT max("out") - '1 year'::interval, max("out") FROM "time_log" WHERE "id" = '$uid');
+  }
+  ($earliest_date, $latest_date) = $Dbh->selectrow_array($date_query);
+  $Dbh->err and die "can't execute query: $date_query, " . $Dbh->errstr;
+
+  if ( $earliest_date ) { # if there is any data
+     # get directory names for all trainees
+     my $one_trainee = ($role eq 'attending' or $User->can_see_all_results) ? qq(true) : qq("id" = '$uid');
+     my $trainee_query = qq(SELECT DISTINCT "id" FROM "time_log" WHERE "in" >= '$earliest_date' AND $one_trainee);
+     my $res = $Dbh->selectcol_arrayref($trainee_query);
+     $Dbh->err and die "can't execute query: $trainee_query, " . $Dbh->errstr;
+     @trainee = Person->map_uids(@$res);
+
+    # add local data to @trainee
+    foreach my $trainee ( @trainee ) {
+      my $query;
+      $query = qq(
+SELECT min("in"), CASE
+                   WHEN max("out") IS NOT NULL 
+                   THEN max("out")
+                   ELSE now()
+                  END AS "out"
+  FROM "time_log"
+ WHERE "id" = '$trainee->{uid}'
+   AND "in" >= '$earliest_date'
+);
+
+      ($trainee->{first_assessed}, $trainee->{last_assessed}) = $Dbh->selectrow_array($query);
+      $Dbh->err and die $Dbh->errstr;
+
+#      $trainee{$trainee->{uid}} = $trainee;
+    }
+  }
+}
+
+elsif ( exists $ARGS{debug} or $ARGS{keywords} =~ /debug/ ) {
+  my $query = qq(SELECT * FROM time_change_log WHERE "uid" = '$uid' ORDER BY "when");
+  @debug_log = @{$Dbh->selectall_arrayref($query)};
+  $Dbh->err and die $Dbh->errstr;
+}
+</%init>
+<%method file_info> <% Util::print_revision(q$Id: work_hours.html,v 2.10 2010-05-31 18:27:20 stat Exp $) %> </%method>
+<%method jshead>
+    <script type="text/javascript" src="lib/image_load_handlers.js"></script>
+</%method>

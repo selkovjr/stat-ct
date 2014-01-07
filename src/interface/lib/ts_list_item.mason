@@ -1,0 +1,10 @@
+<%args>
+  $text
+  $user => undef
+  $timestamp => undef
+</%args>
+% if ( $user ) {
+<li><% $text %><span style="color: #dcb"> /&nbsp;<% $user %>, <% $timestamp %></span></li> \
+% } else {
+<li><% $text %><span style="color: #dcb"> /&nbsp;<% $timestamp %></span></li> \
+% }

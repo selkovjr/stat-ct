@@ -1,0 +1,211 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+my $old_activity = "activity";
+my $new_activity = "new_activity";
+my $db = "stat-ortho";
+
+my $with_id = undef;
+
+use DBI;
+use String::Similarity;
+
+my $dbh = DBI->connect(
+                    "dbi:Pg:dbname=$db",
+                    "selkovjr",
+                    ""
+                    );
+die $DBI::errstr if $DBI::state;
+
+my $query = qq(
+SELECT DISTINCT activity
+  FROM (
+    SELECT activity FROM "eval"
+    UNION
+    SELECT activity FROM "case"
+  ) AS "activity"
+);
+my $assessed_activity = $dbh->selectall_hashref($query, 'activity');
+die $dbh->errstr . $query if $dbh->err;
+
+my %path;
+foreach my $id (keys %$assessed_activity) {
+  next if $id == 0;
+  my $query = qq(
+SELECT parent.label
+  FROM $old_activity AS node, $old_activity AS parent
+ WHERE node.left_id BETWEEN parent.left_id AND parent.right_id
+   AND node.id = $id
+ ORDER BY parent.left_id;
+);
+  my $p = $dbh->selectcol_arrayref($query);
+  die $dbh->errstr . $query if $dbh->err;
+  shift @$p;  # remove 'root'
+  $path{$id} = join(" -> ", @$p);
+
+  # find an identical path in the new activity tree
+  my $pathstr = $p->[-1];
+  print STDERR $query unless defined $pathstr;
+
+  $pathstr =~ s/\'/''/g;
+  $query = qq(
+SELECT node.id, parent.label
+  FROM $new_activity AS node, $new_activity AS parent
+ WHERE node.left_id BETWEEN parent.left_id AND parent.right_id
+   AND node.label = '$pathstr'
+ ORDER BY node.left_id;
+);
+  $p = $dbh->selectall_arrayref($query);
+  die $dbh->errstr . $query if $dbh->err;
+
+  my $all_paths = join ' -> ', map { join '==', @$_ } @$p;
+
+  # the above query will return multiple paths if the element is not unique
+  my @paths = split / -> \d+==root -> /, $all_paths;
+  my %new_id;
+
+  foreach my $p ( @paths ) {
+    $p =~ s/^\d+==root -> //;
+    my $new_id = $1 if $p =~ s/(\d+)==//g;
+    $new_id{$p} = $new_id;
+  }
+
+#  if ( 0 <- do this to see the choices // and  $new_id{$path{$id}} ) {
+  if ($new_id{$path{$id}} ) {
+    print "$id\t$new_id{$path{$id}}\n";
+  }
+  else {
+    print STDERR "< $id:\t$path{$id}\n";
+    foreach my $p ( sort keys %new_id ) {
+      my $ver1 = $p;
+      my $ver2 = $path{$id};
+#       $ver1 =~ s/ -> //g;
+#       $ver1 =~ s/\s+//g;
+#       $ver2 =~ s/ -> //g;
+#       $ver2 =~ s/\s+//g;
+#       $ver1 =~ s/Sigmoidectomy//;
+      my $sim = sprintf("%5.3f", similarity $ver1, $ver2);
+      if ( $sim > 0.96 ) {
+        print STDERR "($sim) => $new_id{$p}:\t\e[7m$p\e[0m\n";
+        print "$id\t$new_id{$p}\n";
+      }
+      else {
+        print STDERR "($sim) > $new_id{$p}:\t$p\n";
+      }
+    }
+    print STDERR "\n";
+  }
+}
+__END__
+
+Steps to replace the tree in the easiest case
+
+1. Get the new tree
+
+    ./export_tree treval.activity > new
+
+2. Create the table from the new tree
+
+   ./import_tree new > newtree.tab
+
+
+3. Make a translation table. Watch for warnings
+
+    DROP TABLE new_activity ;
+    SELECT * INTO new_activity from activity;
+    DELETE FROM new_activity ;
+    \copy new_activity from 'newtree.tab'
+
+    ./find_path > trans.tab
+
+    DROP TABLE trans;
+    CREATE TABLE trans(o int, n int);
+    INSERT INTO trans VALUES (0, 0);
+    \copy trans from 'trans.tab'
+
+    INSERT INTO trans (o, n) SELECT id AS o, id AS n FROM activity WHERE id NOT IN (SELECT o FROM trans);
+
+4. Back things up
+
+    SELECT * INTO note_backup FROM note;
+    SELECT * INTO feedback_backup FROM feedback;
+    SELECT * INTO remark_backup FROM remark;
+    SELECT * INTO eval_backup FROM eval;
+    SELECT * into case_backup from "case" ;
+
+5. Translate the ids
+
+    DROP TABLE new_case;
+
+    SELECT "case".id,
+           "case".date,
+           "case".timestamp,
+           "case".case_no,
+           trans.n AS activity,
+           "case".trainee,
+           "case".attending,
+           "case".assessor
+      INTO new_case
+      FROM "case", trans
+     WHERE "case".activity = trans.o;
+
+     DROP TABLE new_eval;
+
+     SELECT eval.case, trans.n AS activity, eval.assessment, eval.np_reason
+       INTO new_eval
+       FROM eval, trans
+      WHERE eval.activity = trans.o;
+
+     DROP TABLE new_note;
+
+     SELECT note.when, note.user, trans.n AS activity, note.path, note.text
+       INTO new_note
+       FROM note, trans
+      WHERE note.activity = trans.o;
+
+     DROP TABLE new_feedback;
+
+     SELECT feedback.when, feedback.user, trans.n AS activity, feedback.path, feedback.text
+       INTO new_feedback
+       FROM feedback, trans
+      WHERE feedback.activity = trans.o;
+
+
+5. Drop the tree
+
+    DELETE FROM activity;
+
+    INSERT INTO activity SELECT * FROM new_activity ;
+
+
+6. Put everything back in place;
+
+   INSERT INTO "case" SELECT * FROM "new_case";
+
+   DELETE from "eval";
+   INSERT INTO "eval" SELECT * FROM "new_eval";
+
+   DELETE FROM "remark";
+   INSERT INTO "remark" SELECT * FROM "remark_backup";
+
+   DELETE FROM "note";
+   INSERT INTO "note" SELECT * FROM "new_note";
+
+   DELETE FROM "feedback";
+   INSERT INTO "feedback" SELECT * FROM "new_feedback";
+
+7. Clean up
+
+    DROP TABLE trans;
+    DROP TABLE new_case;
+    DROP TABLE new_eval;
+    DROP TABLE new_activity;
+    DROP TABLE new_feedback;
+    DROP TABLE feedback_backup;
+    DROP TABLE new_note;
+    DROP TABLE note_backup;
+    DROP TABLE remark_backup;
+    DROP TABLE case_backup;
+    DROP TABLE eval_backup;
+

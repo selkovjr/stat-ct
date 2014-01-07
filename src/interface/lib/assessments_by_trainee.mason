@@ -1,0 +1,157 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin <% $source %> -->
+% if ( @$pile > 0 ) {
+            <p style="margin-top: 1em">
+              Welcome <b>Dr. <% $User->sn %></b>,
+            </p>
+            <p>
+              It appears that you have attended but not assessed <% $plural_cases ? 'the following cases' : 'this case' %>:
+            </p>
+            <table border="0" cellspacing="0" cellpadding="0">
+              <tbody>
+                <tr bgcolor="#808080">
+                  <td colspan="2" class="compacttd"><span style="color: white">Date/Case No.</span></td>
+                  <td class="compacttd"><span style="color: white">Trainee</span></td>
+                  <td class="compacttd"><span style="color: white">Case</span></td>
+                  <td class="compacttd"><span style="color: white">Action</span></td>
+                </tr>
+% my $row = 0;
+% foreach my $case ( sort {my $one = (split ",", $a->[-1])[0]; my $two = (split ",", $b->[-1])[0]; $one cmp $two} @$pile ) {
+%# foreach my $case ( @$pile ) { # the query sorts them by date, activity and case_no
+%   $row++;
+%   my $color = $row % 2 ? '#F0F0F0' : '#FEFEFE';
+%   my ($uid, $date, $case_no, $activity, $label, $case_id) = @$case;
+                <tr bgcolor="<% $color %>">
+                  <td valign="top" class="compacttd"><% $date %></td>
+                  <td valign="top" class="compacttd"><% $case_no %>/<% $case_id %></td>
+                  <td valign="top" class="compacttd"><% $trainee{$uid} %></td>
+                  <td valign="top" style="padding-left: 1em"><% $label %></td>
+                  <td valign="top" class="compacttd">
+                    <form method="POST" action="eval.html" class="inlineform">
+                      <input type="hidden" name="date" value="<% $date %>">
+                      <input type="hidden" name="case_no" value="<% $case_no %>">
+                      <input type="hidden" name="procedure" value="<% $activity %>:<% $label %>">
+                      <input type="hidden" name="teammate" value="<% $uid %>:<% $trainee{$uid} %>:">
+                      <input type="hidden" name="role" value="attending">
+                      <input type="hidden" name="nogreeting" value="1">
+                      <input type="submit" name="assess" value="Assess" class="smallbutt">
+                    </form>
+                    <form method="POST" action="index.html" class="inlineform">
+                      <input type="hidden" name="date" value="<% $date %>">
+                      <input type="hidden" name="case_no" value="<% $case_no %>">
+                      <input type="hidden" name="case_to_ignore" value="forgotten:<% $case_id %>">
+                      <input type="hidden" name="procedure" value="<% $activity %>:<% $label %>">
+                      <input type="hidden" name="teammate" value="<% $uid %>:<% $trainee{$uid} %>:">
+                      <input type="hidden" name="role" value="attending">
+		      <input type="button" class="smallbutt" name="fix" value="Fix case type/date" onclick="initForm('<% $date %>', '<% $uid %>', '<% $activity %>', 'corrected:<% $case_id %>')">
+                      <input type="submit" name="dismiss" value="Dismiss" class="smallbutt">
+                    </form>
+                  </td>
+                </tr>
+% }
+              </tbody>
+            </table>
+            <p>
+              If you wish to ignore <% $plural_cases ? 'these cases' : 'this case' %>
+              for now, please go ahead and select a new case from the form
+              below. You can return here to assess or dismiss the <% $plural_cases ? 'cases' : 'case' %>
+              reported by your <% $plural_trainees ? 'trainees' : 'trainee' %> at any time.
+            </p>
+% }
+            <!-- end <% $source %> -->
+<%init>
+my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/lib/assessments_by_trainee.mason,v 2.6 2013/11/16 22:19:17 stat Exp $);
+my $pile;
+my $uid = $User->uid;
+my $query = qq(
+SELECT DISTINCT "trainee", "date", "case_no", "activity", "label"
+  FROM "case", "activity"
+ WHERE "case".activity = "activity".id
+   AND "attending" = '$uid'
+   AND "assessor" = "trainee"
+   AND ("date", "case_no", "activity") NOT IN (
+         SELECT DISTINCT "date", "case_no", "activity"
+           FROM "case"
+          WHERE "attending" = '$uid'
+            AND "assessor" = '$uid'
+       )
+   AND ("trainee", "date", "case_no", "activity") NOT IN (
+         SELECT "trainee", "date", "case_no", "activity"
+           FROM "case"
+          WHERE "id" IN (
+                  SELECT "case"
+                    FROM "case_to_ignore"
+                   WHERE "assessor" = '$uid'
+                )
+       )
+   AND "date" > now() - '2 weeks'::interval
+ ORDER BY "date", "activity", "case_no"
+);
+
+$pile = $Dbh->selectall_arrayref($query);
+$Dbh->err and die $Dbh->errstr . "in query: [$query]";
+
+# scan the result to determine the number of trainees
+my %trainee;
+foreach my $case ( @$pile ) {
+  $trainee{$case->[0]}++;
+}
+
+# replace counts with full names
+foreach my $uid ( keys %trainee ) {
+  my $person;
+  my @ent = Person->search_by_uid($uid);
+  if ( @ent == 0 ) {
+    $person = Person->new(
+			  uid => $uid,
+			  cn => "Unknown [$uid]",
+			  sn => "[$uid]",
+			  givenName => 'Unknown',
+			 );
+  }
+  elsif ( @ent == 1 ) {
+    $person = $ent[0];
+  }
+  else {
+    # For now, just assume it's the same person. We will later enforce fully-qualified ids
+    $person = $ent[-1];
+    #die "multiple directory entries for '$uid' found in [" . join(", ", map {"@" . $_->{domain}} @ent) . "]";
+  }
+  $trainee{$uid} = $person->{cn};
+}
+
+# grab matching case IDs
+foreach my $case ( @$pile ) {
+  my ($teammate_uid, $date, $case_no, $activity, $label) = @$case;
+  my $query = qq(
+SELECT "id"
+  FROM "case"
+ WHERE "trainee" = '$teammate_uid'
+   AND "attending" = '$uid'
+   AND "date" = '$date'
+   AND "case_no" = '$case_no'
+   AND "activity" = '$activity'
+);
+  my $res = $Dbh->selectall_arrayref($query);
+  $Dbh->err and die $Dbh->errstr . "in query: [$query]";
+  my $ids = join(",", map {$_->[0]} @$res);
+  push @$case, $ids;
+}
+
+my $plural_cases = @$pile > 1;
+my $plural_trainees = keys %trainee > 1;
+</%init>
+

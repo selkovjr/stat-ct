@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- begin autohandler <% Util::version(q$Header: /opt/cvs/stat/src/interface/autohandler,v 2.25 2013/07/08 14:10:17 stat Exp $) %> -->
+<!-- Copyright 2006 University of Chicago
+
+   Licensed under the UChicago-STAT Public License, (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License in the "license.txt" file
+   distributed with this Work, or download it at
+   http://jcs.uchicago.edu/download/stat/license.txt
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+-->
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title><& SELF:title, %ARGS &></title>
+    <link rel="stylesheet" href="<& lib/url.mason, path => 'stat.css' &>" type="text/css">\
+    <script type="text/javascript">
+      STAT = {};
+      STAT.application = '<% $STAT::application %>';
+    </script>
+    <script src="/combo/lib/?/yui3/build/yui/yui-min.js"></script>
+% if ( $valid_login ) {
+    <& SELF:jshead, %ARGS &>\
+% }
+    <!-- autohandler continues -->
+  </head>
+% if ( $valid_login ) {
+  <body class="yui3-skin-sam" <& SELF:init &>>
+% } else {
+  <body class="yui3-skin-sam">
+% }
+% if ( 0 and $User->uid !~ /selkovjr|roach/ ) {
+    <p>Please wait for an hour or two. The database needs maintenance.</p>
+% } else {
+    <table border="0" cellpadding="0" cellspacing="0" width="900">
+      <tbody>
+        <tr>
+          <td bgcolor="#e0e0e0" align="left" style="border-top:1px black solid; border-bottom:1px black solid; border-left: 1px black solid">
+            <div class="navbar">
+% if ( $valid_login ) {
+              <& REQUEST:page_title, %ARGS &>
+% } else {
+%   if ( my $inst = $Model->config("institution") ) {
+              <% "STAT: $inst" %>
+%   } else {
+              <% "STAT login" %>
+%   }
+% }
+            </div>
+          </td>
+          <td bgcolor="#e0e0e0" align="right" style="border-top:1px black solid; border-bottom:1px black solid; border-right: 1px black solid">
+            <div class="navbar">
+              <span class="noLINE">
+                <& lib/navbar.mason,
+      title => $m->scomp('REQUEST:page_title', %ARGS),
+      menu_handle => $m->scomp('REQUEST:menu_handle', %ARGS),
+      %ARGS &>
+              </span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">
+            <!-- this space is reserved for alerts --> <% $alert %>
+          </td>
+        </tr>
+        <tr valign="top">
+          <td colspan="4">
+            <!-- autohandler insertion: $m->call_next -->
+% if ( $valid_login ) {
+            <% $m->call_next %>
+% } else {
+%   if ( $m->request_comp->path =~ /help.html/ ) { # this is the only request served without a valid login
+            <% $m->scomp( "login.html:help", %ARGS ) %>
+%   } else { # all unauthenticated requests end up here
+            <p></p>
+            <% $m->scomp( "login.html", %ARGS ) %>
+%     if ( $STAT::application =~ /demo/ ) { # the demo versions have a blurb explaining how to use them
+              <p>
+%       if ( $STAT::application =~ /gensurg/ ) { # the demo versions have a blurb explaining how to use them
+                To get one of our past residents' view of STAT, please log in as '<code>wimc</code>', password '<code>pass</code>'.
+%       }
+              </p>
+              <p>
+                Please click "HELP" above to read about all available login choices and teammates' IDs that you will need enter on the assessment form.
+              </p>
+              <p>
+                <a href="src/dist">Download STAT</a>
+              </p>
+%     } else {
+              <!-- Please click "HELP" for ... -- redundand in production apps -->
+%     }
+%   }
+            <hr style="margin-top: 1em">
+% }
+            <!-- autohandler continues -->
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">
+      <div style="margin-top: 1em; color: #999">
+              Questions or comments? Write to: <a href="mailto:<% $STAT::contact%>"><% $STAT::contact %></a>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">
+            <& SELF:file_info &>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+% }
+    <script type="text/javascript"><& SELF:code, %ARGS &>
+    </script>
+  </body>
+</html>
+<!-- end autohandler -->
+<%flags>
+  inherit => 'syshandler'
+</%flags>
+<%method title>Surgical Training Assessment Tool</%method>
+<%method page_title>untitled</%method>
+<%method menu_handle></%method>
+<%method jshead></%method>
+<%method code></%method>
+<%method init></%method>
+<%method links></%method>
+<%method file_info></%method>
+<%args>
+  $alert => undef
+</%args>
+<%init>
+  my $valid_login;
+
+  unless ( $m->request_comp->path =~ /login.html/ ) {
+    unless ( $m->request_comp->path =~ /help.html/ and $ARGS{path} eq 'login.html' ) {
+      if ( $STAT::Session->{token} ) {
+  if ( $STAT::Session->{token} eq Digest::SHA1::sha1_hex( 'secret', $STAT::Session->{username} ) ) {
+    $valid_login = 1;
+  } else {
+    die "someone is trying to be sneaky!";
+  }
+      }
+      else {
+  # token not presented
+
+  my $requested_resource = $r->uri;
+  $requested_resource =~ s/^.+mason_handler.cgi//;
+
+  # append query string if we have one
+  my %args = %{$m->request_args};
+  my $logged_out = delete $args{logged_out};
+
+  if ( %args ) {
+    my @keys = keys %args;
+    if ( @keys > 160 ) { # just an arbitrary number
+      foreach my $key ( @keys ) {
+        # Theese parameters are not needed. They invade this request from
+        # work_hours.html, because they belong to a form there. The form is generated from
+        # the database, so when we delete these arguments, all we lose is the updates
+        # made to the times in the form before the session times out. No big deal.
+        # Otherwise we get this error: "request failed: URI too long (longer than 8190)"
+        delete $args{$key} if $key =~ /^(in|out)_/;
+      }
+    }
+    # url.mason encodes the url, so it has to be decoded
+    # before redirecting to the requested component
+    $requested_resource = $m->scomp("/lib/url.mason", path => $requested_resource, query => \%args );
+  }
+
+  my @message;
+  if ( $logged_out ) {
+    @message = (login_message => "You are logged out. Thank you for using STAT.");
+    delete $ARGS{logged_out};
+  } elsif ( %args ) {
+    @message = (login_message => "If you were logged in, your session may have timed out");
+  } else {
+    @message = (login_message => "Please log in");
+  }
+  $m->comp( '/lib/redirect.mason',
+      path => 'login.html',
+      query => {
+          username => $ARGS{username},
+          password => $ARGS{password},
+          @message,
+          redirect_to => $requested_resource,
+         },
+    );
+      }
+    }
+  }
+</%init>

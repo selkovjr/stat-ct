@@ -1,0 +1,92 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin <% $source %> -->
+    <script type="text/javascript">
+      // These variables specify behavior and appearance of the tree.
+      // For details, see documentation at
+      // http://www.treemenu.net/treemenu/instructions.asp
+
+      USETEXTLINKS = 1;
+      STARTALLOPEN = 0;
+      USEFRAMES = 0;
+      USEICONS = 0;
+      WRAPTEXT = 0;
+      PRESERVESTATE = 0;
+      HIGHLIGHT = 1;
+      ICONPATH = 'lib/icons/';
+
+      var node = {};
+
+      // Close all folders
+      function collapseTree() {
+        parent.clickOnNodeObj(parent.foldersTree); // hide all folders
+        parent.clickOnNodeObj(parent.foldersTree); // restore the first level
+      }
+
+      // This code creates the tree
+      <% join("\n", @JSOUT) %>
+    </script>
+    <!-- end <% $source %> --> \
+<%args>
+</%args>
+<%flags>
+  inherit => '/syshandler'
+</%flags>
+<%init>
+my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/lib/category_tree.js.mason,v 2.6 2011-01-27 21:10:41 stat Exp $);
+my $uid = $User->uid;
+my $role = $User->role;
+
+##################################################################################################
+# begin the Javascript output for the tree
+my $root_label = "Specialty/Procedure:";
+my @JSOUT = (qq(foldersTree = gFld("$root_label", "javascript:undefined")));
+push @JSOUT, qq(      foldersTree.label = "$root_label");
+push @JSOUT, qq(      foldersTree.xID = "root");
+
+##################################################################################################
+# Loop through the top level nodes and insert each one's children. These will represent procedures
+foreach ( $Model->children_of($Model->id_of_specific, extra_data => 'yes, please', user => $uid) ) {
+  my %node = $_->get_columns;
+  $node{pearl_count_in_children}= $Model->number_of_contained_pearls($uid, $node{id});
+  my $suffix =  $node{pearl_count_in_children} ? q(<a target=\"notes\" href=\") .
+    $m->scomp("url.mason", path => "note.html", query => {nodeID => $node{id}}) .
+      qq(\\"><span id=\\"pearl_$node{id}\\" class=\\"blackpearl\\">&nbsp;&nbsp;&nbsp;&nbsp<\\/span><\\/a>) : "";
+  $suffix = "" unless $role eq 'trainee';
+
+  push @JSOUT, qq(      node[$node{id}] = insFld(foldersTree, gFld("$node{label}", "javascript:collapseTree(); clickOnNode(\\"$node{id}\\"); parent.op()")););
+  push @JSOUT, qq(      lb = "$node{label}";);
+  push @JSOUT, qq(      node[$node{id}].label = "$node{label}";);
+  push @JSOUT, qq(      node[$node{id}].xID = "$node{id}";);
+  push @JSOUT, qq(      node[$node{id}].appendHTML = "$suffix";) . ($node{pearl_count} ? qq(
+      node[$node{id}].hasPearls = true;) : "") . ($node{pearl_count_in_children} ? qq(
+      node[$node{id}].containsPearls = true;) : "");
+
+  foreach my $activity ( $Model->children_of($node{id}) ) {
+    my ($id, $label, $pearls_present) = ($activity->id, $activity->label, $Model->number_of_contained_pearls($uid, $activity->id));
+    my $suffix = $pearls_present ? q(<a target=\"notes\" href=\") .
+      $m->scomp("url.mason", path => "note.html", query => {nodeID => $id, mode => 'display'}) .
+        qq(\\"><span id=\\"pearl_$id\\" class=\\"blackpearl\\">&nbsp;&nbsp;&nbsp;&nbsp<\\/span><\\/a>) : "";
+    $suffix = "" unless $role eq 'trainee';
+
+    push @JSOUT, qq(        node[$id] = insDoc(node[$node{id}], gLnk("S", "$label", "javascript:setProc($id)")););
+    push @JSOUT, qq(        node[$id].label = "$label";);
+    push @JSOUT, qq(        node[$id].xID = "$id";);
+    push @JSOUT, qq(        node[$id].appendHTML = "$suffix";) . ($pearls_present ? qq(
+        node[$id].containsPearls = true;) : "");
+
+  }
+}
+</%init>

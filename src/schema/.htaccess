@@ -1,0 +1,8 @@
+DirectoryIndex stat-schema.html
+Allow from all
+Satisfy Any
+<FilesMatch "(\.html|\.css)$">
+  RemoveHandler html-mason .css
+  RemoveHandler html-mason .html
+</FilesMatch>
+

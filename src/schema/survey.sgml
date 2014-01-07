@@ -1,0 +1,264 @@
+<!-- survey was nixed in 2008 -->
+    <!-- **** S U R V E Y   D E M O G R A P H I C **** -->
+    <class name="survey_demographic" group="fact">
+      <description>Data about survey respondents</description>
+      <source>user input</source>
+      <attribute name="user" type="text" pkey="1">
+        <description>ID of the respondent</description>
+      </attribute>
+      <attribute name="gender" type="text">
+        <description>Respondent's gender</description>
+      </attribute>
+      <attribute name="medschool" type="text">
+	<description>Medical School</description>
+      </attribute>
+      <attribute name="medschool_year" type="smallint">
+	<description>Year graduated from medical school</description>
+      </attribute>
+      <attribute name="int_hospital" type="text">
+	<description>Internship_hospital</description>
+      </attribute>
+      <attribute name="int_type" type="text">
+	<description>Internship type</description>
+      </attribute>
+      <attribute name="int_year" type="smallint">
+	<description>Year completed internshiy</description>
+      </attribute>
+    </class>
+
+    <!-- **** S U R V E Y   Q U E S T I O N   G R O U P **** -->
+    <class name="survey_question_group" group="enum">
+      <description>Topics used to group questions on the survey form</description>
+      <source>curator</source>
+      <attribute name="group_id" type="text" pkey="1">
+        <description>Numeric id of the group</description>
+      </attribute>
+      <attribute name="topic" type="text">
+        <description>Topic title</description>
+      </attribute>
+      <init>
+0	Role
+A	Feedback
+B	Learning objectives
+C	Assessment of skills
+D	Structure of intra-operative educational process 
+E	Awarenes of progress
+F	Orientation of priorities about performance in the OR
+G	Time spent in preparation for cases
+H	Improvement in focus on preparation
+I	Resident and faculty satisfaction
+J	Formalized performance assessments
+K	Respondent satisfaction
+      </init>
+    </class>
+
+    <!-- ************** S U R V E Y   Q U E S T I O N S ************ -->
+    <class name="survey_question" group="enum">
+      <description>Survey questions for staff/residents</description>
+      <source>curator</source>
+      <attribute name="group_id" type="text" ref="survey_question_group">
+        <description>Reference to a group topic</description>
+      </attribute>
+      <attribute name="num" type="smallint">
+        <description>Numeric id of the question within a topic</description>
+      </attribute>
+      <attribute name="category" type="text" link="survey_response">
+        <description>Reference to response class defined in "survey_response"</description>
+      </attribute>
+      <attribute name="question_id" type="text" pkey="1">
+        <description>A unique id of the question (attempting to be readable)</description>
+        <comment>It is also used as a variable name on the survey form</comment>
+      </attribute>
+      <attribute name="text" type="text">
+        <description>The text of the question</description>
+      </attribute>
+      <init>
+0	1	role	role	\N
+A	1	percentage	feedback_performance	In your estimation, during/after what percentage of cases did <% $role eq 'trainee' ? "attending physicians give you feedback?" : "you give your residents feedback on their operative performance?" %>
+A	2	gen_spec	feedback_specific	In general, was the feedback <% $role eq 'trainee' ? 'the attending physicians' : "you" %> provided generic or specific?
+A	3	agreement_na	feedback_clear	In general, when you do <% $role eq 'trainee' ? "receive feedback, does it help you" : "give feedback, would you say it helps your trainees" %> understand clearly what <% $role eq 'trainee' ? "you" : "they" %> did poorly and what <% $role eq 'trainee' ? "you" : "they" %> did well?
+A	4	agreement_na	feedback_timely	In general, the feedback <% $role eq 'trainee' ? "from attending physicians" : "you give" %> is timely enough to improve <% $role eq 'trainee' ? "your performance while on that specific rotation" : "your trainee's performance while on rotation with you" %>?
+A	5	agreement_na	feedback_accurate	In general, the <% $role eq 'trainee' ? "dialogue / verbal feedback is accurate (it matches your own internal assessment of your performance)" : "content of your dialogue / verbal feedback is not surprising (it matches your trainee's internal assessments of his or her performance)" %>.
+B	6	percentage	objectives_specified	In your estimation, before or during or after what percentage of operative cases did <% $role eq 'trainee' ? "your attending physicians" : "you" %> specify learning objectives for <% $role eq 'trainee' ? "you" : "your residents" %> (like a coach telling a player what to work on for the next game)?
+B	7	agreement_na	objectives_spec_resident	In general, based on the learning objectives you did <% $role eq 'trainee' ? "receive" : "deliver" %>, they were very specific to <% $role eq 'trainee' ? "you" : "that resident" %> individually<% $role eq 'trainee' ? "" : " (as opposed to being general learning objectives for any resident on service)" %>?
+B	8	agreement_na	objectives_spec_session	In general, when you do <% $role eq 'trainee' ? "receive" : "provide" %> learning objectives, they are very specific to what would occur or did occur in the training session<% $role eq 'trainee' ? "" : " (as opposed to being general learning objectives for anyone doing that particular type of case)" %>?
+B	9	agreement_na	objectives_understood	In general, in any given case, <% $role eq 'trainee' ? "you" : "your resident" %> knew clearly what <% $role eq 'trainee' ? "your" : "his or her" %> learning objectives were?
+B	10	agreement_na	objectives_timely	In general, the learning objectives <% $role eq 'trainee' ? "provided by attending physicians" : "you provided" %> were timely enough to improve <% $role eq 'trainee' ? "your" : "his or her" %> performance while on that specific rotation?
+B	11	agreement_na	objectives_match	In general, the learning objectives <% $role eq 'trainee' ? "provided by attending physicians were consistent with your own" : "you provide seem to match your tainee's" %> internal assessment of what <% $pronoun %> learning objectives should be?<% $role eq 'trainee' ? "" : " (Example of mismatch: they think they should be learning to dissect the pulmonary hilum whereas you think they need to learn to position the patient first)" %>
+B	12	specificity	objectives_spec_abilitiy	How specific were expectations of procedural ability outlined to <% $role eq 'trainee' ? "you" : "trainee" %> before entering the OR?
+B	13	specificity	objectives_spec_task	How specific were explanations of what <% $role eq 'trainee' ? "you" :  "trainee" %> would be asked to do in training session?
+B	14	specificity	objectives_spec_knowledge	How specific were the requirements for knowledge <% $role eq 'trainee' ? "you" : "trainee" %> should have going into the OR?
+C	15	quality	assessment_of_knowledge	With respect to <% $role eq 'trainee' ? "my" : "their" %> level of training, <% $role eq 'trainee' ? "my" : "your residents'" %> level of surgical knowledge / coceptual understanding is:
+C	16	quality	assessment_of_skill	With respect to <% $role eq 'trainee' ? "my" : "their" %> level of training, <% $role eq 'trainee' ? "my" : "your residents'" %> level of technical ability (skill) in the OR is:
+C	17	quality	assessment_of_independence	With respect to <% $role eq 'trainee' ? "my" : "their" %> level of training, <% $role eq 'trainee' ? "my" : "your residents'" %> level of professional independence is:
+C	18	agreement	assessment_quantifiable	<% $role eq 'trainee' ? "Your competencies" : "When reporting your assessments of residents, your descriptions of their competencies" %> were measured/assessed in a way that was quantifiable (could conceivably be translated into a score or number).
+C	19	agreement	assessment_qualitative	<% $role eq 'trainee' ? "Your skills" : "When reporting your assessments of residents, your descriptions of their competencies" %> were assessed in a way that was qualitative (could conceivably be translated into a strategy for change, improvement, or practice).
+C	20	agreement	assessment_comparable	<% $role eq 'trainee' ? "Your skills" : "When reporting your assessments of residents, your descriptions of their competencies" %> were measured/assessed in a way that was comparable (could conceivably be compared to performance of other trainees or to <% $role eq 'trainee' ? "your" : "their own" %> performance in the past).
+C	21	impact	instruction_impact_on_skill	What impact did <% $role eq 'trainee' ? "the" : "your" %> instruction in the OR have on the quality of <% $role eq 'trainee' ? "your" : "your residents'" %> motor skill?
+D	22	frequency	intraop_knowledge_tested	There is "book knowledge" and there is "applied knowledge". ABSITE exams measure "book knowledge". Question: In the OR, <% $role eq 'trainee' ? "are you probed by your attending with regard to your" : "do you probe your residents with regard to their" %> "applied knowledge"?
+D	23	frequency	intraop_focus_on_skill	In the OR, <% $role eq 'trainee' ? "you and your attending" : "you and your resident" %> focused upon the particular elements of surgical skill necessary to reach the next level of technical ability.
+D	24	frequency	intraop_focus_on_independence	In the OR, <% $role eq 'trainee' ? "you and your attending" : "you and your resident" %> focused upon developing independence.
+D	25	frequency	intraop_teaching_structured	Time spent in the OR <% $role eq 'trainee' ? "seems to be" : "is" %> structured and orderly (to the degree that a lesson plan can be followed in spite of possible surgical uncertainties).
+D	26	frequency	postop_reflection	After time spent in the OR, you typically reflect upon your <% $role eq 'trainee' ? "learning experience" : "teaching effectiveness" %>.
+E	27	frequency	progress_relative_to_past	During the surgical training program it was clear to me how <% $role eq 'trainee' ? "me" : "my residents" %> were doing relative to <% $pronoun %> past performance.
+E	28	frequency	progress_relative_to_others	During the surgical training program it was clear to me how <% $role eq 'trainee' ? "me" : "my residents" %> were doing relative to others at <% $pronoun %> level.
+E	29	frequency	progress_relative_to_goals	During the surgical training program it was clear to me how <% $role eq 'trainee' ? "me" : "my residents" %> were doing relative to where <% $role eq 'trainee' ? "you" : "they" %> were expected to be.
+F	30	agreement	intraop_lessons_appropriate	Lessons provided in the OR are in line with what <% $role eq 'trainee' ? "you hoped to learn" : "the residents should be learning" %> from <% $pronoun %> surgical training.
+F	31	agreement	intraop_performance_selfconcept	How <% $role eq 'trainee' ? "you" : "your residents" %> perform in the OR forms the basis of <% $role eq 'trainee' ? "your self-concept as a surgeon" : "their self-concept as surgeons" %>.
+F	32	agreement	intraop_performance_priority	With regard to your <% $role eq 'trainee' ? "residency" : "residents'" %> training, <% $role eq 'trainee' ? "you" : "they seem to" %> have no higher objective than doing <% $pronoun %> best in the operating room.
+F	33	agreement	intraop_obligation_priority	Of all <% $pronoun %> various professional obligations, <% $role eq 'trainee' ? "you" : "your residents" %> reserve <% $pronoun %> best efforts for performing well in the operating room.
+G	34	advance_prep	time_to_prepare	When do <% $role eq 'trainee' ? "you" : "you think your residents" %> begin to prepare for a case of average complexity?
+G	35	review_time	time_to_review	How much time do <% $role eq 'trainee' ? "you" : "you think your residents" %> spend reviewing a case of average complexity?
+G	36	frequency	preparedness	Given <% $pronoun %> methods and materials for operative education/review, <% $role eq 'trainee' ? "do you feel prepared" : "how prepared do you think your residents are" %> for the operating room?
+H	37	inc_dec	time_to_prepare_inc	<% $role eq 'trainee' ? "The amount of time you" : "You think the amount of time your residents" %> spend preparing for the typical surgical case has:
+H	38	agreement	focus_on_preparation_improved	<% $role eq 'trainee' ? "Your" : "Your residents'" %> preparation for surgical procedures has gotten more specific and directed during the past six months.
+I	39	agreement	satisfaction_recommend_use	Based on my experience with STAT, I would recommend its continued use with future classes.
+I	40	agreement	satisfaction_recommend_changes	Based on my experience with STAT, I would recommend significant changes to its design and/or implementation.
+I	41	agreement_na	satisfaction_impact_essential	With regard to my future success as a <% $role eq 'trainee' ? "professional surgeon" : "teaching physician" %>, I feel the impact of STAT upon our training program has been essential.
+I	42	agreement	satisfaction_program_effective	With regard to educating residents in the skills necessary to become a surgeon, this surgical training program is effective.
+J	43	agreement	paper_helpful	The periodic (monthly) formal performance assessments I <% $role eq 'trainee' ? "receive" : "give" %> are helpful
+J	44	agreement	paper_monthly_sufficient	I <% $role eq 'trainee' ? "receive" : "give" %> them monthly, and that is enough for <% $role eq 'trainee' ? "my" : "my residents'" %> development.
+J	45	agreement	paper_accurate	I think these accurately reflect <% $role eq 'trainee' ? "my" : "my residents'" %> abilities, performance, and potential.
+J	46	agreement	paper_reciprocal_accurate	I think my assessments of my <% $role eq 'trainee' ? "attendings" : "residents" %> are accurate.
+K	47	enjoyment	enjoyed_stat	How much did you enjoy participating in the QBST-STAT study?
+K	48	enjoyment	enjoyed_survey	How much did you enjoy participating in this survey?
+      </init>
+    </class>
+
+    <!-- *********** S U R V E Y   R E S P O N S E ********* -->
+    <class name="survey_response" group="enum">
+      <description>Assignment of rated response values by category</description>
+      <source>curator</source>
+      <attribute name="category" type="text">
+        <description>
+          defines a category of the responses: qualitative, degree of
+          agreement, etc.
+        </description>
+      </attribute>
+      <attribute name="rating" type="smallint">
+        <description>numeric value (rating) of the response</description>
+      </attribute>
+      <attribute name="legend" type="text">
+        <description>the legend for the rating</description>
+      </attribute>
+      <init>
+role	\N	\N
+percentage	0	Zero
+percentage	1	1 - 25%
+percentage	2	25 - 50%
+percentage	3	50 - 75%
+percentage	4	75 - 100%
+quality	1	Very poor
+quality	2	\N
+quality	3	\N
+quality	4	\N
+quality	5	\N
+quality	6	\N
+quality	7	excellent
+preparedness	1	Totally unprepared
+preparedness	2	\N
+preparedness	3	\N
+preparedness	4	\N
+preparedness	5	\N
+preparedness	6	\N
+preparedness	7	very well prepared
+inc_dec	-1	N/A
+inc_dec	1	Decreased
+inc_dec	2	\N
+inc_dec	3	\N
+inc_dec	4	\N
+inc_dec	5	\N
+inc_dec	6	\N
+inc_dec	7	increased
+specificity	1	Not specific at all
+specificity	2	\N
+specificity	3	\N
+specificity	4	\N
+specificity	5	\N
+specificity	6	\N
+specificity	7	highly specific
+gen_spec	-1	N/A
+gen_spec	1	Highly generic
+gen_spec	2	\N
+gen_spec	3	\N
+gen_spec	4	\N
+gen_spec	5	\N
+gen_spec	6	\N
+gen_spec	7	highly specific
+agreement	1	Strongly disagree
+agreement	2	\N
+agreement	3	\N
+agreement	4	\N
+agreement	5	\N
+agreement	6	\N
+agreement	7	strongly agree
+agreement_na	-1	N/A
+agreement_na	1	Strongly disagree
+agreement_na	2	\N
+agreement_na	3	\N
+agreement_na	4	\N
+agreement_na	5	\N
+agreement_na	6	\N
+agreement_na	7	strongly agree
+impact	1	No impact
+impact	2	\N
+impact	3	\N
+impact	4	\N
+impact	5	\N
+impact	6	\N
+impact	7	maximum impact
+frequency	1	Never
+frequency	2	\N
+frequency	3	\N
+frequency	4	\N
+frequency	5	\N
+frequency	6	\N
+frequency	7	always
+advance_prep	0	I don't prepare
+advance_prep	1	Minutes before
+advance_prep	2	Hours before
+advance_prep	3	The night before
+advance_prep	4	Days before
+review_time	0	I don't reiview
+review_time	1	Less than 30 minutes
+review_time	2	30 minutes to an hour
+review_time	3	1 to 2 hours
+review_time	4	2 hours or more
+enjoyment	1	Not at all
+enjoyment	2	\N
+enjoyment	3	\N
+enjoyment	4	\N
+enjoyment	5	\N
+enjoyment	6	\N
+enjoyment	7	Extremely
+      </init>
+    </class>
+
+    <!-- ******************** S U R V E Y ****************** -->
+    <class name="survey" group="fact">
+      <description>trial questionnaire</description>
+      <source>user input</source>
+      <attribute name="n" type="smallint">
+        <description>serial number of the survey</description>
+        <source>auto</source>
+      </attribute>
+      <attribute name="when" type="timestamptz">
+        <description>Submission time</description>
+        <source>auto</source>
+      </attribute>
+      <attribute name="user" type="text" ref="survey_demographic">
+        <description>ID of the respondent</description>
+      </attribute>
+      <attribute name="role" type="text">
+        <description>specifies whether the user's role was attending or trainee</description>
+      </attribute>
+      <attribute name="question_id" type="text" ref="survey_question">
+        <description>Reference to survey question</description>
+        <comment>Also used as a variable on the survey form</comment>
+        <source>auto</source>
+      </attribute>
+      <attribute name="response" type="text">
+        <description>respondent's rating of his or her response</description>
+        <source>user input</source>
+      </attribute>
+    </class>

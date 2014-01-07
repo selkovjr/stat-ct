@@ -1,0 +1,1265 @@
+<!DOCTYPE metadata SYSTEM "metadata.dtd">
+<!-- $Id: stat-meta.sgml,v 2.17 2013/11/16 23:46:38 stat Exp $ -->
+
+<metadata name="stat">
+  <entities>
+
+    <!-- ******************* C O N F I G ************************ -->
+    <class name="config" group="fact">
+      <description>Various site-specific configuration data</description>
+      <source>system administator</source>
+      <attribute name="param" type="text" pkey="1">
+        <description>Name of the configuration parameter</description>
+        <source>system administrator</source>
+      </attribute>
+      <attribute name="value" type="text">
+        <description>Parameter value</description>
+      </attribute>
+      <init>
+institution	Cardio-Thoracic
+alerts	yes
+admin	Gene Selkov <selkovjr@observercentral.net>
+      </init>
+    </class>
+
+    <!-- ********************** C A S E ************************* -->
+    <class name="case" group="fact">
+      <description>Links trainer/trainee to a case that occurred on a given day</description>
+      <source>user input</source>
+      <attribute name="id" type="integer" pkey="1" sequence="case_id_seq">
+        <description>Unique ID</description>
+        <source>sequence</source>
+      </attribute>
+      <attribute name="date" type="date">
+        <description>Date when the event took place</description>
+        <source>user input</source>
+      </attribute>
+      <attribute name="timestamp" type="timestamptz">
+        <description>Assessment timestamp</description>
+        <source>user input</source>
+      </attribute>
+      <attribute name="case_no" type="smallint" length="2">
+        <description>
+          Sequential case number to be specified if more
+          than one case of the same type is handled during the
+        </description>
+        <source>auto</source>
+      </attribute>
+      <attribute name="activity" type="smallint" ref="activity(id)" length="2">
+        <description>
+          Reference to a node in the activity tree
+        </description>
+        <comment>
+          This table will refer to the highest levels of the activity tree,
+          to identify an operation
+        </comment>
+        <source>auto</source>
+      </attribute>
+      <attribute name="body_part" type="text"
+        <description>
+          Area of surgery
+        </description>
+        <comment>
+          This attribute is useful for identification in Ortho and
+          other specialties where they do many similar cases on the
+          same day
+        </comment>
+        <example>
+          Shoulder
+          Arm
+          Elbow
+          Forearm
+          Wrist
+          Hand/Fingers
+          Hip/Pelvis
+          Thigh
+          Knee
+          Leg
+          Ankle
+          Foot/Toes
+        </example>
+      </attribute>
+      <attribute name="trainee" type="text" ref="role">
+        <description>Reference to Trainee (via CNetID)</description>
+        <source>user input</source>
+      </attribute>
+      <attribute name="attending" type="text" ref="role">
+        <description>Reference to Attending Physician (via CNetID)</description>
+      </attribute>
+      <attribute name="assessor" type="text" ref="role">
+        <description>Reference to Assessor (via CNetID)</description>
+        <source>user input</source>
+      </attribute>
+    </class>
+
+    <!-- ************* C A S E _ T O _ I G N O R E **************** -->
+    <class name="case_to_ignore" group="fact">
+      <description>
+        A list of cases that the assessor asserts he or she cannot
+        assess, or cases that had to be corrected
+      </description>
+      <source>user input</source>
+      <attribute name="assessor" type="text">
+        <description>Reference to Assessor (via CNetID)</description>
+        <source>auto</source>
+      </attribute>
+      <attribute name="case" type="smallint" ref="case">
+        <description>Reference to Case</description>
+        <source>user input</source>
+      </attribute>
+      <attribute name="reason" type="text">
+        <description>Reason why the case should be ignored</description>
+        <source>user input</source>
+      </attribute>
+    </class>
+
+    <!-- ********************** E V A L ************************* -->
+    <class name="eval" group="fact">
+      <description>Trainee evaluation</description>
+      <source>user input</source>
+      <attribute name="case" type="integer" ref="case">
+        <description>Reference to the event during which training took place</description>
+        <source>auto</source>
+      </attribute>
+      <attribute name="activity" type="smallint" ref="activity(id)" length="2">
+        <description>Reference to a node in the activity
+          tree</description>
+        <comment>This can be an elementary operation, as well as a
+          class of activities evaluated as a whole</comment>
+        <source>auto</source>
+      </attribute>
+      <attribute name="assessment" type="smallint" ref="rating" length="2">
+        <description>Reference to performance rating</description>
+        <comment>The Assessor's (eval.assessor) rating of Trainee's (eval.trainee)
+          performance while conducting the activity specified in (eval.activity)</comment>
+        <source>user input</source>
+      </attribute>
+      <attribute name="np_reason" type="text" ref="np_reason">
+        <description>Reference to explanation of reasons for omission</description>
+        <source>user input</source>
+      </attribute>
+    </class>
+
+    <!-- **************** P E R F O R M A N C E ****************** -->
+    <class name="performance" group="fact">
+      <description>Ferguson component assessment</description>
+      <source>user input</source>
+      <attribute name="case" type="integer" ref="case">
+        <description>Reference to the event during which training took place</description>
+        <source>auto</source>
+      </attribute>
+      <!-- attribute name="procedure" type="text" ref="component" -->
+      <attribute name="procedure" type="text">
+        <description>Reference to procedure name in the component table</description>
+        <comment>
+          This attribute is part of the composite primary key (id,
+          domain). A unique constraint needs to be defined on the two
+          in the functions element.
+        </comment>
+        <source>auto</source>
+      </attribute>
+      <!-- attribute name="seq" type="smallint" length="2" ref="component" -->
+      <attribute name="seq" type="smallint" length="2">
+        <description>Reference to this component's ordinal number in the component table</description>
+        <comment>
+          This attribute is part of the composite primary key (id,
+          domain). A unique constraint needs to be defined on the two
+          in the functions element.
+        </comment>
+        <source>auto</source>
+      </attribute>
+      <!-- attribute name="assessment" type="smallint" ref="rating" length="2" -->
+      <attribute name="level" type="smallint" length="2">
+        <!-- description>Reference to performance rating</description -->
+        <description>Performance level rating</description>
+        <comment>The Assessor's (eval.assessor) rating of Trainee's
+        (eval.trainee) performance while conducting the component of the class
+        specified in component(procedure, seq)</comment>
+        <source>user input</source>
+        <values>
+-2
+0
+1
+2
+3
+        </values>
+      </attribute>
+      <attribute name="tp" type="smallint" length="2">
+        <description>Transition point confirmation</description>
+        <comment>The Assessor's (eval.assessor) assertion of whether the trainee
+        (eval.trainee) a specified transition has been discussed or not</comment>
+        <source>user input</source>
+        <values>
+-2
+1
+0
+-1
+        </values>
+      </attribute>
+      <attribute name="dp" type="smallint" length="2">
+        <description>Decision-making competence</description>
+        <source>user input</source>
+        <values>
+-2
+0
+1
+2
+3
+-1
+        </values>
+      </attribute>
+      <attribute name="tp_np_reason" type="text" ref="np_reason">
+        <description>Reference to explanation of reasons for the omission of input</description>
+        <source>user input</source>
+      </attribute>
+      <attribute name="dp_np_reason" type="text" ref="np_reason">
+        <description>Reference to explanation of reasons for the omission of input</description>
+        <source>user input</source>
+      </attribute>
+    </class>
+
+
+    <!-- **************** C O M P O N E N T  _ S U G G E S T I O N ****************** -->
+    <class name="component_suggestion" group="fact">
+      <description>Collector for user suggestions regarding Ferguson components</description>
+      <source>user input</source>
+      <attribute name="when" type="timestamptz">
+        <description>Submission time for suggestion</description>
+        <source>auto</source>
+      </attribute>
+      <attribute name="user" type="text">
+        <description>ID of the user who entered the suggestion</description>
+      </attribute>
+      <attribute name="procedure" type="text">
+        <description>Procedure type this suggestion relates to.
+          It is a reference to procedure name in the component table
+        </description>
+        <comment>
+          This attribute is part of the composite primary key (id,
+          domain). A unique constraint needs to be defined on the two
+          in the functions element.
+        </comment>
+        <source>auto</source>
+      </attribute>
+      <attribute name="seq" type="smallint" length="2">
+        <description>Reference to this component's ordinal number in the component table</description>
+        <comment>
+          This attribute is part of the composite primary key (id,
+          domain). A unique constraint needs to be defined on the two
+          in the functions element.
+        </comment>
+        <source>auto</source>
+      </attribute>
+      <attribute name="text" type="text">
+        <description>User-supplied suggestion for this component</description>
+        <source>user input</source>
+      </attribute>
+    </class>
+
+
+    <!-- **************** T P _ S U G G E S T I O N ****************** -->
+    <class name="tp_suggestion" group="fact">
+      <description>Collector for user suggestions regarding Ferguson transition points</description>
+      <source>user input</source>
+      <attribute name="when" type="timestamptz">
+        <description>Submission time for suggestion</description>
+        <source>auto</source>
+      </attribute>
+      <attribute name="user" type="text">
+        <description>ID of the user who entered the suggestion</description>
+      </attribute>
+      <attribute name="procedure" type="text">
+        <description>Procedure type this suggestion relates to.
+          It is a reference to procedure name in the component table
+        </description>
+        <comment>
+          This attribute is part of the composite primary key (id,
+          domain). A unique constraint needs to be defined on the two
+          in the functions element.
+        </comment>
+        <source>auto</source>
+      </attribute>
+      <attribute name="seq" type="smallint" length="2">
+        <description>Reference to this component's ordinal number in the component table</description>
+        <comment>
+          This attribute is part of the composite primary key (id,
+          domain). A unique constraint needs to be defined on the two
+          in the functions element.
+        </comment>
+        <source>auto</source>
+      </attribute>
+      <attribute name="text" type="text">
+        <description>User-supplied suggestion for this transition point</description>
+        <source>user input</source>
+      </attribute>
+    </class>
+
+
+    <!-- **************** D P _ S U G G E S T I O N ****************** -->
+    <class name="dp_suggestion" group="fact">
+      <description>Collector for user suggestions regarding Ferguson decision points</description>
+      <source>user input</source>
+      <attribute name="when" type="timestamptz">
+        <description>Submission time for suggestion</description>
+        <source>auto</source>
+      </attribute>
+      <attribute name="user" type="text">
+        <description>ID of the user who entered the suggestion</description>
+      </attribute>
+      <attribute name="procedure" type="text">
+        <description>Procedure type this suggestion relates to.
+          It is a reference to procedure name in the component table
+        </description>
+        <comment>
+          This attribute is part of the composite primary key (id,
+          domain). A unique constraint needs to be defined on the two
+          in the functions element.
+        </comment>
+        <source>auto</source>
+      </attribute>
+      <attribute name="seq" type="smallint" length="2">
+        <description>Reference to this component's ordinal number in the component table</description>
+        <comment>
+          This attribute is part of the composite primary key (id,
+          domain). A unique constraint needs to be defined on the two
+          in the functions element.
+        </comment>
+        <source>auto</source>
+      </attribute>
+      <attribute name="text" type="text">
+        <description>User-supplied suggestion for this decision point</description>
+        <source>user input</source>
+      </attribute>
+    </class>
+
+    <!-- ********************** R A T I N G ************************** -->
+    <class name="rating" group="enum">
+      <description>Enumerated performance ratings</description>
+      <comment>
+        This class combines several different systems of grades
+        used for different purposes. General skills and specific
+        procedures are rated (UQ .. AA), while the overall grade
+        is given in the range of (F .. A). The numeric values
+        for different grade systems are offset by 10.
+      </comment>
+      <source>curator</source>
+      <attribute name="value" type="smallint" pkey="1" length="2">
+        <description>Numeric rating level</description>
+        <source>auto</source>
+      </attribute>
+      <attribute name="symbol" type="text">
+        <description>Rating symbol</description>
+        <source>curator</source>
+      </attribute>
+      <attribute name="desc" type="text">
+        <description>Short description of the rating level</description>
+        <source>curator</source>
+      </attribute>
+      <attribute name="description" type="text">
+        <description>Description of the rating level</description>
+        <source>curator</source>
+      </attribute>
+      <init>
+-1	NP	Non-participatory	trainee was not involved for the reasons indicated separately
+0	P	Poor	a serious problem exists
+1	A	Awkward	worthy of concentrated efforts to improve
+2	C	Competent	perfectly acceptable
+3	E	Expert	finely done
+4	X	EXpert	finely done
+5	X	EXpert	finely done
+10	C	Cognitive	task performance is almost totally under conscious control
+11	I	Integrative	learner is in the process of integrating the task. Some activities require conscious deliberation, some are automatic
+12	A	Autonomous	task performance is locked-in, leaving the person free to engage in other activities or to monitor the environment
+13	P	Proficient	Highly autonomous and proficient
+20	P	Poor	\N
+21	F	Fair	\N
+22	G	Good	\N
+23	VG	Very Good	\N
+24	E	Excellent	\N
+30	Passed	Successfully passed through this transition point	\N
+31	Failed	Transition point has not been reached or was ignored	\N
+40	N	Naïve	Slow transition between steps; halting, uncertain movements; frequent instrument collisions if MIS; failure to progress
+41	I	Intermediate learner	Reasonable transition between steps; moderately confident movements; rare instrument collisions if MIS; avoids most errors
+42	C	Competent	Smooth flow of operation; confident movements; no instrument collisions if MIS; aviods common errors
+43	E	Expert	Avoids errors; able to recover from errors and unexpected challenges; transitions to alternate techniques without hesitation when indicated
+50	N	Naïve	Understands rationale for component; understands major anatomic features; incomplete knowledge of surgical steps
+51	I	Intermediate learner	Understands detailed anatomy; complete knowledge of standard surgical steps
+52	C	Competent	Understands an alternative to standard surgical steps; understands how to avoid common errors
+53	E	Expert	Understands several alternatives to standard surgical steps
+60	N	Naïve	\N
+61	I	Intermediate learner	\N
+62	C	Competent	\N
+63	E	Expert	\N
+70	Passed	Was aware of the possibilities to consider at this point	\N
+71	Failed	Required prompting or explanation	\N
+72	Not discussed	This point has not been brought up in teaching	\N
+100	F	\N	\N
+101	D-	\N	\N
+102	D	\N	\N
+103	D+	\N	\N
+104	C-	\N	\N
+105	C	\N	\N
+106	C+	\N	\N
+107	B-	\N	\N
+108	B	\N	\N
+109	B+	\N	\N
+110	A-	\N	\N
+111	A	\N	\N
+112	A+	\N	\N
+      </init>
+    </class>
+
+    <!-- ******************* R A T I N G _ M A P ***************** -->
+    <class name="rating_map" group="map">
+      <description>Grade system selector</description>
+      <comment>
+        This is a hack that allows the program code to determine which
+        grade system to use depending on the purpose and the role of
+        the user (trainee or attending). It serves as an index into
+        the rating table.
+      </comment>
+      <source>curator</source>
+      <attribute name="subtree" type="text">
+        <description>The name of the subtree for which the set range of ratings apply</description>
+        <source>curator</source>
+      </attribute>
+      <attribute name="role" type="text">
+        <description>User role (attending/trainee)</description>
+        <source>curator</source>
+      </attribute>
+      <attribute name="low" type="smallint" ref="rating(value)">
+        <description>The lowest rate in the range</description>
+        <source>curator</source>
+      </attribute>
+      <attribute name="high" type="smallint" ref="rating(value)">
+        <description>The highest rate in the range</description>
+        <source>curator</source>
+      </attribute>
+      <init>
+Specific	attending	0	3
+Specific	trainee	10	13
+General Capabilities	attending	50	53
+General Capabilities	trainee	50	53
+Component performance	attending	40	43
+Component performance	trainee	40	43
+Transition points	attending	30	31
+Transition points	trainee	30	31
+Decision points	attending	70	42
+Decision points	trainee	70	72
+Overall Case Assessment	attending	60	63
+Overall Case Assessment	trainee	60	63
+      </init>
+    </class>
+    <!-- ******************** N P _ R E A S O N ****************** -->
+    <class name="np_reason" group="enum">
+      <description>List of reasons for omission of
+        activities</description>
+      <source>curator</source>
+      <attribute name="order" type="smallint">
+        <description>Menu order</description>
+        <source>curator</source>
+      </attribute>
+      <attribute name="code" type="text" pkey="1">
+        <description>Abbreviation</description>
+        <source>curator</source>
+      </attribute>
+      <attribute name="text" type="text">
+        <description>Reason for omission</description>
+        <source>curator</source>
+      </attribute>
+      <init>
+1	NR	Not required
+2	PW	Patient's welfare
+3	ML	Multiple learners
+4	P	Pace of operation
+5	T	Team event
+6	D	Demonstration
+7	O	Other
+      </init>
+    </class>
+
+    <!-- ******************** R E M A R K ****************** -->
+    <class name="remark" group="fact">
+      <description>Arbitrary remarks referring to a case</description>
+      <source>user input</source>
+      <attribute name="case" type="smallint" ref="case">
+        <description>Case ID</description>
+        <source>auto</source>
+      </attribute>
+      <attribute name="text" type="text">
+        <description>text</description>
+        <source>user input</source>
+      </attribute>
+    </class>
+
+    <!-- ******************** N O T E ****************** -->
+    <class name="note" group="fact">
+      <description>"Pearls of wisdom" regarding elements of the case type</description>
+      <source>user input</source>
+      <attribute name="when" type="timestamptz">
+        <description>Submission time for the note</description>
+        <source>auto</source>
+      </attribute>
+      <attribute name="user" type="text">
+        <description>ID of the user who entered the note</description>
+      </attribute>
+      <attribute name="activity" type="smallint" ref="activity">
+        <description>An element of the case to which this note is to be attached</description>
+        <source>auto</source>
+      </attribute>
+      <attribute name="path" type="text">
+        <description>Complete path to activity node</description>
+        <comment>
+          This is needed to preserve the annotation for the elements
+          that may be deleted or otherwise modified in the future
+        </comment>
+        <source>auto</source>
+      </attribute>
+      <attribute name="text" type="text">
+        <description>text</description>
+        <source>user input</source>
+      </attribute>
+    </class>
+
+    <!-- ******************** F E E D B A C K ****************** -->
+    <class name="feedback" group="fact">
+      <description>user comments regarding elements of the case</description>
+      <source>user input</source>
+      <attribute name="when" type="timestamptz">
+        <description>Submission time for the note</description>
+        <source>auto</source>
+      </attribute>
+      <attribute name="user" type="text">
+        <description>ID of the user who entered the note</description>
+      </attribute>
+      <attribute name="activity" type="smallint" ref="activity">
+        <description>An element of the case to which this note is to be attached</description>
+        <source>auto</source>
+      </attribute>
+      <attribute name="path" type="text">
+        <description>Complete path to activity node</description>
+        <comment>
+          This is needed to preserve the annotation for the elements
+          that may be deleted or otherwise modified in the future
+        </comment>
+        <source>auto</source>
+      </attribute>
+      <attribute name="text" type="text">
+        <description>text</description>
+        <source>user input</source>
+      </attribute>
+    </class>
+
+    <!-- ******************** R E V I E W  ****************** -->
+    <class name="review" group="fact">
+      <description>Attendings' review of trainee performance</description>
+      <source>user input</source>
+      <attribute name="when" type="timestamptz">
+        <description>Time stamp for the review</description>
+        <source>auto</source>
+      </attribute>
+      <attribute name="attending" type="text">
+        <description>ID of the reviewing attending</description>
+      </attribute>
+      <attribute name="trainee" type="text">
+        <description>ID of the trainee being reviewed</description>
+      </attribute>
+      <attribute name="plan" type="text">
+        <description>Improvement plan</description>
+        <source>user input</source>
+      </attribute>
+    </class>
+
+
+    <!-- ********************** R O L E ************************ -->
+    <class name="role" group="fact">
+      <description>indicates the user's role: trainee or attending</description>
+      <source>user input</source>
+      <attribute name="user" type="text" pkey="1">
+        <description>user ID</description>
+      </attribute>
+      <attribute name="rolename" type="text">
+        <description>the word indicating the user's role: "trainee" or "attending"</description>
+      </attribute>
+      <attribute name="can_see_results" type="bool">
+        <description>a flag indicating that this user can see departmental overviews</description>
+      </attribute>
+      <attribute name="can_see_overview" type="bool">
+        <description>a flag indicating that this user can see all results</description>
+      </attribute>
+      <init>
+roach	trainee	t	t
+selkovjr	attending	t	t
+      </init>
+    </class>
+
+    <!-- ******************* A B S E N T  ************************ -->
+    <class name="absent" group="fact">
+      <description>indicates the trainee has graduated or left the program for any reason</description>
+      <source>curator</source>
+      <attribute name="uid" type="text" pkey="1" ref="role">
+        <description>user ID</description>
+      </attribute>
+    </class>
+
+    <!-- ****************** A C T I V I T Y ******************** -->
+    <class name="activity" group="enum">
+      <description>Hierarchy of procedure steps</description>
+      <comment>This is a nested-set representation of a tree, designed
+        for easy selection of subtrees</comment>
+      <source>curator</source>
+      <attribute name="id" type="smallint" pkey="1" length="2">
+        <description>Numeric ID of the tree node</description>
+        <source>auto</source>
+      </attribute>
+      <attribute name="parent" type="smallint" ref="activity" length="2">
+        <description>Reference to the parent node</description>
+        <source>auto</source>
+      </attribute>
+      <attribute name="left_id" type="smallint">
+        <description>Sequence number of the node in pre-order traversal</description>
+        <comment>Defines the subtree comprising this node</comment>
+        <source>auto</source>
+      </attribute>
+      <attribute name="right_id" type="smallint">
+        <description>Sequence number of the node in post-order traversal</description>
+        <comment>Defines the subtree comprising this node</comment>
+        <source>auto</source>
+      </attribute>
+      <attribute name="required" type="boolean">
+        <description>A flag indicating that this step is subject to mandatory assessment</description>
+        <source>curator</source>
+      </attribute>
+      <attribute name="opt" type="boolean">
+        <description>A flag indicating that this step is optional</description>
+        <source>curator</source>
+      </attribute>
+      <attribute name="label" type="text">
+        <description>Node label</description>
+        <source>curator</source>
+      </attribute>
+    </class>
+
+    <!-- ****************** C O M P O N E N T ******************** -->
+    <class name="component" group="enum">
+      <description>Procedure components for Dr. Ferguson's decision/transition points' assessment</description>
+      <comment>This is a menu of possible procedure components linked to a class of procedures by name</comment>
+      <source>curator</source>
+      <attribute name="procedure" type="text">
+        <description>The name of procedure class that is composed of this component set</description>
+        <comment>
+          This attribute is part of the composite primary key (procedure, seq).
+          A unique constraint needs to be defined on the two in the functions element.
+        </comment>
+        <source>curator</source>
+        <example>
+Pulmonary
+        </example>
+      </attribute>
+      <attribute name="seq" type="smallint" length="2">
+        <description>The ordinal number of this component in a rendered list</description>
+        <comment>
+          This attribute is part of the composite primary key (procedure, seq).
+          A unique constraint needs to be defined on the two in the functions element.
+        </comment>
+        <source>curator</source>
+      </attribute>
+      <attribute name="name" type="text">
+        <description>This component's name</description>
+        <source>curator</source>
+        <example>
+Nodal dissection
+        </example>
+      </attribute>
+      <attribute name="difficulty" type="char" length="1">
+        <description>Difficulty</description>
+        <source>curator</source>
+        <values>
+l	Low
+m	Moderate
+h	High
+        </values>
+      </attribute>
+      <attribute name="tp" type="text">
+        <description>Transition point</description>
+        <source>curator</source>
+        <example>
+Identified carina during level 7 dissection
+        </example>
+      </attribute>
+      <attribute name="dp" type="text">
+        <description>Decision point</description>
+        <source>curator</source>
+        <example>
+Management of unexpected N2 disease
+        </example>
+      </attribute>
+      <init>
+Major lung resection	1	Knowledge	h	\N	\N
+Major lung resection	2	Preparation	h	Positioning and choice of incision(s)	\N
+Major lung resection	3	Dissect levels 4, 5/6, 7, 8, 9	m	Carina, esophagus, [SVC, trachea, azygos vein] or [aorta/PA] identified	N2 disease present
+Major lung resection	4	Dissect, divide pulmonary vein	m	Pulmonary vein to remain in place identified	Common pulmonary vein; how to control venous bleeding
+Major lung resection	5	Dissect, divide pulmonary artery branches	h	Differentiate between branches to affected lobe vs other lobes	How to control arterial bleeding
+Major lung resection	6	Complete fissure(s)	m	Avoid impinging on other lobes	Fissure involved by cancer
+Major lung resection	7	Conclusion	m	\N	\N
+Thymectomy	1	Knowledge	h	\N	\N
+Thymectomy	2	Preparation	h	Positioning and choice of incision(s)	\N
+Thymectomy	3	Opening pleura adjacent to ipsilateral phrenic nerve	l	Identify phrenic nerve and internal thoracic vein	\N
+Thymectomy	4	Dissection of pericardium	m	Identify the plane between the thymus and pericardium	\N
+Thymectomy	5	Dissection of upper poles	m	Identify upper poles	\N
+Thymectomy	6	Dissection and division of venous branches	h	Identify innominate vein	\N
+Thymectomy	7	Completion of dissection with preservation of contralateral phrenic nerve	h	Identify contralateral phrenic nerve	\N
+Thymectomy	8	Conclusion	m	\N	\N
+Radical pleurectomy/decortication	1	Knowledge	h	\N	\N
+Radical pleurectomy/decortication	2	Preparation	h	Positioning and choice of incision(s)	\N
+Radical pleurectomy/decortication	3	Separation of lung from pleura	m	Identify pleural plane	\N
+Radical pleurectomy/decortication	4	LN dissection	m	\N	\N
+Radical pleurectomy/decortication	5	Dissection of upper poles	m	Identify of upper poles	\N
+Radical pleurectomy/decortication	6	Excision and reconstruction of diaphragm	h	Identify the plane between the diaphragm and peritoneum	\N
+Radical pleurectomy/decortication	7	Excision and reconstruction of pericardium	h	Identify the plane between the pericardium and epicardium	\N
+Radical pleurectomy/decortication	8	Conclusion	m	\N	\N
+Esophagectomy	1	Knowledge	h	\N	\N
+Esophagectomy	2	Preparation	h	Positioning and choice of incision(s)	\N
+Esophagectomy	3	Mobilization of stomach	m	Identify gastroepiploic arcade	\N
+Esophagectomy	4	LN dissection	h	Identify left gastric vessels	\N
+Esophagectomy	5	Creation of a gastric tube	m	Identify angulus	\N
+Esophagectomy	6	Gastric emptying procedure	m	Identification of pylorus	\N
+Esophagectomy	7	J tube insertion	m	Identify insertion site 30-40 cm from LOT	\N
+Esophagectomy	8	Creation of a gastric tube	m	Identify angulus	\N
+Esophagectomy	9	Division of pleura	l	\N	\N
+Esophagectomy	10	Mobilization of infra-azygos esophagus	m	Identify aorta, azygos, thoracic duct, contralateral pleura, pulmonary veins, airways	\N
+Esophagectomy	11	Division of azygos and mobilization of upper thoracic esophagus	m	Identify recurrent laryngeal nerves	\N
+Esophagectomy	12	Nodal dissection	m	\N	\N
+Esophagectomy	13	Anastomosis	h	Identify correct locations on gastric tube and esophagus	\N
+Esophagectomy	14	Conclusion	m	\N	\N
+Diaphragm (hiatal) hernia repair	1	Knowledge	h	\N	\N
+Diaphragm (hiatal) hernia repair	2	Preparation	h	Positioning and choice of incision(s)	\N
+Diaphragm (hiatal) hernia repair	3	Dissection and excision of sac	h	Identify peritoneal plane and hiatal margins	\N
+Diaphragm (hiatal) hernia repair	4	Esophageal mobilization	m	Identify aorta and pleura	\N
+Diaphragm (hiatal) hernia repair	5	Performance of a lengthening procedure	h	Diagnosis of esophageal shortening	\N
+Diaphragm (hiatal) hernia repair	6	Hiatal closure	m	\N	\N
+Diaphragm (hiatal) hernia repair	7	Gastric wrap	m	Determination of the type of wrap to perform	\N
+Diaphragm (hiatal) hernia repair	8	Conclusion	m	\N	\N
+Lung transplant implant	1	Knowledge	h	\N	\N
+Lung transplant implant	2	Preparation	h	Positioning and choice of incision(s)	\N
+Lung transplant implant	3	\N	\N	\N	\N
+Lung transplant implant	4	\N	\N	\N	\N
+Lung transplant implant	5	\N	\N	\N	\N
+Lung transplant implant	6	Conclusion	m	\N	\N
+Initiating CPB	1	Knowledge	h	\N	\N
+Initiating CPB	2	Preparation	h	Positioning and choice of incision(s)	\N
+Initiating CPB	3	Aortic cannulation	m	Selection of site	\N
+Initiating CPB	4	Venous cannulation	m	Selection of site(s) and cannula(e)	\N
+Initiating CPB	5	Institution of bypass	m	\N	\N
+Initiating CPB	6	Cross clamp and cardioplegia	h	Selection of site and plan for plegia	\N
+Initiating CPB	7	Conclusion	m	\N	\N
+Separation from CPB	1	Knowledge	h	\N	\N
+Separation from CPB	2	Preparation	h	Knowledge of appropriate timing	\N
+Separation from CPB	3	Rewarming	m	Identify appropriate timing	\N
+Separation from CPB	4	De-airing and volume administration	m	\N	\N
+Separation from CPB	5	Rhythm assessment/need for pacing	m	\N	\N
+Separation from CPB	6	Cannulae removal and heparin reversal	m	\N	\N
+Separation from CPB	7	Conclusion	m	\N	\N
+CABG	1	Knowledge	h	\N	\N
+CABG	2	Preparation	h	Positioning and choice of incision(s) and conduit(s)	\N
+CABG	3	Mammary takedown	m	\N	\N
+CABG	4	Target identification and exposure	h	Establish angiographic and anatomic correlates	\N
+CABG	5	Distal anastomosis	h	\N	\N
+CABG	6	Proximal anastomosis	m	\N	\N
+CABG	7	Conclusion	m	\N	\N
+AVR	1	Knowledge	h	\N	\N
+AVR	2	Preparation	h	Positioning and choice of incision(s)	\N
+AVR	3	Aortotomy	m	Identify appropriate location	\N
+AVR	4	Leaflet removal/decalcification	h	Identify mitral apparatus at risk	\N
+AVR	5	Suture placement	m	Identify conduction system at risk	\N
+AVR	6	Valve sizing and seating	h	\N	\N
+AVR	7	Aortic closure	m	\N	\N
+AVR	8	Conclusion	m	\N	\N
+MV Repair	1	Knowledge	h	\N	\N
+MV Repair	2	Preparation	h	Positioning and choice of incision(s)	\N
+MV Repair	3	Atriotomy	m	Identify appropriate location	\N
+MV Repair	4	Leaflet remodeling	h	Identify components of mitral apparatus at risk	\N
+MV Repair	5	Annuloplasty 	m	Identify conduction system at risk	\N
+MV Repair	6	Atriotomy closure	m	\N	\N
+MV Repair	7	Conclusion	m	\N	\N
+LVAD	1	Knowledge	h	\N	\N
+LVAD	2	Preparation	h	Positioning and choice of incision(s)	\N
+LVAD	3	Pocket creation	l	Identify location and orientation	\N
+LVAD	4	Ventriculotomy	m	Identify position relative to septum and orientation	\N
+LVAD	5	Placement of inflow cannula	\N	\N	\N
+LVAD	6	Placement of outflow graft	h	\N	\N
+LVAD	7	Assess management of RV	h	\N	\N
+LVAD	8	VAD settings	h	Determine relationship to septal position and aortic valve opening	\N
+LVAD	9	Conclusion	m	\N	\N
+Heart transplant implant	1	Knowledge	h	\N	\N
+Heart transplant implant	2	Preparation	h	Positioning and choice of incision(s)	\N
+Heart transplant implant	3	\N	\N	\N	\N
+Heart transplant implant	4	\N	\N	\N	\N
+Heart transplant implant	5	\N	\N	\N	\N
+Heart transplant implant	6	\N	\N	\N	\N
+Heart transplant implant	7	\N	\N	\N	\N
+Heart transplant implant	8	\N	\N	\N	\N
+Heart transplant implant	9	Conclusion	m	\N	\N
+ASD closure	1	Knowledge	h	\N	\N
+ASD closure	2	Preparation	h	Positioning and choice of incision(s)	\N
+ASD closure	3	\N	\N	\N	\N
+ASD closure	4	\N	\N	\N	\N
+ASD closure	5	\N	\N	\N	\N
+ASD closure	6	\N	\N	\N	\N
+ASD closure	7	\N	\N	\N	\N
+ASD closure	8	\N	\N	\N	\N
+ASD closure	9	Conclusion	m	\N	\N
+VSD closure	1	Knowledge	h	\N	\N
+VSD closure	2	Preparation	h	Positioning and choice of incision(s)	\N
+VSD closure	3	\N	\N	\N	\N
+VSD closure	4	\N	\N	\N	\N
+VSD closure	5	\N	\N	\N	\N
+VSD closure	6	\N	\N	\N	\N
+VSD closure	7	\N	\N	\N	\N
+VSD closure	8	\N	\N	\N	\N
+VSD closure	9	Conclusion	m	\N	\N
+Repair coarctation	1	Knowledge	h	\N	\N
+Repair coarctation	2	Preparation	h	Positioning and choice of incision(s)	\N
+Repair coarctation	3	\N	\N	\N	\N
+Repair coarctation	4	\N	\N	\N	\N
+Repair coarctation	5	\N	\N	\N	\N
+Repair coarctation	6	\N	\N	\N	\N
+Repair coarctation	7	\N	\N	\N	\N
+Repair coarctation	8	\N	\N	\N	\N
+Repair coarctation	9	Conclusion	m	\N	\N
+Ligate PDA	1	Knowledge	h	\N	\N
+Ligate PDA	2	Preparation	h	Positioning and choice of incision(s)	\N
+Ligate PDA	3	\N	\N	\N	\N
+Ligate PDA	4	\N	\N	\N	\N
+Ligate PDA	5	\N	\N	\N	\N
+Ligate PDA	6	\N	\N	\N	\N
+Ligate PDA	7	\N	\N	\N	\N
+Ligate PDA	8	\N	\N	\N	\N
+Ligate PDA	9	Conclusion	m	\N	\N
+Palliative shunt	1	Knowledge	h	\N	\N
+Palliative shunt	2	Preparation	h	Positioning and choice of incision(s)	\N
+Palliative shunt	3	\N	\N	\N	\N
+Palliative shunt	4	\N	\N	\N	\N
+Palliative shunt	5	\N	\N	\N	\N
+Palliative shunt	6	\N	\N	\N	\N
+Palliative shunt	7	\N	\N	\N	\N
+Palliative shunt	8	\N	\N	\N	\N
+Palliative shunt	9	Conclusion	m	\N	\N
+      </init>
+    </class>
+
+    <!-- ******* A C T I V I T Y   C H A N G E   L O G ********* -->
+    <class name="activity_change_log" group="fact">
+       <description>Keeps track of when and by whom the activity tree was changed</description>
+      <source>auto</source>
+      <attribute name="version" type="integer" pkey="1" sequence="activity_log_seq">
+        <description>Version number</description>
+        <source>sequence</source>
+      </attribute>
+      <attribute name="when" type="timestamptz">
+        <description>The time when the tree was last updated</description>
+        <source>auto</source>
+      </attribute>
+      <attribute name="who" type="text">
+        <description>CNetID of the user submitting the update</description>
+        <source>auto</source>
+      </attribute>
+      <init>
+0	'now'	operator
+      </init>
+    </class>
+    <class name="time_log" group="fact" oid="1">
+      <description>Residents' time log</description>
+      <source>user input</source>
+      <attribute name="id" type="text" ref="role">
+        <description>CNetID of the user</description>
+      </attribute>
+      <attribute name="in" type="timestamptz">
+        <description>Time in</description>
+      </attribute>
+      <attribute name="out" type="timestamptz">
+        <description>Time out</description>
+      </attribute>
+      <constraint>
+ALTER TABLE time_log
+  ADD CONSTRAINT "end of interval cannot be in the future"
+  CHECK ("out" <= current_timestamp);
+      </constraint>
+      <constraint>
+ALTER TABLE time_log
+  ADD CONSTRAINT "start of interval cannot be in the future"
+  CHECK ("in" <= current_timestamp);
+      </constraint>
+      <constraint>
+ALTER TABLE time_log
+  ADD CONSTRAINT "positive interval"
+  CHECK ("out" > "in");
+      </constraint>
+    </class>
+
+
+    <!-- ******** D I R E C T O R Y   C A C H E ****************** -->
+    <class name="directory_cache" group="aux">
+      <description>Accessible local storage for directory entries</description>
+      <source>LDAP and other directory queries</source>
+      <attribute name="uid" type="text">
+        <description>User ID</description>
+        <comment>
+          This attribute is part of the composite primary key (id,
+          domain). A unique constraint needs to be defined on the two
+          in the functions element.
+        </comment>
+        <source>LDAP or passwd</source>
+        <example>
+mcposner
+        </example>
+      </attribute>
+      <attribute name="domain" type="text">
+        <description>Organisational domain</description>
+        <comment>
+          The domain attribute is used to identify the authentication
+          source.  It is part of the composite primary key (id,
+          domain). A unique constraint needs to be defined on the two
+          in the functions element.
+        </comment>
+        <source>LDAP or passwd</source>
+        <example>
+uchicago.edu
+med.navy.mil
+        </example>
+      </attribute>
+      <attribute name="dirtype" type="text">
+        <description>Specifies the kind of directory where this record originates</description>
+        <example>
+LDAP
+passwd
+        </example>
+      </attribute>
+      <attribute name="password" type="text">
+        <description>Encrypted user password</description>
+        <source>LDAP or passwd</source>
+        <comment>
+          Not used with LDAP directories.
+        </comment>
+      </attribute>
+      <attribute name="cn" type="text">
+        <description>Common Name</description>
+        <source>LDAP or passwd</source>
+        <example>
+Michael C Posner
+        </example>
+      </attribute>
+      <attribute name="sn" type="text">
+        <description>Surname</description>
+        <source>LDAP or passwd</source>
+        <example>
+Posner
+        </example>
+      </attribute>
+      <attribute name="givenname" type="text">
+        <description>Given Name</description>
+        <source>LDAP or passwd</source>
+        <example>
+Michael
+        </example>
+      </attribute>
+      <attribute name="mail" type="text">
+        <description>Electronic mail address</description>
+        <source>LDAP or passwd</source>
+        <example>
+mcposner@uchicago.edu
+        </example>
+      </attribute>
+      <attribute name="department" type="text">
+        <description>Institutional department (where there are many)</description>
+        <source>LDAP or passwd</source>
+        <example>
+General Surgery
+        </example>
+      </attribute>
+      <attribute name="ts" type="timestamptz">
+        <description>The cache timestamp</description>
+        <source>automatic -- Person.pm</source>
+      </attribute>
+    </class>
+  </entities>
+  <constraints>
+  </constraints>
+  <functions>
+--CREATE LANGUAGE plpgsql;
+
+ALTER TABLE component ADD CONSTRAINT component_pkey PRIMARY KEY ("procedure", "seq");
+
+ALTER TABLE ONLY "performance"
+   ADD CONSTRAINT "$4" FOREIGN KEY ("procedure", "seq") REFERENCES "component" ON DELETE CASCADE;
+
+ALTER TABLE directory_cache ADD CONSTRAINT directory_cache_pkey PRIMARY KEY (uid, domain);
+CREATE INDEX directory_cache_ts_ix on directory_cache using btree(ts);
+CREATE INDEX directory_cache_domain_ix on directory_cache using btree(domain);
+CREATE INDEX directory_cache_mail_ix on directory_cache using btree(mail);
+CREATE INDEX directory_cache_givenname_ix on directory_cache using btree("givenname");
+CREATE INDEX directory_cache_sn_ix on directory_cache using btree(sn);
+CREATE INDEX directory_cache_cn_ix on directory_cache using btree(cn);
+CREATE INDEX directory_cache_uid_ix on directory_cache using btree(uid);
+
+ALTER TABLE component_suggestion ALTER COLUMN "when" SET DEFAULT now();
+ALTER TABLE tp_suggestion ALTER COLUMN "when" SET DEFAULT now();
+ALTER TABLE dp_suggestion ALTER COLUMN "when" SET DEFAULT now();
+
+CREATE OR REPLACE FUNCTION rollup(int, int) RETURNS record AS
+$body$
+DECLARE
+  category ALIAS FOR $1;
+  assessment_id ALIAS FOR $2;
+  result record;
+BEGIN
+  IF category = 0 THEN
+    SELECT INTO result (assessment - rating_map.low)::float
+      FROM eval, "case", rating_map
+     WHERE "case" = assessment_id
+       AND "case".id = eval.case
+       AND eval.activity = 0
+       AND rating_map.role =
+           CASE
+             WHEN "case".assessor = "case".trainee THEN 'trainee'
+             ELSE 'attending'
+           END
+       AND rating_map.subtree = 'Overall Case Assessment';
+  ELSE
+    SELECT INTO result to_char(avg(eval.assessment - rating_map.low), '99D99')::float AS avg, count(*) AS count
+     FROM eval, "case", rating_map
+    WHERE eval.case = assessment_id
+      AND "case".id = eval.case
+      AND rating_map.role =
+        CASE
+          WHEN "case".assessor = "case".trainee THEN 'trainee'
+          ELSE 'attending'
+        END
+      AND rating_map.subtree =
+        CASE
+          WHEN eval.activity IN (
+              SELECT t2.id
+                FROM activity AS t1, activity AS t2
+               WHERE t2.left_id BETWEEN t1.left_id AND t1.right_id
+                 AND t1.label = 'General Capabilities'
+            ) THEN 'General Capabilities'
+          WHEN eval.activity = 0 THEN 'Overall Case Assessment'
+          ELSE 'root'
+        END
+      AND eval.activity IN (
+        SELECT t2.id
+          FROM activity AS t1, activity AS t2
+         WHERE t2.left_id BETWEEN t1.left_id AND t1.right_id
+           AND t1.id = category
+      )
+      AND eval.assessment >= 0;
+  END IF;
+  RETURN result;
+END;
+$body$
+LANGUAGE 'plpgsql';
+CREATE OR REPLACE FUNCTION delete_subtree(int) RETURNS INT AS '
+DECLARE
+  node_to_delete ALIAS FOR $1;
+  victim         RECORD;
+  branch_width   INTEGER;
+BEGIN
+  SELECT INTO victim id, left_id, right_id
+    FROM activity_clone
+   WHERE id = node_to_delete;
+
+  DELETE FROM activity_clone
+   WHERE left_id >= victim.left_id
+     AND right_id <= victim.right_id;
+
+  branch_width := victim.right_id - victim.left_id + 1;
+
+  UPDATE activity_clone SET left_id = left_id - branch_width
+   WHERE left_id > victim.left_id;
+
+  UPDATE activity_clone SET right_id = right_id - branch_width
+   WHERE right_id > victim.right_id;
+
+  RETURN(0);
+END;
+' LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION append_node_to(int) RETURNS INT AS
+$body$
+DECLARE
+    targetparent RECORD;
+    parent_node ALIAS FOR $1;
+    new_id INTEGER;
+    new_left_id INTEGER;
+    new_right_id INTEGER;
+BEGIN
+    -- remember the original range of the target node
+    SELECT INTO targetparent id, left_id, right_id
+           FROM activity_clone
+           WHERE id = parent_node;
+
+    -- move the right_id of all elements FOLLOWING and
+    -- INCLUDING the target node off by branch width (which is 1 + 1)
+    UPDATE activity_clone SET right_id = right_id + 2
+           WHERE right_id >= targetparent.right_id;
+
+    -- move the left_id of all elements FOLLOWING the
+    -- target node by branch width
+    UPDATE activity_clone SET left_id = left_id + 2
+           WHERE left_id > targetparent.right_id;
+
+    -- assign the new range for the item being inserted
+    new_left_id := targetparent.right_id;  -- replaces parent in post-order
+    new_right_id := targetparent.right_id + 1; -- sets the range (1 new element)
+
+    -- assign new id
+    SELECT INTO new_id (SELECT max(id)+1 FROM activity_clone);
+
+    -- insert and link to parent
+    INSERT INTO activity_clone
+           (id, parent, left_id, right_id, required, opt) VALUES
+           (new_id, targetparent.id, new_left_id, new_right_id, 'f', 'f');
+
+    RETURN (new_id);
+END;
+$body$
+LANGUAGE 'plpgsql';
+
+-- appends a subtree in copy_buffer to a node in argument
+CREATE OR REPLACE FUNCTION append_buffer_to(int) RETURNS INT AS
+$body$
+DECLARE
+    parent_node ALIAS FOR $1;
+    parent_right_id INTEGER;
+    old_left_id INTEGER;
+    "offset" INTEGER;
+    branch_width INTEGER;
+BEGIN
+    -- remember the original range of the target node
+    SELECT INTO parent_right_id right_id FROM activity_clone WHERE id = parent_node;
+
+    -- determine branch width: right_id - left_id + 1
+    SELECT INTO branch_width (SELECT max(right_id) - min(left_id) + 1 FROM copy_buffer);
+
+    -- remember the old left_id of the branch
+    SELECT INTO old_left_id (SELECT min(left_id) FROM copy_buffer);
+
+    -- reparent the branch
+    UPDATE copy_buffer SET parent = parent_node WHERE left_id = old_left_id;
+
+    -- calculate the amount by which the entire branch in buffer must be shifted
+    "offset" := old_left_id - parent_right_id;
+
+    -- shift the branch
+    UPDATE copy_buffer SET left_id = left_id - "offset";
+    UPDATE copy_buffer SET right_id = right_id - "offset";
+
+    -- shift nodes following the target node and expand the target node
+    UPDATE activity_clone SET right_id = right_id + branch_width
+           WHERE right_id >= parent_right_id;
+    UPDATE activity_clone SET left_id = left_id + branch_width
+           WHERE left_id > parent_right_id;
+
+    -- insert the buffer
+    INSERT INTO activity_clone SELECT * FROM copy_buffer;
+
+    -- clean up the mess left by a kludge in Util::next_available_id()
+    DELETE FROM activity_clone WHERE parent = -1;
+
+    -- make sure data in copy_buffer will not be used again
+    DROP TABLE copy_buffer;
+
+    RETURN (1);
+END;
+$body$
+LANGUAGE 'plpgsql';
+
+-- swaps two nodes under a single parent
+-- This function removes the branch in the second argument
+-- and places it in front of the branch in the frist argument.
+-- Both branches must belong to the same parent.
+CREATE OR REPLACE FUNCTION move_to_the_left_of(int, int) RETURNS INT AS
+$body$
+DECLARE
+  pop RECORD;
+  slide RECORD;
+  node_to_pop ALIAS FOR $1;
+  node_to_slide ALIAS FOR $2;
+  branch_width INTEGER;
+BEGIN
+  -- 1. Remember the boundaries of the sliding node and the node being displaced
+  SELECT INTO slide left_id, right_id
+    FROM activity_clone
+   WHERE id = node_to_slide;
+  SELECT INTO pop left_id, right_id
+    FROM activity_clone
+   WHERE id = node_to_pop;
+
+  -- 2. Hide all left and right values on the branch to move by multiplying them by -1
+  UPDATE activity_clone SET left_id = -left_id WHERE left_id >= slide.left_id AND right_id <= slide.right_id;
+  UPDATE activity_clone SET right_id = -right_id WHERE right_id >= slide.left_id AND right_id <= slide.right_id;
+
+  -- 3. Determine branch width: right_id - left_id + 1
+  -- SELECT slide.right_id - slide.left_id + 1; -- (10)
+  branch_width := slide.right_id - slide.left_id + 1;
+
+  -- 4. Make space to insert the sliding branch BEFORE the popping node (and pop that node)
+  UPDATE activity_clone
+     SET left_id = left_id + branch_width
+   WHERE left_id BETWEEN  pop.left_id AND slide.left_id;
+                                      -- ids to the right of the items being swapped do not change
+  UPDATE activity_clone
+     SET right_id = right_id + branch_width
+   WHERE right_id BETWEEN pop.left_id AND slide.right_id;
+
+  -- 5. Move the sliding node in place
+  UPDATE activity_clone SET left_id = -left_id + pop.left_id - slide.left_id WHERE left_id < 0;
+  UPDATE activity_clone SET right_id = -right_id + pop.left_id - slide.left_id WHERE right_id < 0;
+
+  RETURN (1);
+END;
+$body$
+LANGUAGE 'plpgsql';
+
+-- this function deletes the parent and re-parents its children
+CREATE OR REPLACE FUNCTION reparent(int) RETURNS int AS
+$body$
+DECLARE
+  parent_id ALIAS FOR $1;
+  victim RECORD;
+BEGIN
+  SELECT INTO victim parent, left_id, right_id
+    FROM activity_clone
+   WHERE id = parent_id;
+
+  DELETE FROM activity_clone
+   WHERE id = parent_id;
+
+  -- The following 2 queries update the children
+  UPDATE activity_clone SET left_id = left_id - 1, parent = victim.parent
+   WHERE left_id >= victim.left_id
+     AND right_id < victim.right_id;
+  UPDATE activity_clone SET right_id = right_id - 1, parent = victim.parent
+   WHERE left_id >= victim.left_id
+     AND right_id < victim.right_id;
+
+  -- The following 2 queries update the rest of the tree
+  UPDATE activity_clone SET left_id = left_id - 2
+   WHERE left_id > victim.right_id;
+  UPDATE activity_clone SET right_id = right_id - 2
+   WHERE right_id > victim.right_id;
+
+  RETURN(0);
+END;
+$body$
+LANGUAGE 'plpgsql';
+
+CREATE EXTENSION hstore;
+CREATE AGGREGATE "add"(hstore) (
+   SFUNC = hs_concat,
+   STYPE = hstore,
+   INITCOND = ''
+);
+
+  </functions>
+</metadata>

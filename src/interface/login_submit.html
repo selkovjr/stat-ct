@@ -1,0 +1,81 @@
+<%args>
+  $username
+  $password
+  $redirect_to
+</%args>
+<%init>
+  $username = lc $username;
+
+  my @result = Person->search_by_uid($username);
+  if ( @result == 0 ) {
+    $m->comp( '/lib/redirect.mason',
+	      path => 'login.html',
+	      query => { username => $username,
+			 password => $password,
+			 login_error => qq(username "$username" is incorrect),
+			 redirect_to => $redirect_to,
+		       },
+	    );
+  }
+  elsif ( @result == 1 ) {
+    my $person = shift @result;
+    unless ($ENV{REMOTE_ADDR} eq 'ipadrr') { # put your client address here to bypass authentication
+      unless ( Util::password_valid($person, $password) ) {
+	$m->comp( '/lib/redirect.mason',
+		  path => 'login.html',
+		  query => { username => $username,
+			     password => $password,
+			     login_error => qq(Invalid username or password),
+			     redirect_to => $redirect_to,
+			   },
+		);
+      }
+    }
+    # password accepted; redirect to requested page
+
+    # first store the current username in the cookie
+    my $c = new CGI::Cookie(
+			  -name  => $STAT::application . "_user",
+			  -value => { username => $username },
+			  -path  => '/',
+			  -expires => '+1M',
+			 );
+    # this will work under mod_perl, but not CGI:
+    #  $r->headers_out->add('Set-Cookie' => $c);
+    $r->headers_out->add('Cookie' => $c);
+
+    $STAT::Session->{username} = $username;
+    $STAT::Session->{token} = Digest::SHA1::sha1_hex( 'secret', $username );
+    my ($path, $args) = split /\?/, $redirect_to;
+    my %args;
+    foreach (split(/[;&]/, $args)) {
+      my ($k, $v) = split /=/;
+      $v =~ s/\%([A-Fa-f0-9]{2})/pack('C', hex($1))/seg; # it gets encoded by url.mason in autohandler
+      $args{$k} = $v;
+    }
+
+    # we don't want the new user reloding an expired browser session to see what was there
+    if ( $username eq $LastUserID ) {
+      $m->comp( '/lib/redirect.mason', path => $path, query => \%args );
+    }
+    else {
+      $m->comp( '/lib/redirect.mason', path => "/$STAT::application", query => {} );
+    }
+  }
+  else { # multiple results
+    my @fqn = map {'"' . $_->{uid} . '@' . $_->{domain} . '"'} @result;
+    my $fqn = join(", or ", @fqn);
+    $m->comp( '/lib/redirect.mason',
+	      path => 'login.html',
+	      query => { username => $username,
+			 password => $password,
+			 login_error => qq("$username" is an ambiguous ID. Please use a fully qualified ID, such as $fqn),
+			 redirect_to => $redirect_to,
+		       },
+	    );
+  }
+</%init>
+
+<%flags>
+  inherit => '/syshandler'
+</%flags>

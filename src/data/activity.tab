@@ -1,0 +1,29 @@
+0	\N	0	57	\N	\N	root
+1	0	1	12	f	f	Common
+2	0	13	56	f	f	Specific
+3	1	2	3	f	f	Overall Assessment
+4	1	4	11	f	f	General Capabilities
+5	2	14	27	f	f	Thoracic
+6	2	28	43	f	f	Adult cardiac
+7	2	44	55	f	f	Congenital heart surgery
+8	4	5	6	f	f	Knowledge & Understanding
+9	4	7	8	f	f	Skill
+10	4	9	10	f	f	Independence
+11	5	15	16	f	f	Major lung resection
+12	5	17	18	f	f	Thymectomy
+13	5	19	20	f	f	Radical pleurectomy/decortication
+14	5	21	22	f	f	Esophagectomy
+15	5	23	24	f	f	Diaphragm (hiatal) hernia repair
+16	5	25	26	f	f	Lung transplant implant
+17	6	29	30	f	f	Initiating CPB
+18	6	31	32	f	f	Separation from CPB
+19	6	33	34	f	f	CABG
+20	6	35	36	f	f	AVR
+21	6	37	38	f	f	MV Repair
+22	6	39	40	f	f	LVAD
+23	6	41	42	f	f	Heart transplant implant
+24	7	45	46	f	f	ASD closure
+25	7	47	48	f	f	VSD closure
+26	7	49	50	f	f	Repair coarctation
+27	7	51	52	f	f	Ligate PDA
+28	7	53	54	f	f	Palliative shunt

@@ -1,0 +1,3 @@
+#!/usr/bin/perl -np
+
+s/label=([^\], ]+)/label="($1)" color=brown fontcolor=brown/, s/<comma>/,/g if /->/ and /<comma>/;

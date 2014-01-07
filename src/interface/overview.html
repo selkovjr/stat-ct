@@ -1,0 +1,190 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin <% $source %> -->
+            <div style="margin-top: 1em; margin-bottom: 0.5em">
+              <table width="100%">
+                <tbody>
+                  <tr>
+                    <td align="left"> <h3 class="title">Program Director's Overview </h3></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <table border="0">
+              <tbody>
+                <tr>
+                  <td style="padding-top: 2em; padding-bottom: 1em"><h4>Case assessments logged <% $timeframe %></h4></td>
+                </tr>
+                <tr>
+                  <td valign="top">
+                    <& lib/plot_cases_logged.mason, month => $month &>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <table border="0">
+              <tbody>
+                <tr>
+                  <td style="padding-top: 2em; padding-bottom: 1em"><h4>Assessments and reviews by attending</h4></td>
+                </tr>
+                <tr>
+                  <td>
+                    <table border="0" cellspacing="0" cellpadding="4">
+                      <tbody>
+                        <tr bgcolor="#808080">
+                          <td align="left" valign="top" rowspan="2"><span style="color: white">Attending</span></td>
+                          <td align="center" style="padding-bottom: 0"><span style="color: white;">Assessments</span></td>
+                          <td align="center" style="padding-bottom: 0; padding-left: 1em"><span style="color: white;">Review</span></td>
+                        </tr>
+                        <tr bgcolor="#808080">
+                          <td align="center" style="padding-top: 0"><span style="color: white;">Submitted<!-- Estimated Cases --> </span></td>
+                          <td align="center" style="padding-top: 0; padding-left:1em"><span style="color: white;">Sessions</span></td>
+                        </tr>
+% my $row = 0;
+%   foreach my $person ( sort {$a->{sn} cmp $b->{sn}} @{$data{attending}} ) {
+%     $row++;
+%     my $color = $row % 2 ? '#F0F0F0' : '#FEFEFE';
+                        <tr bgcolor="<% $color %>">
+                          <td nowrap> <% $person->{cn} %> </td>
+% #                       <td align="center"> <% ($person->{assessments} != $person->{total}) ? "$person->{assessments} of $person->{total}" : $person->{total} %> </td>
+                          <td align="center"> <% $person->{assessments} %> </td>
+                          <td align="center"> <% $person->{service_chief} ? $person->{reviews} : "" %> </td>
+                        </tr>
+%   }
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <table border="0">
+              <tbody>
+                <tr>
+                  <td style="padding-top: 2em; padding-bottom: 1em"><h4>Assessments and reviews by trainee</h4></td>
+                </tr>
+                <tr>
+                  <td>
+                    <table border="0" cellspacing="0" cellpadding="4">
+                      <tbody>
+                        <tr bgcolor="#808080">
+                          <td align="left" valign="top" rowspan="2"><span style="color: white">Resident</span></td>
+                          <td align="center" style="padding-bottom: 0"><span style="color: white;">Assessments</span></td>
+                          <td align="center" style="padding-bottom: 0; padding-left: 1em"><span style="color: white;">Review</span></td>
+                        </tr>
+                        <tr bgcolor="#808080">
+                          <td align="center" style="padding-top: 0"><span style="color: white;">Submitted</span></td>
+                          <td align="center" style="padding-top: 0; padding-left:1em"><span style="color: white;">Sessions</span></td>
+                        </tr>
+%   $row = 0;
+%   foreach my $person ( sort {$a->{sn} cmp $b->{sn}} @{$data{trainee}} ) {
+%     $row++;
+%     my $color = $row % 2 ? '#F0F0F0' : '#FEFEFE';
+                        <tr bgcolor="<% $color %>">
+                          <td nowrap> <% $person->{cn} %> </td>
+% #                         <td align="center"> <% ($person->{assessments} != $person->{total}) ? "$person->{assessments} of $person->{total}" : $person->{total} %> </td> 
+                          <td align="center"> <% $person->{assessments} %> </td>
+                          <td align="center"> <% $person->{reviews} ? $person->{reviews} : "0" %> </td>
+                        </tr>
+%   }
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+<%args>
+  $month => undef
+</%args>
+<%method page_title>STAT Overview</%method>
+<%method menu_handle>Overview</%method>
+<%method help>
+    <p>
+      A stub for Overview Instructions
+    </p>
+</%method>
+<%init>
+my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/overview.html,v 2.3 2009-03-12 19:54:52 selkovjr Exp $);
+
+my @monthName = qw/none January February March April May Junu July August September October November December/;
+my $date_range = $month ? qq(extract('month' FROM "date") = $month) : qq("date" >= 'now'::date - '1 month'::interval);
+my $timestamp_range = $month ? qq(extract('month' FROM "when") = $month) : qq("when" >= 'now'::date - '1 month'::interval);
+my $timeframe = $month ? "in $monthName[$month]" : "during one-month period ending today";
+
+my %data;
+
+foreach my $role ( qw/attending trainee/ ) {
+  # get directory names for everyone in this role
+  my $res = $Dbh->selectcol_arrayref(qq(
+SELECT "$role" FROM "case"
+ WHERE $date_range
+UNION
+SELECT "$role" FROM "review"
+ WHERE $timestamp_range
+));
+  $Dbh->err and die $Dbh->errstr;
+  @{$data{$role}} = Person->map_uids(@$res);
+
+  # add data to each person
+  foreach my $person ( @{$data{$role}} ) {
+    my $query = qq(
+SELECT count(*)
+  FROM "case"
+ WHERE "$role" = '$person->{uid}'
+   AND "assessor" = '$person->{uid}'
+   AND $date_range
+);
+    ($person->{assessments}) = $Dbh->selectrow_array($query);
+    $Dbh->err and die $Dbh->errstr . "in query: $query";
+
+    if ( $role eq 'trainee' ) {
+      $query = qq(
+SELECT DISTINCT "date", "case_no", "activity", "trainee"
+  FROM "case"
+ WHERE "$role" = '$person->{uid}'
+   AND $date_range
+);
+      $person->{total} = scalar @{$Dbh->selectall_arrayref($query)};
+      $Dbh->err and die $Dbh->errstr . "in query: $query";
+    }
+    else {
+      my $query = qq(
+SELECT count(*)
+  FROM "case"
+ WHERE attending = '$person->{uid}'
+   AND $date_range
+);
+      ($person->{total}) = $Dbh->selectrow_array($query);
+      $Dbh->err and die $Dbh->errstr . "in query: $query";
+    }
+
+    $query = qq(
+SELECT count(*)
+  FROM "review"
+ WHERE "$role" = '$person->{uid}'
+   AND $timestamp_range
+);
+    ($person->{reviews}) = $Dbh->selectrow_array($query);
+    $person->{service_chief} = $person->{uid} =~ /pangelos|fichera|prachan|roggin/i;
+    $Dbh->err and die $Dbh->errstr . "in query: $query";
+  }
+}
+</%init>
+<%method file_info> <% Util::print_revision(q$Id: overview.html,v 2.3 2009-03-12 19:54:52 selkovjr Exp $) %> </%method>
+<%method jshead>
+    <script type="text/javascript" src="lib/image_load_handlers.js"></script>
+</%method>

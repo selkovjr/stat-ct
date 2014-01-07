@@ -1,0 +1,66 @@
+<form action="residents.html" method="POST">
+  <p style="margin-top: 1em">
+    <input type="submit" name="submit" value="Update">
+  </p>
+  <table border cellspacing="0" cellpadding="4">
+    <tr>
+      <th align="left">graduated</th>
+      <th align="left">uid</th>
+      <th align="left">name</th>
+      <th>last active</th>
+      <th>last logged</th>
+      <th>submissions</th>
+    </tr>
+% foreach my $trainee ( $Model->trainees ) {
+%   my $uid = $trainee->get_column('username');
+%   my ( $person ) = Person->search_by_uid($uid);
+%   my $status = $trainee->get_column('absent') ? ' checked' : '';
+%   my $last_active = $trainee->get_column('last_active');
+%   my $last_logged = $trainee->get_column('last_logged');
+%   my $submissions = $trainee->get_column('submissions');
+%   $last_active = '&nbsp;' if $last_active eq '2000-01-01';
+%   $last_logged = '&nbsp;' if $last_logged eq '2000-01-01';
+%   $submissions = '&nbsp;' if $submissions == 0;
+    <tr>
+      <td align=right>
+        <input type="checkbox" name="absent_<% $uid %>"<% $status %>>
+        <input type="hidden" name="uid_<% $uid %>">
+      </td>
+      <td> <% $uid %> </td>
+      <td>
+%   if ( $person ) {
+        <% $person->cn %>
+%   } else {
+         <em style="color: brown">unknown</em>
+%   }
+      </td>
+      <td><% $last_active %></td>
+      <td><% $last_logged %></td>
+    <td align="right"><% $submissions %></td>
+    </tr>
+% }
+  </table>
+  <p>
+    <input type="submit" name="submit" value="Update">
+  </p>
+</form>
+<%args>
+  $submit => undef
+</%args>
+<%init>
+  if ( $submit ) {
+    foreach ( keys %ARGS ) {
+      if ( /^uid_(.+)$/ ) {
+        my $uid = $1;
+        if ( exists $ARGS{"absent_$uid"} ) {
+          $Model->mark_absent($uid);
+        }
+        else {
+          $Model->unmark_absent($uid);
+        }
+      }
+    }
+  }
+</%init>
+<%method title>list of residents</%method>
+<%method page_title>list of residents</%method>

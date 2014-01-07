@@ -1,0 +1,284 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin manage.html <% Util::version(q$Header: /opt/cvs/stat/src/interface/manage.html,v 2.2 2009-02-20 15:04:39 selkovjr Exp $) %> -->
+            <form name="manageform" id="manageform" method="POST" action="update_tree.html">
+              <fieldset>
+                <legend><% $User->uid %></legend>
+                <input type="hidden" name="node">
+                <input type="hidden" name="other_node">
+                <table>
+                  <tr>
+                    <td align="left">
+                      <input type="button" name="expand" value="Expand" onclick="javascript:expandSelected()">
+                      <input type="submit" name="add" value="Add">
+                      <input type="submit" name="edit" value="Edit">
+                      <input type="submit" name="copy" value="Copy">
+                      <input type="submit" name="cut" value="Cut">
+                      <input type="submit" name="reparent" value="Reparent">
+                      <input type="submit" name="paste" value="Paste">
+                      <input type="submit" name="up" value="Up" onclick="javascript:locatePrevious()">
+                      <input type="submit" name="down" value="Down" onclick="javascript:locateNext()">
+                    </td>
+                    <td> &nbsp; </td>
+                    <td align="right">
+                      <input type="submit" name="compare" id="compare" value="Compare">
+                      <input type="submit" name="commit" id="commit" value="Submit">
+                      <input type="submit" name="cancel" id="commit" value="Cancel">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <!-- <% $source %> insertion -->
+                      <& lib/tree_menu.mason &>
+                      <!-- <% $source %> continues -->
+                    </td>
+                  </tr>
+                </table>
+              </fieldset>
+            </form>
+            <!-- end <% $source %> -->
+<%args>
+</%args>
+<%init>
+  my $source = Util::source(q$Id: manage.html,v 2.2 2009-02-20 15:04:39 selkovjr Exp $);
+</%init>
+<%method jshead><!-- begin manage.html:jshead -->
+    <script type="text/javascript" src="lib/ua.js"></script>
+    <script type="text/javascript" src="lib/ftiens4.js"></script>
+    <script type="text/javascript" src="lib/manage_handlers.js"></script>
+    <& lib/manage_tree.js.mason &>
+    <!-- end manage.html:jshead -->
+</%method>
+<%method init>onload="javascript:initForm();"</%method>
+<%method title><& PARENT:title &> &mdash; Activity Tree Management</%method>
+<%method page_title>Activity Tree Management</%method>
+<%method links><a href="download.html">Download</a></%method>
+<%method file_info> <% Util::print_revision(q$Id: manage.html,v 2.2 2009-02-20 15:04:39 selkovjr Exp $) %> </%method>
+<%method help>
+  <p>&nbsp;</p>
+
+  <h3>Activity Tree Management</h3>
+
+  <p>
+    All assessments done in STAT are structured in the form of a tree
+    representing procedures, activities, or general competencies,
+    grouped according to their level of generality. The tree serves as
+    a structured container for assessments and notes made by the users.
+  </p>
+
+  <p>
+    The purpose of this management tool is to allow the curator of the
+    site to modify the structure of the tree and to set some node
+    attributes. The semantics of different branches are interpreted by
+    the assessment tools, which implement different behaviors and
+    appearance based on the names of the top-level nodes. Therefore,
+    operations that can be accomplished with this tool are limited to
+    modifications of the structure; the semantic values, such as
+    classes of ratings or grades that apply to a set of nodes are
+    configured elsewhere (in the database schema or in the code).
+  </p>
+
+  <& lib/caution.mason, message => qq(Because the behavior of
+  assessment tools is linked to the names of the top-level nodes, such
+  as "General Capabilities" used in the assessment of persons, these
+  nodes should not be edited by the user) &>
+
+  <h4>Massive changes and the problem of data integrity</h4>
+
+  <p>
+    Although this tool provides a complete set of operations to
+    accomplish arbitrary transformations of the tree, it can be
+    inefficient if used to perform massive and complicated edits. In
+    such cases, <a href="download.html">downloading</a> and editing
+    the text form of the tree in a text editor may be easier.
+  </p>
+  <p>
+    Externally edited trees can be imported into the database using a
+    command-line tool, <code>import_tree</code>.
+  </p>
+ 
+  <& lib/caution.mason, message => qq(Regardless of the method of
+  editing, committing changes to the live production database will
+  typically result in corruption of prior assessments linked with the
+  earlier version of the tree. Because additions, deletions or
+  transpositions result in a change of internal node IDs, merging of
+  the updated tree into the live database requires a series of tedious
+  manipulations of data tables, which cannot be done automatically.) &>
+
+  <p>
+    Due to the complexity of tree updates, it is best to work out the
+    final shape of the tree before the system goes to production. As a
+    rule, the more data is in the system, the more difficult it will
+    be to reconcile the changes. In any such operation, the prior
+    assessments corresponding to deleted elements of the tree must be
+    discarded; assessments linked to tree nodes with the same meaning
+    but different ids must be remapped. Renaming of nodes or
+    substantial change in their meaning or usage may render the old
+    data meaningless.
+  </p>
+
+  <h3>Operations</h3>
+
+  <p>
+    All operations are performed by clicking on the buttons near the
+    top of the page.
+  </p>
+
+  <p>
+    There are two kinds of operations. Node operations apply to the
+    currently selected node. To select a node, click in its name. The
+    operations <code>Compare</code>, <code>Submit</code>, and
+    <code>Cancel</code> apply to the entire tree.
+  </p>
+
+  <h4>Node operations</h4>
+
+  <ul>
+    <li>
+      <b>Expand</b>
+      <p>
+        The initial view of the tree shows only its top-level
+        nodes. Any node containing other nodes can be expanded to show
+        its immediate children by clicking on the (+)-icon next to its
+        name. The <input type="button" value="Expand"> button works
+        differently: it serves expand the entire subtree under the
+        currently selected node.
+      </p>
+    </li>
+
+    <li>
+      <b>Add</b>
+      <p>
+        A click on the <input type="button" value="Add"> button
+        creates a new child. The currently selected node becomes this
+        new node's parent. The new node is defined by its name
+        (label); additionally, one of the two attributes can be
+        specified.
+      </p>
+      <p>
+        In the hierarchies describing procedure steps, the
+        <code>Procedure Performed</code> attribute specifies whether
+        this node is optional or not (always/not always
+        performed). This attribute does not change the behavior of the
+        node in the assessment tool, but if the node is marked as
+        optional, its rendering will be different, and in the training
+        applications, it will not be flagged as non-particapatory
+        (because such items are non-participatory by default).
+      </p>
+      <p>
+	The second attribute, <code>Assessment Required</code>, is
+	used by the validation logic in the assessment tool to tell
+	the user that the assessment of the associated item is
+	mandatory. Some items, such as the top-level nodes, are
+	mandatory by default. The purpose of this attribute is to flag
+	mandatory items deeper in the hierarchy, where the
+	programmatic defaults do not apply.
+      </p>
+    </li>
+
+    <li>
+      <b>Edit</b>
+      <p>
+	The <input type="button" value="Edit"> button permits changes
+	in the name and attributes of the selected node (see the
+	explanation of attributes for the <b>Add</b> opeartion above.
+      </p>
+    </li>
+
+    <li>
+      <b>Copy</b>
+      <p>
+        This operation duplicates the content of the selected node,
+        including all its descendants, in a hidden buffer. Copying a node
+        (effectively, a subtree) does not result in a visible change
+        in the tree. But the page reloads, reflecting a change in the
+        status of the <input type="button" value="Paste"> button,
+        which becomes enabled.
+      </p>
+    </li>
+
+    <li>
+      <b>Cut</b>
+      <p>
+        This operation, like <b>Copy</b>, puts the content of the
+        currently selected node in the paste buffer. But it also
+        removes the selected node from the tree.
+      </p>
+    </li>
+
+    <li>
+      <b>Reparent</b>
+      <p>
+        This one is a little tricky. It does two things. First, it
+        takes all descendants of the current node and turns them into
+        descendants of this node's parent. After that, their former
+        parent (the currently selected node) gets killed. This
+        operation is useful when a certain subtree is mistakenly
+        placed at the wrong level of hierarchy.
+      </p>
+    </li>
+
+    <li>
+      <b>Paste</b>
+      <p>
+        This operation places the content of the paste buffer (where it
+        gets through either <b>Copy</b> or <b>Cut</b> operation)
+        <em>inside</em> the selected node.
+      </p>
+    </li>
+
+    <li>
+      <b>Up</b> and <b>Down</b>
+      <p>
+        These operations change the order of siblings.
+      </p>
+    </li>
+  </ul>
+
+  <h4>Whole tree operations</h4>
+
+  <p>
+    All transformations of the tree occur in a temporary space. To
+    make it permanent, press the <input type="button" value="Submit">
+    button. The temporary tree will be copied in place of the
+    permanent one and will become visible to STAT tools (also, that is
+    how it can destroy the existing data &mdash; see the second
+    warning near the top of this page).
+  </p>
+
+  <p>
+    The active (permanent) version of the tree and the tree being
+    edited in the temporary buffer can be compared by pressing the
+    <input type="button" value="Compare"> button. The resulting page
+    will present a line-by-line diff between the text versions of the
+    two trees, in which lines marked with a (-) reperesent the areas
+    of the original tree deleted to make room for the changes, whith
+    additions in the new (temporary) tree makred with a (+). The
+    meaning of (-) and (+) should be interpreted as "before and after
+    the change".  The lines not marked with either (-) or (+) contain
+    the text surrounding the changed region. For example, a change in
+    just one character in the label of one of the nodes will be seen
+    in the diff output as three lines of leading context, followed by
+    a single (-)-line, followed by a single (+)-line, followed by
+    three lines of trailing context.
+  </p>
+
+  <p>
+    All changes to the temporary version of the tree can be rolled
+    back by pushing the <input type="button" value="Cancel"> button.
+  </p>
+
+  <p>&nbsp;</p>
+</%method>

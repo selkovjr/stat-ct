@@ -1,0 +1,186 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+% if ( defined $User->role ) {
+<!-- begin <% $source %> -->
+            <& lib/new_case.mason, %ARGS &>
+            <& lib/ratings_inset.js.mason &>
+            <!-- end <% $source %> --> \
+% }
+% else {
+            <& lib/redirect.mason, path => "survey.html", query => [init => 1] &>
+% }
+<%init>
+  my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/index.html,v 2.16 2013/11/16 22:19:18 stat Exp $);
+</%init>
+
+<%method jshead><!-- begin index.html:jshead -->
+% if ( ref($User) eq 'Person' && $User->role ) { # no point in loading these for the login form
+    <script type="text/javascript" src="lib/ua.js"></script>
+    <script type="text/javascript" src="lib/ftiens4.js"></script>
+    <script type="text/javascript" src="lib/index_handlers.js"></script>
+    <& lib/case_date_overlay.js.mason &>
+    <& lib/teammate_hints.js.mason &>
+    <script type="text/javascript" src="lib/wick.js"></script>
+    <& lib/category_tree.js.mason, %ARGS &>
+% }
+    <!-- end index.html:jshead --> \
+</%method>
+
+<%method page_title>Case Data</%method>
+<%method menu_handle>New Case</%method>
+
+<%method help>
+<%args>
+  $role => undef
+</%args>
+    <h3>Case Selection Form</h3>
+    <p>
+      This is the front page of the Training Assessment Tool. The
+      purpose of this page is to identify the case for
+      assessment.
+    </p>
+
+    <p>
+      You have already identified yourself by logging in. Now you need
+      to indicate who was your teammate. Also, you will need to select
+      the case type from the tree menu below, where cases are arranged
+      by specialty.
+    </p>
+
+    <p>
+      Note that at the moment, we only consider teams consisting of
+% if ( $role ) {
+      yourself and your <% $role eq 'trainee' ? 'attending' :
+      'trainee' %>.
+% } else {
+      yorself and your trainee if you were attending the case, or of
+      yourself and your attending if you are a trainee.
+% }
+      The form automatically derives the role of your
+      teammate as soon as you select yours.
+    </p>
+
+    <p>
+      The best way to identify your teammate is to key in his or her
+      CNetID. If that is unknown, try any combination of their first and
+      last name, or portions thereof. As you push the <code>Proceed</code>
+      button, the machine will search the University Directory, and if
+      it finds a unique match, it will simply transfer you to the
+      Assessment form. Once there, please verify that the right person is
+      chosen.
+    </p>
+
+    <p>
+      If the Directory returns multiple names, you will be presented
+      with a list of names containing the search string(s). Once you
+      have chosen the right person, you will be transferred to the
+      Assessment form with all the data that you have selected so
+      far. In this case as well, please check that you have correctly
+      identified the case and your teammate.
+    </p>
+
+    <h4>Avoiding multiple directory matches</h4>
+
+    <p>
+      It may be inconvenient to have to select you teammate from a
+      list of multiple matches every time you use this form. This
+      condition usually occurs when you search by the surname, or if
+      you search by CNetID which happens to be the same as your
+      teammate's (or someone else's) surname. To avoid that, make your
+      search expression unique by adding the person's first name, or
+      any part of it. Just using an single initial might help, with or
+      without the period.
+    </p>
+
+    <p>
+      Example:
+    </p>
+    <p>
+      Given the following directory matches for "<code>posner</code>":
+    </p>
+
+    <table border="0" cellspacing="0" cellpadding="4">
+      <tr bgcolor="#808080">
+        <td><span style="color: white; text-align: right">CNetID</span></td>
+        <td><span style="color: white; text-align: left">Name</span></td>
+        <td><span style="color: white; text-align: left">Department</span></td>
+      </tr>
+
+      <tr bgcolor="#F0F0F0">
+        <td>
+          <input type="radio" name="teammate" id="eposner" value="eposner:Eric Posner:Law School">
+          <label for="eposner" style="vertical-align: top"> e<span style="text-decoration: underline">posner</span> </label>
+        </td>
+        <td valign="top"> Eric <span style="text-decoration: underline">Posner</span> </td>
+
+        <td valign="top"> Law School </td>
+      </tr>
+      <tr bgcolor="#FEFEFE">
+        <td>
+          <input type="radio" name="teammate" id="mcposner" value="mcposner:Mitchell Posner:Surgery" checked>
+          <label for="mcposner" style="vertical-align: top"> mc<span style="text-decoration: underline">posner</span> </label>
+
+        </td>
+        <td valign="top"> Mitchell <span style="text-decoration: underline">Posner</span> </td>
+        <td valign="top"> Surgery </td>
+      </tr>
+      <tr bgcolor="#F0F0F0">
+        <td>
+
+          <input type="radio" name="teammate" id="rposner" value="rposner:Richard Posner:Law School">
+          <label for="rposner" style="vertical-align: top"> r<span style="text-decoration: underline">posner</span> </label>
+        </td>
+        <td valign="top"> Richard <span style="text-decoration: underline">Posner</span> </td>
+        <td valign="top"> Law School </td>
+
+      </tr>
+      <tr bgcolor="#FEFEFE">
+        <td>
+          <input type="radio" name="teammate" id="posner" value="posner:Amanda Delores Posner:Social Services Administration, School of">
+          <label for="posner" style="vertical-align: top"> <span style="text-decoration: underline">posner</span> </label>
+        </td>
+        <td valign="top"> Amanda Delores <span style="text-decoration: underline">Posner</span> </td>
+
+        <td valign="top"> Social Services Administration, School of </td>
+      </tr>
+      <tr bgcolor="#F0F0F0">
+        <td>
+          <input type="radio" name="teammate" id="kposner" value="kposner:Kearney Marie Posner:">
+          <label for="kposner" style="vertical-align: top"> k<span style="text-decoration: underline">posner</span> </label>
+
+        </td>
+        <td valign="top"> Kearney Marie <span style="text-decoration: underline">Posner</span> </td>
+        <td valign="top">  </td>
+      </tr>
+      <tr bgcolor="#FEFEFE">
+        <td colspan="3" align="left">
+        </td>
+      </tr>
+    </table>
+
+    <p>
+      all of the following seach patterns will uniquely identify Dr. Posner:
+    </p>
+
+    <pre>
+  mcposner
+  Mitchell Posner
+  Mitch Posner
+  M. Posner
+  m posner
+    </pre>
+</%method>
+<%method file_info> <% Util::print_revision(q$Id: index.html,v 2.16 2013/11/16 22:19:18 stat Exp $) %> </%method>
+

@@ -1,0 +1,74 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin <% $source %> -->
+            <form name="nodeeditform" id="nodeeditform" action="update_tree.html" method="POST" onsubmit="javascript:<& /lib/check_label.js &>">
+              <input type="hidden" name="node" value="<% $node %>">
+              <input type="hidden" name="command" value="<% $command %>">
+% if ( $general ) {
+              <input type="hidden" name="opt" value="<% $optional ? 't' : 'f' %>">
+% }
+              <table border="0" cellspacing="0" cellpadding="4">
+                <tr>
+                  <td>
+                    <label for="label" style="vertical-align:baseline">Label:</label>
+                    <input type="text" name="label" id="label" style="width: 40em" value="<% $label %>">
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <table>
+% unless ( $general ) {
+                      <tr>
+                        <td align="left">Procedure Performed:</td>
+                        <td align="left">
+                          <input type="radio" name="opt" id="optional_no" value="f"<% $optional ? '' : ' checked' %>>
+                          <label for="optional_no">Always</label>
+                          <input type="radio" name="opt" id="optional_yes" value="t"<% $optional ? ' checked' : ''%>>
+                          <label for="optional_yes">Not Always</label>
+                        </td>
+                      </tr>
+% }
+                      <tr>
+                        <td align="left">Assessment Required:</td>
+                        <td align="left">
+                          <input type="radio" name="required" id="required_yes" value="t"<% $required ? ' checked' : ''%>>
+                          <label for="required_yes">Yes</label>
+                          <input type="radio" name="required" id="required_no" value="f"<% $required ? '' : ' checked'%>>
+                          <label for="required_no">No</label>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr bgcolor="#FEFEFE">
+                  <td colspan="2" align="left">
+                    <input type="submit" value="Update">
+                  </td>
+                </tr>
+              </table>
+            </form>
+            <!-- end <% $source %> -->
+<%args>
+  $node
+  $general
+  $command
+  $message
+  $label => undef
+  $required
+  $optional
+</%args>
+<%init>
+  my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/lib/edit_node.mason,v 2.2 2009-05-21 17:23:50 selkovjr Exp $);
+</%init>

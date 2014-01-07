@@ -1,0 +1,70 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+% # $Id: ratings_button_group-simple.js.mason,v 2.5 2013/09/12 22:43:59 stat Exp $
+<input type=\"hidden\" id=\"<% $nodeID %>\" name=\"<% $nodeID %>\">\
+% foreach my $value ( @set ) {
+%   my $lb = $label->{$value};
+%   my $ti = $title->{$value} ? qq( title=\\"$title->{$value}\\") : '';
+%   $ti =~ s/\b([Nn])a.{1,2}ve/\b$1a&iuml;ve\b/gi; # browser tooltips can't use non-ascii characters in the title attribute
+%   if ( $lb eq 'NP' and $isOptional ) {
+%      # if node represents an optional entry, set 'NP' to 'NR' (Not Required)
+<span id=\"<% $nodeID %>_<% $value %>\" class=\"depressed\" onclick=\"STAT.toggleButton(this);\"><% $lb %><\/span>\
+<select id=\"<% $nodeID %>_np\" name=\"<% $nodeID %>_np\">\
+%      foreach my $r ( @$reasonOrder ) {
+<option value=\"<% $r %>\"><% $reasonText->{$r} %><\/option>\
+%      }
+<\/select>\
+%   }
+%   else {
+<span<% $ti %> id=\"<% $nodeID %>_<% $value %>\" class=\"raised l<% $level %>\" onclick=\"STAT.toggleButton(this);\"><% $lb %><\/span>\
+%   }
+% }
+<%args>
+  $component
+  $element
+  $ratings
+  $label
+  $title => undef
+  $useNP => undef
+  $reasonText => undef
+  $reasonOrder => undef
+  $isOptional => undef
+  $level
+</%args>
+<%init>
+  my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/lib/ratings_button_group-simple.js.mason,v 2.5 2013/09/12 22:43:59 stat Exp $);
+  my @set = @$ratings;
+  push @set, -1 if $useNP;
+
+  my $nodeID = "${element}_rating_" . $component->{seq};
+
+  # add corrections for Mozilla/Gecko css bugs
+  my $ua = $r->header_in('User-Agent');
+  my $tdstyle = ' style=\\"padding-right: 0.5em\\"';
+  if ( $ua =~ /gecko/i and not $ua =~ /safari|konqueror/i ) {
+    # Safari (Konqueror) is the only gecko-like browser that doesn't have the problem
+    # Mozilla doesn't properly size the parent table element. It seems to ignore
+    # the span padding as defined by the stylesheet, and leaves it as if the table
+    # element contained just the text in the span elements.
+    my $padding = 2 * (4 + 1) * (@set + 1); # 4 + 1 is span padding + border width, on both sides of each span
+    $tdstyle = qq( style=\\"padding-right: ${padding}px\\");
+  }
+  if ( $ua =~ /opera/i ) {
+    $tdstyle = ' style=\\"padding-right: 0.5em\\"';
+  }
+  if ( $ua =~ /msie/i ) {
+    $tdstyle = ' style=\\"padding-right: 1em\\"';
+  }
+</%init>

@@ -1,0 +1,424 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin <% $source %> -->
+% if ( $level ) {
+%   if ( $level == 1 ) {
+            <div style="margin-top: 1em; margin-bottom: 0.5em">
+              <table width="100%">
+                <tbody>
+                  <tr>
+                    <td align="left"> <h3 class="title"><% $person->cn . ($query_month ? " &mdash; $monthName[$query_month]" : "") %> </h3></td>
+                    <td align="right"> <a href="results.html">To Trainees' List</a> </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <table border="0">
+              <tbody>
+                <tr>
+                  <td style="padding-top: 2em; padding-bottom: 1em"><h4>Overall Assessment:</h4></td>
+                </tr>
+                <tr>
+                  <td nowrap valign="top" style="padding-left: 2em"><& lib/plot_category.mason, uid => $uid, category => 'Overall', year => $year, month => $month &> </td>
+                </tr>
+            </tbody>
+          </table>
+
+          <table>
+            <tbody>
+              <tr>
+                <td style="padding-top: 2em; padding-bottom: 1em"><h4>General Assessments:</h4></td>
+              </tr>
+              <tr>
+                <td nowrap valign="top" style="padding-left: 2em"><& lib/plot_category.mason, uid => $uid, category => 'Skill', year => $year, month => $month &> </td>
+              </tr>
+              <tr>
+                <td nowrap valign="top" style="padding-left: 2em"><& lib/plot_category.mason, uid => $uid, category => 'Knowledge', year => $year, month => $month &> </td>
+              </tr>
+              <tr>
+                <td nowrap valign="top" style="padding-left: 2em"><& lib/plot_category.mason, uid => $uid, category => 'Independence', year => $year, month => $month &> </td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <table>
+            <tbody>
+              <tr>
+                <td style="padding-top: 2em; padding-bottom: 1em"><h4>Specific Assessments:</h4></td>
+              </tr>
+              <tr>
+                <td nowrap valign="top" style="padding-left: 2em"><& lib/plot_category.mason, uid => $uid, category => 'Specific', year => $year, month => $month &> </td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <table border="0">
+            <tbody>
+              <tr>
+                <td style="padding-top: 2em; padding-bottom: 1em"><h4>Number of assessments and remarks by case type:</h4></td>
+              </tr>
+	      <tr>
+                <td><em>recent cases are shown in bold</em></td>
+              </tr>
+              <tr>
+                <td>
+                  <table border="0" cellspacing="0" cellpadding="4">
+                    <tbody>
+                      <tr bgcolor="#808080">
+                        <td align="left" style="padding-right: 1em"><span style="color: white">Assessments</span></td>
+                        <td align="left"><span style="color: white">Case type</span></td>
+                        <td align="left" colspan="2"><span style="color: white">Remarks</span></td>
+                      </tr>
+%     my $row = 0;
+%     foreach my $name ( sort keys %case ) {
+%       $row++;
+%       my $color = $row % 2 ? '#F0F0F0' : '#FEFEFE';
+%       my $style = $case{$name}->{fresh} ? qq(style="font-weight: bold" ) : "";
+                      <tr bgcolor="<% $color %>">
+%       my $nrem = $case{$name}->{remarks} ? scalar @{$case{$name}->{remarks}} : 0;
+%       my $span = $nrem ? qq( rowspan="$nrem") : '';
+                        <td valign="top" align="right"<% $span %> style="padding-right: 1em"><% $case{$name}->{count} %></td>
+                        <td <% $style %>valign="top"<% $span %>><% $name %></td>
+%       if ( $nrem ) {
+                        <td valign="top" align="right"><em><% $case{$name}->{remarks}[0][0] =~ /att/ ? "<u>$case{$name}->{remarks}[0][0]</u>" : $case{$name}->{remarks}[0][0]%></em>:</td>
+                        <td valign="top"><% $case{$name}->{remarks}[0][1] %></td>
+%         if ( $nrem > 1 ) {
+%           for my $i ( 1 .. $nrem - 1 ) {
+                      </tr>
+                      <tr bgcolor="<% $color %>">
+                        <td valign="top" align="right"><em><% $case{$name}->{remarks}[$i][0] =~ /att/ ? "<u>$case{$name}->{remarks}[$i][0]</u>" : $case{$name}->{remarks}[$i][0]%></em>:</td>
+                        <td valign="top"><% $case{$name}->{remarks}[$i][1] %></td>
+%           }
+%         }
+%       } else {
+                        <td>&nbsp;</td><td>&nbsp;</td>
+%       }
+                      </tr>
+%     } # foreach case type
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding-bottom: 2em">&nbsp;</td>
+            </tr>
+          </tbody>
+        </table>
+
+%     if ( $role eq 'attending' ) {
+        <form action="results.html" method="POST">
+          <fieldset>
+            <legend><b>Session signature</b></legend>
+            <input type="hidden" name="uid" value="<% $uid %>">
+            <input type="hidden" name="signoff" value="1">
+            <p>
+              If you have an improvement plan that you would like to record, please write a brief description in this box:
+            </p>
+            <textarea name="plan" rows="4" cols="80" style="width:100%"></textarea>
+            <p>
+              To finish this session, please have Dr. <% $person->sn %> 
+              type in his/her password, then press the "Sign" button.
+            </p>
+            <label for="password">Resident's Password:</label>
+            <input type="password" name="password" id="password"> 
+            <input type="submit" value ="Sign" style="width: 7em">
+          </fieldset>
+        </form>
+%       } # if attending
+%       my $query = qq(SELECT "when"::date, "plan" FROM review WHERE trainee = '$uid' ORDER BY "when");
+%       my $res = $Dbh->selectall_arrayref($query);
+%       die $Dbh->errstr if $Dbh->err;
+%       if ( @$res > 0 ) {
+%         my $heading = $role eq 'trainee' ? "Improvement plans" : "Prior plans";
+        <table cellspacing="10">
+          <tbody>
+            <tr>
+              <td style="padding-top: 2em; padding-bottom: 1em" colspan="2"><h4><% $heading %>:</h4></td>
+            </tr>
+%         foreach my $row (@$res) {
+%           my ($when, $plan) = @$row;
+            <tr>
+              <td valign="top"><% $when %></td>
+              <td><% $plan %></td>
+            </tr>
+%         }
+          </tbody>
+        </table>
+%     } # if $level = 1
+%   } # $if $level
+% }
+% else {
+%   if ( $signoff ) {
+%     my @person = Person->search_by_uid($uid);  #FQDN!
+%     die "multiple directory matches for '$uid'" if @person > 1;
+%     die "unknown user ID '$uid'" unless @person;
+%     my $person = shift @person;
+%     if ( Util::password_valid($person, $password) ) {
+%       if ( $plan ) {
+%         $plan = Util::trim_blanks(Util::pg_escape_apostrophe($plan));
+%         if ( $plan gt '' and not $plan =~ /^\s+$/ ) {
+%           my $query = qq(INSERT INTO review ("when", "attending", "trainee", "plan") VALUES ('now', '$my_uid', '$uid', '$plan'));
+%           $Dbh->do($query) or die $Dbh->errstr;
+%           $Dbh->commit;
+%         }
+%       }
+%       $m->comp("lib/redirect.mason", path => "results.html");
+%     } else {
+             <table width="100%" cellpadding="5">
+               <tr>
+                  <td bgcolor="white" style="border-top:1px black dashed; border-bottom:1px black dashed; color: brown;">
+                  <img src="lib/icons/stopsign.gif" align="middle">
+                  &nbsp;
+                  Couldn't validate password for <b><% $uid %></b>. Please <a href="javascript:history.back()">go back</a> and enter correct password.
+                </td>
+              </tr>
+            </table>
+%     }
+%   } else {
+%     # the default action -- list residents
+            <p></p>
+            <p style="margin-top: 2em; color: gray">
+              <% $Model->number_of_cases %> cases recorded between <% $earliest_date %> and <% $latest_date %>
+            </p>
+            <div id="results_by_year">
+              <ul>
+%      my $data_exists = $Model->months_hit;
+%      foreach my $y (0 .. $#years) {
+%        if ($y == 0 and $years[0] == $Model->current_academic_year) {
+                <li><a href="#<% $years[0] %>">Current academic year</a></li>
+%        }
+%         else {
+                <li><a href="#<% $years[$y] %>"><% $years[$y] %> - <% $years[$y] + 1 %></a></li>
+%        }
+%      }
+              </ul>
+              <div>
+%      foreach my $y (@years) {
+%        my @month = $Model->academic_months($y);
+                <div id="#<% $y %>">
+                  <table border="0" cellspacing="0" cellpadding="4">
+                    <tbody>
+                      <tr bgcolor="#808080">
+                        <td align="left"><span style="color: white">Resident/Fellow</span></td>
+                        <td><span style="color: white">Lifetime</span></td>
+                        <td><span style="color: white">Annual</span></td>
+%          foreach ( @month ) {
+                        <td><span style="color: white"><% $_->{abbr} %></span></td>
+%          }
+                      </tr>
+%        my $row = 0;
+%        my @trainees = sort {$a->{sn} cmp $b->{sn}} Person->map_uids($Model->trainees_in_year($y));
+%        unless ( $User->can_see_all_results ) {
+%          @trainees = grep {$_->{uid} eq $my_uid} @trainees; 
+%        }
+%        foreach my $trainee ( @trainees ) {
+%          $row++;
+%          my $color = $row % 2 ? '#F0F0F0' : '#FEFEFE';
+                      <tr bgcolor="<% $color %>">
+                        <td nowrap> <% $trainee->{cn} %> </a> </td>
+                        <td> <a href="results.html?level=1;uid=<% $trainee->{uid} %>"> <img border="0" src="lib/icons/chart-icon-lifetime-24p.png"> </a> </td>
+                        <td> <a href="results.html?level=1;uid=<% $trainee->{uid} %>;year=<% $y %>"> <img border="0" src="lib/icons/chart-icon-annual-24p.png"> </a> </td>
+%          foreach ( @month ) {
+%            if ( $data_exists->{$trainee->{uid}}->{$_->{year}}->{$_->{month}} ) {
+                        <td>
+                          <a href="results.html?level=1;uid=<% $trainee->{uid} %>;month=<% "$_->{year}:$_->{month}" %>"> <img border="0" src="lib/icons/chart-icon-monthly-24p.png"> </a>
+                        </td>
+%            } else {
+                        <td style="color: #B0B0B0"><% $_->{abbr} %></td>
+%            }
+%          }
+                      </tr>
+%        }
+                  </table>
+                </div>
+%      }
+              </div>
+            </div>
+
+%   }
+% }
+            <!-- end <% $source %> -->
+<%args>
+  $level => undef
+  $month => undef
+  $year => undef
+  $signoff => undef
+  $uid => undef
+  $password => undef
+  $plan => undef
+</%args>
+<%method page_title>STAT Results</%method>
+<%method menu_handle>Results</%method>
+<%once>
+use POSIX;
+</%once>
+<%init>
+my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/results.html,v 2.13 2013/08/15 01:07:39 stat Exp $);
+my @monthName = qw/none January February March April May June July August September October November December/;
+
+
+my $person;                 # used in level 1 (graph page)
+my $my_uid = $User->uid;
+my $role = $User->role;
+
+my ($query_year, $query_month) = split ":", $month;   # used in level 1
+
+# determine the range of dates
+my $date_range;
+my $year_range;
+if ( $User->can_see_all_results ) {
+  $date_range = $Model->range_of_dates;
+  $year_range = $Model->range_of_academic_years;
+}
+else {
+  $date_range = $Model->range_of_dates(trainee => $my_uid);
+  $year_range = $Model->range_of_academic_years(trainee => $my_uid);
+}
+my ($earliest_date, $latest_date) = ($date_range->{earliest}, $date_range->{latest});
+
+# List academic years in this date range
+my @years = reverse $year_range->{earliest} .. $year_range->{latest};
+
+my %case;
+if ( $level and $level == 1 ) {
+  ($person) = Person->search_by_uid($uid);  #FQDN!
+  my $date_constraint;
+  if (defined $month) {
+    $date_constraint = qq(extract (YEAR FROM "date") = $query_year AND extract(MONTH FROM "date") = $query_month);
+  }
+  elsif (defined $year) {
+    my $year_start = $Model->config('year_start');
+    my $start = sprintf("'%4d-01-01'::timestamptz + '%d days'", $year, $year_start);
+    my $end = sprintf("'%4d-01-01'::timestamptz + '%d days'", $year + 1, $year_start);
+    $date_constraint = qq("date" BETWEEN $start AND $end);
+  }
+  else {
+    $date_constraint = qq("date" >= '$earliest_date');
+  }
+  my $query = qq(
+SELECT "case".id, "case".assessor, activity.label, remark.text, "timestamp" > now() - '2 weeks'::interval AS fresh
+  FROM "case" LEFT OUTER JOIN remark ON (remark."case" = "case".id), activity
+ WHERE trainee = '$uid'
+   -- AND assessor != '$uid'
+   -- AND assessor = '$my_uid'
+   AND activity.id = "case".activity
+   AND $date_constraint
+);
+
+  my $res = $Dbh->selectall_arrayref($query);
+  $Dbh->err and die $Dbh->errstr;
+  foreach my $row ( @$res ) {
+    my ( $id, $assessor, $name, $remark, $fresh) = @$row;
+    $case{$name}->{count}++;
+    $case{$name}->{fresh} = $fresh;
+    push @{$case{$name}->{remarks}}, [$assessor eq $uid ? 'resident' : 'attending', $remark] if $remark;
+  }
+}
+</%init>
+<%method help>
+  <%args>
+    $level => undef
+    $month => undef
+    $uid => undef
+  </%args>
+  <%init>
+    my ( $whose, $period, $comment );
+    if ( $level == 1 ) {
+      my ( $person ) = Person->search_by_uid($uid);  #FQDN!
+      $whose = $uid eq $User->uid ? "your" : "Dr. " . $person->sn . "\'s";
+      $period = $month ? Util::full_month_name($month) : "the entire period of $whose activity in STAT";
+    }
+  </%init>
+% if ( $uid ) {
+%   if ( $level ) {
+%     if ( $level == 1 ) {
+            <h3>Viewing Results and Signing a Review</h3>
+            <p>
+              This page presents an overview of <% $month ? $whose : "" %> performance assessments during <% $period %>. The time period is selected by clicking into the trainee's name in the results index (to view all results), or by selecting a calendar month. The results are plotted graphically as time charts in the top part of the page, and if any of the assessments were accompanied by remarks, those will be all listed in the bottom part. At the very bottom, if you are an attending, you will see a session signature form (explained below), which your trainee will sign at the end of performance review. 
+            </p>
+
+            <h4>Roll-up Assessments and Time Charts</h4>
+            <p>
+              All assessments in the selected time period are ordered by case date and case number. For each case, the mean values of all assessments in the four major categories are calculated and plotted in sequence on the corresponding time charts. The categories Are <em>Skill</em>, <em>Knowledge</em>, <em>Independence</em> and <em>Specific</em>. Because these categories can contain many detailed assessments, we calculate a single value for each in a process we call <em>roll-up</em>, which is best described as bottom-up recursive averaging of equally ranked nodes. That is, we take all leaf nodes under the same parent and average their values, assigning the average to their parent. Then we take the values of the parent node and its siblings, average them and assign to grandparent. This process is repeated until we reach the top category, at which time we'll have only one number left, that we call a <em>roll-up assessment</em> for that category.
+            </p>
+	<p>The charts contain roll-up assessments for each case with the date in the selected time range and are plotted with time progressing from left to right. The horizontal distance between the points on a graph does not really represent time between the cases; its only purpose is to indicate the order in which the cases were done. Additionally, there is a similar chart for the <em>Overall assessment</em>, which is a simple category not requiring a roll-up. Because roll-ups are likely to result in a fractional value, you will see some of the dots hanging between the grades. For example, the <em>Skill</em> category consists of <em>Security</em>, <em>Technique</em> and <em>Tactical Ability</em>. If <em>Security</em> and <em>Technique</em> are rated Good, while <em>Tactical Ability</em> is rated Very Good, the rolled-up data point for <em>Skill</em> will be plotted on the chart 1/3rd of the grade point above Good.
+            </p>
+
+            <h4>Assessment pairing</h4>
+            <p>
+              On the chart, each purple dot represents a roll-up of a single submission by the trainee, and black dots represent submissions by attendings. If a case was attended by multple mentors, and each cared to submit an assessment, those assessments are rolled up into a single black dot. Since STAT doesn't store case IDs or any patient-related information, the assessments by teammates are paired by matching the following data:
+            </p>
+            <ul>
+              <li>Case Type</li>
+              <li>Date</li>
+              <li>Case Number</li>
+              <li>Trainee</li>
+            </ul>
+
+            <p>
+              Case Number is an ordinal assigned to multiple cases of the same type done on one day. STAT increments it automatically when it sees the same case entered more than once. We have found that this set of artificial IDs allows reliable pairing of attendings' and trainees' assessments without revealing the actual case.
+            </p>
+
+            <h4>Viewing assessment details</h4>
+	    <p>
+              
+            </p>
+            <h4>Remarks</h4>
+	    <p>
+            </p>
+            <h4>Periodic Review</h4>
+	    <p>
+            </p>
+
+%     } # level == 1
+%   } # level defined
+% } # uid defined
+% else {
+            <h3 style="margin-top: 1em">Results grouped by month</h3>
+            <p>If you are authorized to view everybody's results, you will see a table listing all trainees and the months during which they submmitted their assessments or were assessed.</p>
+            <p>Click on the user name to see the summary of that user's results for the lifetime of the system, or on a particular month, to see the report for that month only.</p>
+            <p>Please be patient with lifetime reports, as they can take a long time to generate.</p>
+            <p>If you are not authorized to view other user's data, the table will show only your own results.</p>
+% } # uid undefined
+</%method>
+<%method file_info> <% Util::print_revision(q$Id: results.html,v 2.13 2013/08/15 01:07:39 stat Exp $) %> </%method>
+<%method jshead>
+  <%args>
+    $level => undef
+  </%args>
+% if ( defined $level and $level == 1 ) {
+  <script type="text/javascript" src="lib/image_load_handlers.js"></script>
+  <script src="/combo/lib/?/yui3/build/yui/yui-min.js"></script>
+% }
+% else {
+  <script src="/combo/lib/?/yui3/build/yui/yui-min.js"></script>
+%}
+</%method>\
+<%method code>
+  <%args>
+    $level => undef
+  </%args>
+
+% unless ( defined $level ) {
+YUI().use('tabview', function (Y) {
+  var tabview = new Y.TabView({
+    srcNode: '#results_by_year'
+  });
+
+  tabview.render();
+});
+% }
+</%method>

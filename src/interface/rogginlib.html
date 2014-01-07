@@ -1,0 +1,177 @@
+<!-- begin <% $source %> -->
+           <p>
+             <em>Status: <% $ndocs %> documents indexed; <% $nfailed %> do not contain exportable text</em>
+           </p>
+
+           <form name="searchform" id="searchform" method="POST" onsubmit="return preprocess()">
+             <table cellspacing="12">
+               <tbody>
+                 <tr width="900">
+                   <td colspan="2">
+                     <p>
+                       Select the search category and enter search
+                       terms in the box below (see instructions on the
+                       help page for details of the search
+                       expressions). No selection will have the same
+                       meaning as selecting "All categories".
+                     </p>
+                     <p>
+                       Please <a target="files"
+                       href="https://jcs.uchicago.edu/rogginlib/articles">follow
+                       this link</a> to browse the document file tree
+                       directly
+                     </p>
+                   </td>
+                 </tr>
+                 <tr>
+                   <td width="30%" valign="top" rowspan="2">
+                    <!-- <% $source %>  insertion -->
+                    <& lib/tree_menu.mason &>
+                    <!-- <% $source %>  continues -->
+                   </td>
+                   <td></td>
+                 </tr>
+                 <tr>
+                   <td valign="top">
+                     <table>
+                       <tbody>
+                         <tr>
+                           <td vailgn="top">
+                           </td>
+                         </tr>
+                         <tr>
+                           <td>
+                             <input type="hidden" name="category" value="<% $offset %>">
+                             <input type="hidden" name="offset" value="<% $offset %>">
+                             <input type="text" name="search" size=70 maxlength=2048 value="<% $expr %>" title="Search">
+                             <font size="-1"> <input type="submit" value="Search"></font>
+                           </td>
+                         </tr>
+                       </tbody>
+                     </table>
+                     <p> <% $errtext %> </p>
+                     <% join("\n", @list) %>
+                   </td>
+                 </tr>
+               </tbody>
+             </table>
+           </form>
+           <hr>
+           <!-- end <% $source %> --> \
+<%args>
+  $offset => 0
+  $search => undef
+  $category => undef
+</%args>
+<%method jshead><!-- begin index.html:jshead -->
+    <script type="text/javascript" src="lib/ua.js"></script>
+    <script type="text/javascript" src="lib/ftiens4.js"></script>
+    <script type="text/javascript" src="lib/libsearch_handlers.js"></script>
+    <& lib/library_tree.js.mason, %ARGS &>
+    <!-- end rogginlib.html:jshead -->
+</%method>
+<%method title>Dr. Kevin Roggin's library</%method>
+<%method page_title>Library</%method>
+<%method menu_handle>Papers</%method>
+<%method init>onload="javascript:initForm();"</%method>
+<%method help>
+    <h3>Library Search</h3>
+    <p>
+      This search tool accepts arbitrary Boolean expressions, in which
+      the search terms are joined with the operators
+      <code><b>&</b></code>, <code><b>|</b></code> and
+      <code><b>!</b></code>, meaning <code>And</code>,
+      <code>Or</code>, and <code>Not</code>,
+      respectively. Sub-expressions can be grouped with
+      parentheses. The default operator is <code>And</code>, which
+      means that an expression consisting of several words separated
+      by blanks will pull the documents containing all of those words.
+    </p>
+    <p>
+      <em>Example:</em>
+    </p>
+    <pre>tumor (invading | involving) visceral pleura</pre>
+</%method>
+<%method file_info> <% Util::print_revision(q$Id: rogginlib.html,v 2.4 2012/05/13 09:04:20 stat Exp $) %> </%method>
+<%init>
+my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/rogginlib.html,v 2.4 2012/05/13 09:04:20 stat Exp $);
+
+my $dbh = DBI->connect(
+                    'dbi:Pg:dbname=rogginlib',
+                    "selkovjr",
+                    "",
+                    {AutoCommit => 0, RaiseError => 1}
+                   );
+die $DBI::errstr if $DBI::state;
+
+my ($nfailed) = $dbh->selectrow_array('SELECT count(*) FROM storage WHERE doc IS NULL');
+$dbh->err and die $dbh->errstr;
+
+my ($ndocs) = $dbh->selectrow_array('SELECT count(*) FROM storage WHERE doc IS NOT NULL');
+$dbh->err and die $dbh->errstr;
+
+my $expr = $search;
+my $query = '';
+my @list;
+my $errtext;
+
+if ( $expr gt '' ) {
+  my $expr_fixed = $expr;
+  $expr_fixed =~ s/\s+([&|!()]+)\s*/$1/g;
+  $expr_fixed =~ s/\s*([&|!()]+)\s+/$1/g;
+  $expr_fixed =~ s/([^&|!\(]+)\(/$1&\(/g;
+  $expr_fixed =~ s/\)([^&|!\(]+)/\)&$1/g;
+
+  my @expr = split /\s+/, $expr_fixed;
+  $expr_fixed = join "&", @expr;
+  $expr_fixed =~ s/([&|!()])/ $1 /g;
+
+  my $res;
+  # my ( $res ) = $dbh->selectrow_array("SELECT set_curcfg('default')");
+  # die $dbh->errstr if $dbh->err;
+
+  if ( $category =~ /^all/i ) {
+    $query = "SELECT * FROM finddoc('$expr_fixed') ORDER BY rank DESC LIMIT 100 OFFSET $offset";
+  }
+  else {
+    $query = qq(
+SELECT id, headline(doc, q), rank(vector, q)
+  FROM storage, to_tsquery('$expr_fixed') AS q
+ WHERE vector @@ q AND storage.id ~* '^$category' ORDER by rank(vector, q) DESC LIMIT 100);
+  }
+  $res = $dbh->selectall_arrayref($query);
+
+  if ( $dbh->err ) {
+    $errtext = "<p>" . $dbh->errstr . "</p>";
+#    $m->comp( "lib/redirect.mason", path => "rogginlib.html", query => {%ARGS, alert => $errtext} );
+  }
+  else {
+    if ( @$res ) {
+      foreach my $row ( @$res ) {
+        my ( $file, $headline, $rank ) = @$row;
+        push @list, <<END
+    <p>
+      <a href="/rogginlib/articles/$file">$file</a> | Relevance: $rank
+      <br>
+      $headline
+    </p>
+END
+;
+      }
+    }
+    else {
+      push @list, <<END
+             <table>
+               <tr>
+                 <td>
+                   Search expression not found. Try different words or select a broader category.
+                 </td>
+               </tr>
+             </table>
+END
+;
+    }
+  }
+}
+$dbh->disconnect;
+</%init>

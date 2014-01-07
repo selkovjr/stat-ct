@@ -1,0 +1,77 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin <% $source %> -->
+            <& alert.mason,
+             message => qq(Multiple records were found matching "<code>$name_or_id</code>". Please select one to continue.)
+            &>
+            <form action="verify_data.html" method="POST">
+              <input type="hidden" name="date" value="<% $date %>">
+              <input type="hidden" name="procedure" value="<% $procedure %>">
+              <input type="hidden" name="body_part" value="<% $body_part %>">
+              <input type="hidden" name="teammate_selected" value="1">
+              <input type="hidden" name="case_to_ignore" value="<% $case_to_ignore %>">
+              <table border="0" cellspacing="0" cellpadding="4">
+                <tr bgcolor="#808080">
+                  <td><span style="color: white; text-align: right">CNetID</span></td>
+                  <td><span style="color: white; text-align: left">Name</span></td>
+                  <td><span style="color: white; text-align: left">Department</span></td>
+                </tr>
+<%perl>
+my $row = 0;
+my $checked = " checked";
+foreach my $p ( @$people ) {
+  my %val;
+  $row++;
+  foreach my $k ( keys %$p ) {
+    $val{$k} = $p->{$k};
+    $p->{$k} =~ s|$name_or_id|<span style="text-decoration: underline">$name_or_id</span>|g;
+    $p->{$k} =~ s|$Name_or_id|<span style="text-decoration: underline">$Name_or_id</span>|g;
+  }
+  my $color = $row % 2 ? '#F0F0F0' : '#FEFEFE';
+</%perl>
+                <tr bgcolor="<% $color %>">
+                  <td>
+                    <input type="radio" name="teammate" id="<% $val{uid} %>" value="<% join ':', @val{qw(uid cn department)} %>"<% $checked %>>
+                    <label for="<% $val{uid} %>" style="vertical-align: top"> <% $p->{uid} %> </label>
+                  </td>
+                  <td valign="top"> <% $p->{cn} %> </td>
+                  <td valign="top"> <% $p->{department} %> </td>
+                </tr>
+<%perl>
+  $checked = '';
+}
+my $color = ++$row % 2 ? '#F0F0F0' : '#FEFEFE';
+</%perl>
+                <tr bgcolor="<% $color %>">
+                  <td colspan="3" style="text-align: left">
+                    <input type="submit" value=">> Proceed">
+                  </td>
+                </tr>
+              </table>
+            </form>
+            <!-- end <% $source %> -->
+<%args>
+  $name_or_id => undef
+  $people => undef
+  $role => undef
+  $date => undef
+  $procedure => undef
+  $body_part => undef
+  $case_to_ignore => undef
+</%args>
+<%init>
+  my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/lib/choose_person.mason,v 2.5 2010-09-17 12:46:51 stat Exp $);
+  my $Name_or_id = ucfirst $name_or_id;
+</%init>

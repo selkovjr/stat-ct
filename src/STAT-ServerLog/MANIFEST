@@ -1,0 +1,7 @@
+bin/logger
+Changes
+lib/STAT/ServerLog.pm
+Makefile.PL
+MANIFEST
+README
+t/STAT-ServerLog.t

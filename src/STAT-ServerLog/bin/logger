@@ -1,0 +1,53 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+$|++;
+
+## config
+my $DSN = 'dbi:Pg:dbname=server_log';
+my $DB_TABLE = 'request';
+my $DB_USER = 'stat';
+## end config
+
+use DBI;
+#DBI->trace(10);
+
+{
+  defined (my $pid = fork) or do { warn "can't fork: $!"; sleep 5; redo };
+  if ($pid) {
+    ## parent does...
+    waitpid($pid, 0);
+    last unless $?;             # clean exit means I can go away too
+    warn "logger died with $?, restarting...";
+    sleep 5;                    # do not thrash!
+    redo;
+  }
+  ## child does...
+
+  my $dbh = DBI->connect($DSN, $DB_USER, "", {RaiseError => 1 });
+
+  while (<STDIN>) {
+    ## warn "$0 saw $_";
+    s/^<(.*)>$/$1/
+      or warn ("skipping $_\n"), next;
+    my @fields;
+    for my $field (split) {
+      $field =~ /^(\w+)=([0-9a-fA-F]*)$/
+        or warn ("skipping $_ in $field\n"), next;
+      my ($key, $value) = ($1, pack("H*", $2));
+      push @fields, [$key, $value];
+    }
+    my $INSERT =
+      "INSERT INTO $DB_TABLE (".
+        (join ",", map $_->[0], @fields).
+          ") VALUES(".
+            (join ",", ("?") x @fields).
+              ")";
+    my $sth = $dbh->prepare_cached($INSERT);
+    $sth->execute(map $_->[1], @fields);
+  }
+
+  $dbh->disconnect;
+  exit 0;
+}

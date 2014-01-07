@@ -1,0 +1,9 @@
+<%init>
+  # clean up and go back to the login form
+  $Cache->remove( $STAT::Session->{_session_id} );
+  %ARGS = ();
+  $m->comp( '/lib/redirect.mason', path => "/$STAT::application", query => {logged_out => time} );
+</%init>
+<%flags>
+  inherit => '/syshandler'
+</%flags>

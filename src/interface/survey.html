@@ -1,0 +1,74 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<%args>
+  $role => undef
+  $submit => undef
+</%args>
+% if ( $User->role ) { # we must have arrived here by mistake -- a cached link or something
+            <& lib/redirect.mason, path => "index.html" &>
+% }
+<!-- begin <% $source %> -->
+% if ( $submit ) {
+%   my $query;
+%   if ( $role eq 'attending' ) {
+%     $query = qq(INSERT INTO role ("user", "rolename", "can_see_results", "can_see_overview") VALUES ('$uid', '$role', 't', 't'));
+%   } elsif ( $role eq 'trainee' ) {
+%     $query = qq(INSERT INTO role ("user", "rolename", "can_see_results", "can_see_overview") VALUES ('$uid', '$role', 'f', 'f'));
+%   } else {
+%     $query = qq(INSERT INTO role ("user", "rolename", "can_see_results", "can_see_overview") VALUES ('$uid', '$role', 't', 't'));
+%   }
+%   $Dbh->do($query);
+%   $Dbh->err and die "can't execute query: [$query]; reason: " . $Dbh->errstr;
+%   $Dbh->commit;
+    <& lib/redirect.mason, path => "index.html" &>
+% }
+% else {
+            <div style="margin-top:2em; margin-left:2em">
+              <p>
+                Welcome to STAT.
+              </p>
+              <p>
+                Because you seem to be a new user, we do not know whether you are
+                a trainee or an attending.
+              </p>
+              <form method="POST" action="survey.html">
+                <fieldset>
+                  <p>
+                    <table>
+                      <tr>
+                        <td width="100%">
+                          Your role:
+                          <input type="radio" name="role" id="role_attending" value="attending" checked><label for="role_attending">Attending</label>
+                          <input type="radio" name="role" id="role_trainee" value="trainee"><label for="role_trainee">Trainee</label>
+                          <!-- input type="radio" name="role" id="role_admin" value="admin"><label for="role_admin">Administrator</label -->
+                        </td>
+                        <td style="padding-left:4em">
+                           <input type="hidden" name="num" value="0">
+                           <input type="submit" name="submit" value="Proceed" style="width:20em">
+                        </td>
+                      </tr>
+                    </table>
+                  </p>
+                </fieldset>
+              </form>
+            </div>
+% }
+<%init>
+  my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/survey.html,v 2.5 2010-10-07 20:03:53 stat Exp $);
+  my $uid = $User->uid;
+</%init>
+<%method title>STAT: What is your role?</%method>
+<%method page_title>STAT: What is your role?</%method>
+<%method file_info> <% Util::print_revision(q$Id: survey.html,v 2.5 2010-10-07 20:03:53 stat Exp $) %> </%method>

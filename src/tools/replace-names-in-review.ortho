@@ -1,0 +1,120 @@
+#!/usr/bin/perl -w
+
+# this script must be run from the site's root directory, e.g., /home/stat/web/ssl/stat-ortho
+use warnings FATAL => 'all';
+use strict;
+
+use lib qw(./lib/perl config);
+use STAT;
+use Util;
+use DBI;
+
+my %trans;
+my %old_first_name;
+my %old_last_name;
+foreach ( `cat impersonator-trans.tab` ) {
+  chomp;
+  my ($old, $new) = split;
+  $trans{$old} = $new;
+
+  my $dir;
+  if ( $old eq 'rbaer' ) {
+    $dir->{cn} = 'Ruth Baer';
+    $dir->{sn} = 'Baer';
+  }
+  elsif ( $old eq 'atrueblo' ) {
+    $dir->{cn} = 'Andrew Trueblood';
+    $dir->{sn} = 'Trueblood';
+  }
+  elsif ( $old eq 'scoy1' ) {
+    $dir->{cn} = 'Samuel Coy';
+    $dir->{sn} = 'Coy';
+  }
+  elsif ( $old eq 'kolson1' ) {
+    $dir->{cn} = 'Kristin Olson';
+    $dir->{sn} = 'Olson';
+  }
+  else {
+    $dir = Util::ldap_entry($old);
+  }
+  die "can't find $old" unless $dir;
+  $dir->{cn} =~ s/([\[\]])/\\$1/g;
+  $dir->{sn} =~ s/([\[\]])/\\$1/g;
+  my @names = split /\s+/, $dir->{cn};
+  $old_first_name{$old} = $names[0];
+  $old_last_name{$old} = $dir->{sn};
+}
+
+my %new_first_name;
+my %new_last_name;
+foreach ( `cat surgeons` ) {
+  chomp;
+  my ($new_id, $name) = split "\t";;
+  my @names = split /\s+/, $name;
+  $new_first_name{$new_id} = $names[0];
+  $new_last_name{$new_id} = $names[-1];
+  $new_last_name{$new_id} = "Van Buren" if $names[-2] eq 'Van' and $names[-1] eq 'Buren';
+}
+
+my %first_name_trans = map {$old_first_name{$_} => $new_first_name{$trans{$_}}} keys %old_first_name;
+my $first_names = join '|', keys %first_name_trans;
+my %last_name_trans = map {$old_last_name{$_} => $new_last_name{$trans{$_}}} keys %old_last_name;
+my $last_names = join '|', keys %last_name_trans;
+
+my $dbh = DBI->connect(
+		    'dbi:Pg:dbname=stat-ortho',
+		    "stat",
+		    "",
+		    {AutoCommit => 0, RaiseError => 1}
+		   );
+die $DBI::errstr if $DBI::state;
+
+my $query = qq(
+ SELECT "when", attending, trainee, plan
+   FROM review
+);
+my $res = $dbh->selectall_arrayref($query);
+$dbh->err and die $dbh->errstr . "in query: [$query]";
+foreach my $r ( @$res ) {
+  my ($when, $attending, $trainee, $remark) = @$r;
+
+  $remark =~ s/Callendar/Callender/g; # typo
+  $remark =~ s/Pearse/Pearce/g; # typo
+  $remark =~ s/Ben /Benjamin /g; # nickname
+
+  if ( $old_first_name{$trainee} ) { # if seen in the impersonator table
+    $remark =~ s/$old_first_name{$trainee}(\W)/$new_first_name{$trans{$trainee}} . $1/egi;
+  }
+  if ( $old_last_name{$trainee} ) { # if seen in the impersonator table
+    $remark =~ s/$old_last_name{$trainee}(\W)/$new_last_name{$trans{$trainee}} . $1/egi;
+  }
+  if ( $old_last_name{$attending} ) { # if seen in the impersonator table
+    $remark =~ s/$old_last_name{$attending}(\W)/$new_last_name{$trans{$attending}} . $1/egi;
+  }
+  if ( $trans{$trainee} ) {
+    if ( $new_first_name{$trans{$trainee}} =~ /Mary|Louisa/i ) {
+      $remark =~ s/(\W)He(\W)/$1She$2/g;
+      $remark =~ s/(\W)His(\W)/$1Her$2/g;
+      $remark =~ s/(\W)Him(\W)/$1Her$2/g;
+      $remark =~ s/(\W)he(\W)/$1she$2/g;
+      $remark =~ s/(\W)his(\W)/$1her$2/g;
+      $remark =~ s/(\W)him(\W)/$1her$2/g;
+      $remark =~ s/(\W)himself(\W)/$1herself$2/g;
+    }
+    else {
+      $remark =~ s/(\W)She(\W)/$1He$2/g;
+      $remark =~ s/(\W)Her(\W)/$1His$2/g;
+      $remark =~ s/(\W)she(\W)/$1he$2/g;
+      $remark =~ s/(\W)see her move(\W)/$1see him move$2/g;
+      $remark =~ s/(\W)her(\W)/$1his$2/g;
+      $remark =~ s/(\W)herself(\W)/$1himself$2/g;
+    }
+  }
+
+  $remark =~ s/(^|\W)($first_names)(\W|$)/$1 . $first_name_trans{$2} . $3/eg;
+  $remark =~ s/(^|\W)($last_names)(\W|$)/$1 . $last_name_trans{$2} . $3/eg;
+
+  print "$when\t$trans{$attending}\t$trans{$trainee}\t$remark\n";
+}
+
+$dbh->disconnect;

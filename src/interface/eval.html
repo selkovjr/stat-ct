@@ -1,0 +1,455 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin <% $source %> -->
+            <form name="evalform" id="evalform" method="POST" action="verify_case.html" onsubmit="return STAT.preprocess();">
+              <fieldset>
+                <legend><% $User->uid %></legend>
+                <input type="hidden" name="teammate" value="<% $teammate %>">
+                <input type="hidden" name="procedure" value="<% $procedure %>">
+                <input type="hidden" name="case_no" value="<% $case_no %>">
+                <input type="hidden" name="date" value="<% $date %>">
+                <table>
+% unless ( $nogreeting ) {
+                  <tr>
+                    <td colspan="2">
+                      Welcome <b>Dr. <% $User->sn %></b>,
+                    </td>
+                  </tr>
+% }
+                  <tr>
+                    <td colspan="2">
+                    <% $intro %>
+                    </td>
+                  </tr>
+% if ( $multiple_cases >= 2 ) {
+                  <tr>
+                    <td colspan="2">
+%   if ( $case_no ) {
+		      According to Dr. <% $mate->sn %>, this was the <b><% $ordinal{$case_no} %></b> out of <% $numeral{$multiple_cases} %> cases of the same type done on <% $date %>.
+%   } else {
+                      <% ucfirst $numeral{$multiple_cases} %> cases of the same type done on that day have already been assessed.
+%   }
+                    </td>
+                  </tr>
+% }
+                  <!-- tr>
+                    <td colspan="2">
+                      If the information about the case is correct, please fill out and submit the form.
+                    </td>
+                  </tr -->
+                  <tr>
+                    <td colspan="2">
+                      <!-- <% $source %> insertion -->
+                      <& lib/tree_menu.mason &>
+                      <!-- <% $source %> continues -->
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="left">
+                    <input type="submit" value="Submit">
+                    </td>
+                  </tr>
+                </table>
+              </fieldset>
+            </form>
+            <!-- end <% $source %> -->
+<%args>
+  $link => undef
+  $teammate => undef
+  $procedure => undef
+  $date => undef
+  $case_no => undef
+  $nogreeting => undef
+  $case_to_ignore => undef
+</%args>
+<%init>
+  my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/eval.html,v 2.16 2013/11/16 22:48:18 stat Exp $);
+
+  print STDERR Dumper(\%ARGS);
+  my %numeral = (
+    1 => 'one',
+    2 => 'two',
+    3 => 'three',
+    4 => 'four',
+    5 => 'five',
+    6 => 'six',
+    7 => 'seven',
+    8 => 'eight',
+    9 => 'nine',
+    10 => 'ten',
+    11 => 'eleven',
+    12 => 'twelve',
+    13 => 'thirteen',
+    14 => 'fourteen',
+    15 => 'fifteen',
+    16 => 'sixteen',
+    17 => 'seventeen',
+    18 => 'eighteen',
+    19 => 'nineteen',
+    20 => 'twentie',
+  );
+
+  my %ordinal = (
+    1 => 'first',
+    2 => 'second',
+    3 => 'third',
+    4 => 'fourth',
+    5 => 'fifth',
+    6 => 'sixth',
+    7 => 'seventh',
+    8 => 'eighth',
+    9 => 'ninth',
+    10 => 'tenth',
+    11 => 'eleventh',
+    12 => 'twelfth',
+    13 => 'thirteenth',
+    14 => 'fourteenth',
+    15 => 'fifteenth',
+    16 => 'sixteenth',
+    17 => 'seventeenth',
+    18 => 'eighteenth',
+    19 => 'nineteenth',
+    20 => 'twentieth',
+  );
+
+  my ($procID, $procName);
+  my ($teammate_uid, $name, $department);
+  my ($attending, $trainee, $assessor, $intro);
+  my $query;
+
+  my $mate; # temp name, used because $teammate is still busy with teammate data
+
+  my $uid = $User->uid;
+  my $role = $User->role;
+  if ( defined $link ) {
+    $query = qq(SELECT "date", case_no, activity, trainee, attending, assessor FROM "case" WHERE id = $link);
+    ($date, $case_no, $procID, $trainee, $attending, $assessor) = $Dbh->selectrow_array($query);
+    $Dbh->err and die $Dbh->errstr . "in query: [$query]";
+    my $role = $assessor eq $trainee ? 'attending' : 'trainee'; # must be reciprocal if hyperlinked!
+
+    # fall through if this is not the first time
+    my $res =  Util::is_duplicate($Dbh, $date, $case_no, $procID, $trainee, $attending, $uid);
+    if ( $res->[0] ) {
+      return $m->scomp("lib/duplicate_case.mason", case_id => $res->[0]->[0], timestamp => $res->[0]->[1]);
+    }
+
+    $query = qq(SELECT label FROM activity WHERE id = $procID);
+    ($procName) = $Dbh->selectrow_array($query);
+    $Dbh->err and die $Dbh->errstr . "in query: [$query]";
+    $procedure = "$procID:$procName";
+
+    $teammate_uid = $role eq 'attending' ? $trainee : $attending; # this is the other guy's uid
+    ( $mate ) = Person->search_by_uid($teammate_uid);  #FQDN!
+    $name = $mate->cn;
+
+    # set variables for the form
+    $procedure = "$procID:$procName";
+    $teammate = "$teammate_uid:$name:";
+    $assessor = $uid;
+  }
+  else {
+    # check args
+    die "teammate, procedure and date must be defined" unless $teammate and $procedure and $date;
+    ($procID, $procName) = split ':', $procedure;
+    $procName =~ s/\+/ /g;
+    ($teammate_uid, $name, $department) = split ':', $teammate;
+    $name =~ s/\+/ /g;
+    ( $mate ) = Person->search_by_uid($teammate_uid);  #FQDN!
+    $date =~ s/\+/ /g;
+
+    if ( $role eq 'attending' ) {
+      $attending = $assessor = $uid;
+      $trainee = $teammate_uid;
+    }
+    elsif ( $role eq 'trainee' ) {
+      $trainee = $assessor = $uid;
+      $attending = $teammate_uid;
+    }
+
+    if ( $case_to_ignore ) {
+      my ($reason, $cases) = split ":", $case_to_ignore;
+      foreach my $case ( split ",", $cases ) {
+        $query = qq(
+INSERT INTO case_to_ignore
+         ("assessor", "case", "reason")
+  VALUES ('$uid', $case, '$reason')
+);
+        $Dbh->do($query);
+        $Dbh->err and die $Dbh->errstr . "in query: [$query]";
+        $Dbh->commit;
+      }
+    }
+  }
+
+  if ( $role eq 'attending' ) {
+    $intro = qq(By choosing options on this form, you will record an assessment of <b>Dr. $name</b>\'s performance during <b>$procName</b> that you attended on <b>$date</b>.);
+  }
+  elsif ( $role eq 'trainee' ) {
+    $intro = qq(By choosing options on this form, you will record a self-assessment of <b>$procName</b> that you have performed on <b>$date</b>, with <b>Dr. $name</b> in attending.);
+  }
+
+  my $multiple_cases = Util::last_similar_case($Dbh, $uid, $date, $procID, $trainee, $attending);
+
+</%init>
+<%method jshead>\
+<%args>
+  $link => undef;
+  $procedure => undef;
+</%args>
+<!-- begin eval.html:jshead -->
+    <script type="text/javascript" src="lib/ua.js"></script>
+    <script type="text/javascript" src="lib/ftiens4.js"></script>
+    <script type="text/javascript" src="lib/eval_handlers.js"></script>
+    <& lib/activity_tree.js.mason, procedure => $procedure, %ARGS &>
+    <!-- end eval.html:jshead -->
+<%init>
+  my $role;
+  if ( defined $link ) {
+    my $query = qq(SELECT activity, trainee, attending, assessor FROM "case" WHERE id = $link);
+    my ($procID, $trainee, $attending, $assessor) = $Dbh->selectrow_array($query);
+    $Dbh->err and die $Dbh->errstr . "in query: [$query]";
+    $role = $assessor eq $trainee ? 'attending' : 'trainee'; # must be reciprocal if hyperlinked!
+    $query = qq(SELECT label FROM activity WHERE id = $procID);
+    my ($procName) = $Dbh->selectrow_array($query);
+    $Dbh->err and die $Dbh->errstr . "in query: [$query]";
+    $procedure = "$procID:$procName";
+  }
+  else {
+    die "procedure must be defined" unless $procedure
+  }
+</%init>
+</%method>
+<%method init>onload="javascript:STAT.initForm();"</%method>
+<%method page_title>Case Assessment</%method>
+<%method help>
+<%args>
+  $role => $User->role;
+</%args>
+    <p style="margin-top: 1em">&nbsp;</p>
+    <h4>Aids to making assessments</h4>
+% if ( $role eq 'attending' ) {
+    <p>
+      In specific case-related categories, your subjective assessments
+      are made according to the expected performance of the of the
+      person being assessed. The following ratings apply:
+    </p>
+
+    <p>
+      <table cellspacing="10">
+        <tbody>
+          <tr>
+            <td><span class="example">P</span></td>
+            <td>"Poor"</td>
+            <td>a serious problem exists</td>
+          </tr>
+          <tr>
+            <td><span class="example">A</span>
+            <td>"Awkward"</td>
+            <td>worthy of concentrated efforts to improve</td>
+          </tr>
+          <tr>
+            <td><span class="example">C</span></td>
+            <td>"Competent"</td>
+            <td>precisely acceptable</td>
+          </tr>
+          <tr>
+            <td><span class="example">E</span>
+              <td>"Expert"</td>
+              <td>finely done or expressed</td>
+          </tr>
+        </tbody>
+      </table>
+    </p>
+% }
+% else {
+
+    <p>
+      As a trainee, you will judge your performance in terms of the
+      "phases of technical skills acquisition."
+    </p>
+
+    <p>
+      These categories are most appropriate for initial phases of
+      learning a given task, and they are as follows:
+    </p>
+    <ul>
+      <li>
+        <p>
+          Cognitive &mdash; task performance almost totally under
+          conscious control.  The learner is so absorbed in details
+          he/she may be unaware of surrounding events. "Frontal Lobe
+          execution".
+        </p>
+      </li>
+      <li>
+        <p>
+          Integrative &mdash; learner is in the process of integrating
+          the task completely. Acquiring the ability to recognize and
+          learn the importance of situations and performance is under
+          shared control: some activity requires conscious
+          deliberation and others are automatic.
+        </p>
+      </li>
+      <li>
+        <p>
+          Autonomous &mdash; task performance is "locked-in". With a
+          repertoire of experience, the whole situation is recognized
+          as similar to other situations and performance is under
+          total or near total automatic control, leaving the person
+          free to engage in other activities or to monitor and improve
+          the performance presently taking place under automatic
+          control.  "Cerebellar Lobe execution".
+        </p>
+      </li>
+    </ul>
+
+    <p>
+      These ratings are used to assess performance of specific
+      procedures:
+    </p>
+
+    <table cellspacing="10">
+      <tbody>
+        <tr>
+          <td><span class="example">C</span></td>
+          <td>"Cognitive"</td>
+        </tr>
+        <tr>
+          <td><span class="example">I</span>
+          <td>"Integrative"</td>
+        </tr>
+        <tr>
+          <td><span class="example">A</span></td>
+          <td>"Autonomous"</td>
+        </tr>
+        <tr>
+          <td><span class="example">P</span></td>
+          <td>"Proficient"</td>
+        </tr>
+      </tbody>
+    </table>
+% }
+    <p>
+      You will need a completely different system of ratings to assess
+      <% $role eq 'trainee' ? 'your' : "your trainee's" %> general
+      capabilities pertaining to the case. We suggest that you think
+      of the general qualities, such as <em>Knowledge</em>, as being
+      "sufficient" or "insufficient", and rate them on the following
+      scale:
+    </p>
+
+    <table cellspacing="10">
+      <tbody>
+        <tr>
+          <td><span class="example">P</span>
+          <td>"Poor"</td>
+        </tr>
+        <tr>
+          <td><span class="example">F</span></td>
+          <td>"Fair"</td>
+        </tr>
+        <tr>
+          <td><span class="example">G</span></td>
+          <td>"Good"</td>
+        </tr>
+        <tr>
+          <td><span class="example">VG</span></td>
+          <td>"Very Good"</td>
+        </tr>
+        <tr>
+          <td><span class="example">E</span></td>
+          <td>"Excellent"</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr>
+
+    <h4>Navigating the tree menu</h4>
+
+    <p>
+      The hierarchy of procedures and elementary steps of an operation
+      is approximately arranged in the order of the actual
+      events. Some specific activities, such as <em>Patient
+      preparation</em>, are grouped in modules representing the more
+      general types of activities, such as <em>Procedure
+      Initiation</em>, <em>Exploration</em>, <em>etc.</em> Such
+      grouping allows your assessments to be as specific or as general
+      as you may find appropriate.
+    </p>
+    <p>
+      For example, if you wish to simply state that
+
+% if ( $role eq 'trainee' ) {
+      you have done well
+% } else {
+      the trainee has done well
+% }
+
+      during the exploration phase, without focusing on specific
+      details, find <em>Exploration Phase</em> in the tree
+      corresponding to the specific case you are assessing (assuming
+      this category is defined for that case), and push the button
+      that best reflects your assessment, such as
+
+% if ( $role eq 'trainee' ) {
+      <span class="example">A</span> for "Autonomous".
+% } else {
+      <span class="example">AA</span> for "Above Average".
+% }
+    </p>
+
+    <p>
+      Similarly, you will assess <% $role eq 'trainee' ? 'your' :
+      "your trainee's" %> general capabilities which are also arranged
+      in a tree-like hierarchy.
+    </p>
+
+    <p>
+      To fine-tune your assessments, expand the categories by clicking
+      on the (+) icons until you reach the desired level of
+      precision. A click on the (-) icon will completely collapse the
+      view of the category. Clicking on the name of the category will
+      toggle between the collapsed and the fully expanded view.
+    </p>
+
+    <hr>
+
+    <h4>Required Assessments</h4>
+
+    <p>
+      The categories shown on the assessment page when it first opens
+      represent the level of generality at which all assessments are
+      mandatory. You can expand these categories to give a more
+      detailed assessment if you wish, but you cannot skip them, and
+      you cannot rate the entire case without clicking on each of the
+      top-level categories within.
+    </p>
+
+    <hr>
+
+    <h4>Non-participatory Activities</h4>
+
+    <p>
+      If, for any reason, <% $role eq 'trainee' ? 'you' : 'the
+      trainee' %> did not participate in a certain activity and,
+      therefore, that activity cannot be assessed, please specify what
+      the reason was by selecting <span class="example l2">NP</span>
+      and choosing one of the reasons from a drop-down menu.
+    </p>
+
+
+</%method>
+<%method file_info> <% Util::print_revision(q$Id: eval.html,v 2.16 2013/11/16 22:48:18 stat Exp $) %> </%method>

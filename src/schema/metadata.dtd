@@ -1,0 +1,105 @@
+<!--<Title>metadata-- >
+<!ELEMENT metadata  - - (entities , constraints? , functions?)
+               --<Title>Database schema and data sources--
+               --This document type defines the database schema, describes class attribuets and data sources--
+                >
+
+<!ELEMENT comment  - - (#PCDATA) --<Title>Technical Comment-- >
+
+<!ELEMENT init  - - (#PCDATA) --<Title>Initialization data--
+               --Presented as a tab-delimited table to instantiate small and relatively static tables serving as maps and dictionaries--
+                >
+
+<!ELEMENT source  - - (#PCDATA) --<Title>Data source--
+               --Specifications of the data source(s) used to instantiate the class or its attributes--
+                >
+
+<!ELEMENT description  - - (#PCDATA) --<Title>Description-- >
+
+<!ELEMENT objection  - - (#PCDATA) --<Title>Objection--
+               --Similar to "comment", but indicates there are problems with the entity that must be resolved--
+                >
+
+<!ELEMENT values  - - (#PCDATA) --<Title>Data values--
+               --If an attribute has a limited set of values, this is the list of those values presented as a tab-delimited list--
+                >
+
+<!ELEMENT format  - - (#PCDATA)
+               --<Title>Format of the external representation--
+               --The format should be specified (in the form of a regular expression) if the data elements exhibit any useful regularity--
+                >
+
+<!ELEMENT example  - - (#PCDATA) --<Title>Example of data-- >
+
+<!ELEMENT entities  - - (class+) --<Title>Data Entities--
+               --At the moment, this is simply a list of classes. Other elements may be added later--
+                >
+
+<!ELEMENT functions  - - (#PCDATA) --<Title>functions-- >
+
+<!ELEMENT class  - - (description & comment* & source & attribute+ & 
+               constraint* & (init? | load?)) --<Title>Class-- >
+
+<!ELEMENT attribute  - - (description , comment* , source? , (values? | (
+               format? , example*)) , objection*) --<Title>Class attribute-- >
+
+<!ELEMENT load  - - (#PCDATA) --<Title>Loading Method-- >
+
+<!ELEMENT constraints  - - (#PCDATA) --<Title>constraints-- >
+
+<!ELEMENT constraint  - - (#PCDATA) --<Title>constraint--
+               --Table-level contstraint--
+                >
+
+<!ATTLIST metadata
+               --<Title>Metadata - Attribute List-000--
+               
+               name  CDATA    #REQUIRED 
+               --<Title>Database name--
+                >
+
+<!ATTLIST class
+               --<Title>Metadata - Attribute List-001--
+               
+               name  CDATA    #REQUIRED 
+               --<Title>Class Name--
+               
+               group  CDATA    #REQUIRED 
+               --<Title>Logical grouping attribute--
+               
+               oid  NUMBER    #IMPLIED 
+               --<Title>Specifies table creation with OIDs--
+                >
+
+<!ATTLIST attribute
+               --<Title>Metadata - Attribute List-002--
+               
+               name  CDATA    #REQUIRED 
+               --<Title>Attribute name--
+               
+               type  CDATA    #REQUIRED 
+               --<Title>Attribute type--
+               
+               pkey  NUMBER    #IMPLIED 
+               --<Title>Primary key--
+               
+               ref  CDATA    #IMPLIED 
+               --<Title>Foreign key reference--
+               
+               link  CDATA    #IMPLIED 
+               --<Title>A refernece to a foreign attribtue, not necessarily a key one--
+               
+               length  NUMBER    #IMPLIED 
+               --<Title>Data length in bytes--
+               
+               sequence  CDATA    #IMPLIED 
+               --<Title>Sequence Name--
+                >
+
+<!ATTLIST load
+               --<Title>Metadata - Attribute List-003--
+               
+               from (file , method)   #REQUIRED 
+               --<Title>Source of data for loading--
+                >
+

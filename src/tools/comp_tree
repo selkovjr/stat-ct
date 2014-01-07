@@ -1,0 +1,204 @@
+#!/usr/bin/perl -w
+
+use Sub::Recursive;
+
+my %visited;
+my %visited_link;
+my $depth = 0;
+
+my %node;
+my %edge;
+
+my $topfile = shift @ARGV or die "need a file name";
+
+sub render_simple {
+  my ($caller, $callee, $type, $exists) = @_;
+  if ( $exists ) {
+    print "$caller --($type)--> $callee\n";
+  }
+  else {
+    print "$caller --($type)--> [* $callee *]\n";
+  }
+}
+
+sub render_dot {
+  my ($caller, $callee, $type, $exists) = @_;
+  return if $visited_link{"$caller:$callee:$type"};
+  $visited_link{"$caller:$callee:$type"}++;
+
+  if ( $exists ) {
+      my $color = "black";
+      $color = "gray" unless $type =~ /req|redirect/;
+    print qq("$caller" -> "$callee" [label="$type" color="$color" fontcolor="$color"];
+);
+  }
+  else {
+    print qq("$caller" -> "$callee" [label="$type" color="red" fontcolor="red"];
+);
+  }
+}
+
+sub render {
+  my ($caller, $callee, $type, $exists) = @_;
+  return if $caller =~ /hipec/ or $callee =~ /hipec/;
+  return if $visited_link{"$caller:$callee:$type"};
+  $visited_link{"$caller:$callee:$type"}++;
+
+  $node{$caller} = 1;
+  $node{$callee} = $exists;
+  push @{$edge{"$caller:$callee"}}, $type;
+}
+
+my $traverse = recursive {
+  my ($file) = @_;
+
+  return 1 if $visited{$file};  $visited{$file}++;
+
+  return undef unless -s $file or -s "lib/$file"; # components in lib may refer to other components in lib
+#  print "$depth: $file\n";
+  $depth++;
+
+  my $buf = -s "lib/$file" ? `cat lib/$file` : `cat autohandler $file`;
+  $buf =~ s/\s*\n\s*//gm;
+
+  # remove PARENT references
+  $buf =~ s|<&\s* PARENT:[^&]+&>||;
+
+  # find forms
+  while ( $buf =~ s|<form[^>]+action="([^\"]+)"|| ) {
+    my $comp = $1;
+    # action can be inserted through url.mason
+    if ( $comp =~ /url.mason.+path\s*=>\s*['"]([^'"]+)/ ) {
+      $comp = $1;
+    }
+    $comp =~ s|lib/||;
+    $comp =~ s|^/||;
+    my $exists = 1;
+    $exists = $REC->($comp);
+    render($file, $comp, "req", $exists);
+  }
+
+  # find scripts
+  while ( $buf =~ s|<script[^>]+src="([^\"]+)"|| ) {
+    my $comp = $1; $comp =~ s|lib/||;
+    $comp =~ s|^/||;
+    my $exists = 1;
+    $exists = $REC->($comp);
+    render($file, $comp, "include", $exists);
+  }
+
+  # find links made through url.mason
+  while ( $buf =~ s/<\&[^&]+url.mason[^&]+path\s*=>\s*['"]([^'"]+)[^&]*\&>// ) {
+    my $comp = $1; $comp =~ s|lib/||;
+    my $exists = 1;
+    $exists = $REC->($comp);
+    # ignore stylesheets
+    last if $comp =~ /\.css/;
+    render($file, $comp, "req", $exists);
+  }
+
+  # find redirects made through redirect.mason
+  while ( $buf =~ s/<\&[^&]+redirect.mason[^&]+path\s*=>\s*['"]([^'"]+)[^&]*\&>// ) {
+    my $comp = $1; $comp =~ s|lib/||;
+    my $exists = 1;
+    $exists = $REC->($comp);
+    render($file, $comp, "redirect", $exists);
+  }
+
+  # find components in the body
+  while ( $buf =~ s|<&\s*([^&]+)(?!>)|| ) {
+    my $comp = $1; $comp =~ s|lib/||;
+    $comp =~ s|\s+$||;
+    $comp =~ s|^/||;
+
+    next if $comp =~ /SELF|PARENT|REQUEST/;
+
+    # strip arguments
+    my @tokens = split /\s*,\s*/, $comp;
+    $comp = shift @tokens;
+    my $exists = 1;
+    $exists = $REC->($comp);
+    render($file, $comp, '', $exists);
+  }
+
+  # process the <%init> section
+  if ( $buf =~ s|<%init>(.*)</%init>|| ) {
+    my $init = $1;
+
+    # find components in <%init>
+    while ( $init =~ s/m\s*->\s*s?comp\s*\(\s*[\"\']([^\"\']+)[\"\'](\s*,\s*[^\)]+path\s*=>\s*[\'\"]?([^,\'\"]+))?// ) {
+      my $comp = $1;
+      my $path = $2 ? $3 : '';
+      $path =~ s|^/||;
+      $path =~ s|::|->|g;
+      $comp =~ s|^/||;
+      my $type = '';
+      if ( $comp =~ /redirect/ ) {
+        $comp = $path;
+        $type = "redirect";
+      }
+      elsif ( $comp =~ /url/ ) {
+	$comp = $path;
+	$type = "req";
+      }
+      my $exists = 1;
+      $comp =~ s|lib/||;
+      $exists = $REC->($comp);
+      render($file, $comp, $type, $exists);
+    }
+  }
+
+  $depth--;
+  return 1;
+};
+
+$traverse->($topfile);
+
+print qq(digraph mason {
+  node [fontsize=11, height=0.1]
+  edge [fontsize=11]
+);
+
+foreach $k (keys %node) {
+  my $normalcolor;
+  my $normalshape = 'box';
+  if ( $node{$k} ) {
+    if ( $k =~ /html$/ ) {
+      $normalcolor = 'white';
+      $normalshape = 'ellipse';
+    }
+    elsif ( $k =~ /mason$/ ) {
+      if ( $k =~ /js.mason/ ) {
+	$normalcolor = 'peachpuff';
+      }
+      else {
+	$normalcolor = 'ghostwhite';
+      }
+      $normalshape = 'box';
+    }
+    else {
+      $normalcolor = 'lavender';
+      $normalshape = 'box';
+    }
+  }
+  my $fillcolor = $node{$k} ? $normalcolor : 'red';
+  print qq(  "$k" [shape=$normalshape, style=filled, fillcolor=$fillcolor]
+);
+}
+
+foreach $k (keys %edge) {
+    my ( $caller, $callee ) = split ":", $k;
+    foreach $type ( @{$edge{$k}} ) {
+        my $color = $type eq 'req' ? 'azure4' : 'gray';
+	$color = 'burlywood3' if $type eq 'redirect';
+        my $style = 'solid';
+	$style = 'bold' if $type =~ /req|redirect/;
+	$style = 'dashed' if $type eq 'include';
+	$type = "" if $type eq 'include';
+        print qq(  "$caller" -> "$callee" [label="$type", color=$color, fontcolor=$color, style=$style]
+);
+    }
+}
+
+print qq(}
+);

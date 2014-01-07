@@ -1,0 +1,30 @@
+Building the schema:
+
+  Make
+
+
+Cleaning up:
+
+  Make clean
+
+
+Importing the schema
+
+  createdb stat
+  createlang plpgsql stat
+  psql stat < stat-schema.sql
+
+
+Importing the spreadsheet:
+
+  ./parse-excel.pl STAT\ spreadsheet.xls > spreadsheet.dump
+  ./convert | ./analyze-tree > activity.tab  # spreadsheet.dump is hard-coded into ./convert
+  psql stat -c "DELETE FROM activity"
+  psql stat -c "\\copy activity from 'activity.tab'"
+
+
+Building the component graph
+
+  cd interface/
+  ../comp_tree index.html | dot -T png > callgraph.png 
+

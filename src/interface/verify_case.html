@@ -1,0 +1,101 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<%args>
+  $case_id => undef
+  $case_no => undef
+  $date
+  $teammate => undef
+  $procedure
+  $remark => undef
+</%args>
+<%init>
+# check agruments
+if ( $STAT::application =~ /^hipec/i ) {
+  die "required argument 'case_id' not defined" unless $case_id;
+}
+else {
+  die "required argument 'teammate' not defined" unless $teammate;
+}
+
+my $role = $User->role;
+my $uid = $User->uid;
+
+# ************************************************************************
+# check whether the assessment for this case is already recorded
+my ($procID, $proname) = split ':', $procedure;
+$procID =~ s/[^0-9]+//;
+
+my $caseno_subquery;
+if ( $STAT::application =~ /^hipec/i ) {
+  $caseno_subquery = qq('$case_id'
+   AND assessor = '$uid'
+);
+}
+else {
+  my ($teammate_uid, $cn, $department) = split ':', $teammate;
+  my ($attending, $trainee, $assessor);
+  if ( $role eq 'attending' ) {
+    $attending = $assessor = $uid;
+    $trainee = $teammate_uid;
+  }
+  elsif ( $role eq 'trainee' ) {
+    $trainee = $assessor = $uid;
+    $attending = $teammate_uid;
+  }
+  $caseno_subquery = qq((
+   SELECT max(case_no)
+     FROM "case"
+     WHERE activity = $procID
+     AND trainee = '$trainee'
+     AND attending = '$attending'
+     AND assessor = '$assessor'
+     AND date = '$date'
+   )
+   AND trainee = '$trainee'
+   AND attending = '$attending'
+   AND assessor = '$assessor'
+);
+}
+
+if ( $case_no ) {# we know it's another case of the same type
+  $m->comp( "lib/redirect.mason", path => "submit.html", query => \%ARGS);
+}
+else {  
+  my $query = qq(
+SELECT id, case_no, to_char(timestamp, 'Dy Mon DD HH24:MI YYYY')
+  FROM "case"
+ WHERE case_no = $caseno_subquery
+   AND activity = $procID
+   AND date = '$date'
+);
+
+  my ( $case, $case_no, $timestamp ) = $Dbh->selectrow_array($query);
+  $Dbh->err and die $Dbh->errstr . $query;
+
+  $ARGS{timestamp} = $timestamp;
+  $ARGS{case_exists} = $case_no;
+
+  # assessment for this case may already exist
+  if ( $case ) {
+    $m->comp("lib/confirm_case.mason", %ARGS);
+  }
+  else {
+    # everything is good to go
+    $m->comp( "lib/redirect.mason", path => "submit.html", query => \%ARGS);
+  }
+}
+</%init>
+<%method page_title>Verify Case</%method>
+<%method file_info> <% Util::print_revision(q$Id: verify_case.html,v 2.3 2009-03-09 14:27:20 selkovjr Exp $) %> </%method>

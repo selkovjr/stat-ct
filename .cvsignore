@@ -1,0 +1,2 @@
+lib var *.html *.css *.htc *.cgi *.sed *.dep .htaccess autohandler syshandler
+

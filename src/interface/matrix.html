@@ -1,0 +1,147 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin <% $source %> -->
+            <p style="margin-top: 1em"></p>
+
+<table border="0" cellspacing="0" cellpadding="4">
+  <tr>
+    <td>
+      <table>
+        <tr>
+          <td valign="middle" align="middle" style="width: 2em; border-right: thin dotted black; border-bottom: thin dotted black; padding-right: 2px">total</td>
+          <td valign="middle" align="middle" style="width: 2em; color: #AAA">given</td>
+        </tr>
+        <tr>
+          <td valign="middle" align="middle" style="width: 2em; color: #888">self</td>
+          <td valign="middle" align="middle" style="width: 2em;">paired</td>
+        </tr>
+      </table>
+    </td>
+% my ($row, $col) = (1, 0);
+% foreach my $attending ( sort keys %attending ) {
+%   my $color = $col++ % 2 ? '#707070' : "#808080";
+    <td valign="bottom" align="middle" bgcolor="<% $color %>"><span style="color: white"><& lib/vertical_str.mason, str => $attending &> </span></td>
+% }
+  </tr>
+% foreach my $trainee ( sort keys %trainee ) {
+%   $col = 1;
+%   my $color = $row++ % 2 ? '#F0F0F0' : '#FEFEFE';
+  <tr bgcolor="<% $color %>">
+    <td valign="middle" align="right" style="margin-right; 1em"><% $trainee %></td>
+%   foreach my $attending ( sort keys %attending ) {
+%     $col++;
+%     my $bgcolor = ($row+1) % 2 ? ($col % 2 ? '#ECECEC' : '#F6F6F6') : ($col % 2 ? '#F8F8F8' : '#FEFEFE');
+    <td valign="middle" align="middle" bgcolor="<% $bgcolor %>">
+% if ( $matrix->{$trainee}->{$attending}->{total} or $matrix->{$trainee}->{$attending}->{given} or $matrix->{$trainee}->{$attending}->{self} or $matrix->{$trainee}->{$attending}->{paired} ) {
+      <table>
+        <tr>
+          <td valign="middle" align="middle" style="width: 2em; border-right: thin dotted black; border-bottom: thin dotted black; padding-right: 2px"><% $matrix->{$trainee}->{$attending}->{total} %></td>
+          <td valign="middle" align="middle" style="width: 2em; color: #AAA"><% $matrix->{$trainee}->{$attending}->{given} or "&nbsp;"%></td>
+        </tr>
+        <tr>
+          <td valign="middle" align="middle" style="width: 2em; color: #888"><% $matrix->{$trainee}->{$attending}->{self} or "&nbsp;" %></td>
+          <td valign="middle" align="middle" style="width: 2em;"><% $matrix->{$trainee}->{$attending}->{paired} or "&nbsp;" %></td>
+        </tr>
+      </table>
+    </td>
+% } else {
+    &nbsp;
+% }
+%   }
+  </tr>
+% }
+</table>
+            <!-- end <% $source %> -->
+<%init>
+my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/matrix.html,v 2.3 2009-03-12 19:54:29 selkovjr Exp $);
+
+my $query = qq(
+  SELECT L.trainee, L.attending, L.id AS own_id, R.id AS given_id
+    FROM "case" L LEFT OUTER JOIN "case" R
+      ON (
+           L."date" = R."date"
+           AND L.case_no = R.case_no
+           AND L.activity = R.activity
+           AND L.trainee = R.trainee
+           AND L.assessor = L.trainee
+           AND R.assessor = R.attending
+         )
+   WHERE L.assessor = L.trainee
+
+UNION
+
+  SELECT L.trainee, L.attending, R.id AS own_id, L.id AS given_id
+    FROM "case" L LEFT OUTER JOIN "case" R
+      ON (
+           L."date" = R."date"
+           AND L.case_no = R.case_no
+           AND L.activity = R.activity
+           AND L.attending = R.attending
+           AND L.assessor = L.attending
+           AND R.assessor = R.trainee
+         )
+   WHERE L.assessor = L.attending
+     AND R.id IS NULL
+);
+
+my $res = $Dbh->selectall_arrayref($query);
+$Dbh->err and die "couldn't run this query: $query; reason: " . $Dbh->errstr;
+
+my $matrix = {};
+my %trainee;
+my %attending;
+foreach my $ass ( @$res ) {
+  my ($trainee, $attending, $self, $given) = @$ass;
+  $trainee{$trainee}++;
+  $attending{$attending}++;
+  $matrix->{$trainee}->{$attending}->{total}++;
+  $matrix->{$trainee}->{$attending}->{self}++ if $self;
+  $matrix->{$trainee}->{$attending}->{given}++ if $given;
+  $matrix->{$trainee}->{$attending}->{paired}++ if $self and $given;
+}
+</%init>
+<%method title><& PARENT:title &> &mdash; Assessment Pairing</%method>
+<%method page_title>Assessment Pairing</%method>
+<%method help>
+<%args>
+</%args>
+    <p style="margin-top: 1em">&nbsp;</p>
+    <h4>The matrix of assessment pairings</h4>
+
+    <p>
+      In each cell of the matrix, the numbers are arranged in the following manner:
+    </p>
+
+    <div style="margin-left: 3em">
+      <table>
+	<tr>
+	  <td valign="middle" align="middle" style="width: 2em; border-right: thin dotted black; border-bottom: thin dotted black; padding-right: 2px">total</td>
+	  <td valign="middle" align="middle" style="width: 2em; color: #AAA">given</td>
+	</tr>
+	<tr>
+	  <td valign="middle" align="middle" style="width: 2em; color: #888">self</td>
+	  <td valign="middle" align="middle" style="width: 2em;">paired</td>
+	</tr>
+      </table>
+    </div>
+
+    <ul>
+      <li><em>Total</em> &mdash; the number of all assessments submitted by the resident and the mentor</li>
+      <li><em>Given</em> &mdash; the number of assessments by the mentor</li>
+      <li><em>Self</em> &mdash; the number of assessments by the resident</li>
+      <li><em>Paired</em> &mdash; the number of cases simultaneously assessed by both teammates</li>
+    </ul>
+</%method>
+<%method file_info> <% Util::print_revision(q$Id: matrix.html,v 2.3 2009-03-12 19:54:29 selkovjr Exp $) %> </%method>

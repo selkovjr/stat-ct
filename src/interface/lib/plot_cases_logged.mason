@@ -1,0 +1,110 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<%args>
+  $month => undef
+</%args>
+<!-- begin <% $source %> -->
+% if ( $number_of_assessments > 0 ) {
+%   if ( $r->header_in("User-Agent") =~ /msie/i ) {
+  <img border="0" alt="graph of cases logged during last month" src="<% $src %>">
+%   } else {
+  <img border="0" src="lib/icons/blank.gif" onload="load_one_image('cases_logged', '<% $src %>')">
+  <table><tr><td><img border="0" id="graph_cases_logged" alt="graph of cases logged during last month" src="lib/icons/wait20trans.gif"></td>
+  <td><div id="message_cases_logged"></div></td></tr></table>
+%   }
+% } else {
+   <& caution.mason, message => "no assessments for this period" &>
+% }
+<!-- end <% $source %> --> \
+<%init>
+my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/lib/plot_cases_logged.mason,v 2.3 2009-03-06 22:17:58 selkovjr Exp $);
+my %data;
+my %plot_data;
+# count assessments
+my $query;
+if ( $month ) {
+  my $first_day = "$month/01/2006";
+  $query = qq(
+SELECT date '$first_day' + seq.d AS day, CASE
+                 WHEN assessor IS NULL THEN NULL
+                 ELSE CASE
+                   WHEN assessor = attending THEN 'attending'
+                   ELSE 'trainee'
+                 END
+               END AS role, count(*)
+  FROM "case" RIGHT OUTER JOIN generate_series(0, (
+                                    SELECT extract('days' FROM ((date '$first_day' + interval '1 month' - interval '1 day') - date '$first_day'))
+                               )::integer) AS seq(d)
+                            ON "date" = date '$first_day' + seq.d
+ GROUP BY day, role
+ ORDER BY day, role;
+);
+}
+else {
+  $query = qq(
+SELECT current_date - seq.d AS day, CASE
+                 WHEN assessor IS NULL THEN NULL
+                 ELSE CASE
+                   WHEN assessor = attending THEN 'attending'
+                   ELSE 'trainee'
+                 END
+               END AS role, count(*)
+  FROM "case" RIGHT OUTER JOIN generate_series(0, 30) AS seq(d) ON "date" = current_date - seq.d
+ GROUP BY day, role
+ ORDER BY day, role;
+);
+}
+
+my $res = $Dbh->selectall_arrayref($query);
+$Dbh->err and die "query failed: $query;\n" . $Dbh->errstr;
+
+my $order = 0; # remember the order; sorting by date is difficult
+my $number_of_assessments = 0;
+foreach my $point ( @$res ) {
+  my ( $date, $role, $count ) = @$point;
+  if ( $role ) {
+    $data{$date}->{$role} = $count;
+    $number_of_assessments++;
+  }
+  else {
+    $data{$date}->{attending} = 0;
+    $data{$date}->{trainee} = 0;
+  }
+  $data{$date}->{order} = $order++;
+  $data{$date}->{date} = $date;
+}
+
+# add zeroes instead of missing data
+foreach my $date ( keys %data ) {
+  foreach my $role ( qw/trainee attending/ ) {
+    $data{$date}->{$role} = 0 unless defined $data{$date}->{$role};
+  }
+}
+
+# form tracks for graphing
+foreach my $datum ( sort {$a->{order} <=> $b->{order}} values %data ) {
+  foreach my $role ( qw/trainee attending/ ) {
+    my ( $date, $count ) = ($datum->{date}, $datum->{$role});
+    push @{$plot_data{$role}}, "$date=>$count";
+  }
+}
+
+my $encoded = "yes";
+if ( $r->header_in("User-Agent") =~ /msie/i ) {
+  $encoded = "no";
+}
+
+my $src = $m->scomp("url.mason", path => 'cases_logged_graph.html', query => {self => join('|', @{$plot_data{trainee}}), attending => join('|', @{$plot_data{attending}}), encoded => $encoded});
+</%init>

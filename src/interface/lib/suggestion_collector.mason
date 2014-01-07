@@ -1,0 +1,24 @@
+<input type="text" class="suggestion-collector"<% $id %> value="<% $text %>" /> \
+<%args>
+  $component
+  $element
+  $suggestion
+</%args>
+<%init>
+  my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/lib/error.mason,v 2.2 2009-03-11 21:39:53 selkovjr Exp $);
+  my $text = '';
+  my $id = '';
+  my $seq = $component->{seq};
+  if ($element eq 'component') {
+    $id = qq( id="component_suggestion_$seq" name="component_suggestion_$seq");
+    $text = ($suggestion->{$seq} or 'Define a component');
+  }
+  if ($element eq 'tp') {
+    $id = qq( id="tp_suggestion_$seq" name="tp_suggestion_$seq");
+    $text = ($suggestion->{$seq} or 'Suggest a transition point for this component');
+  }
+  elsif ($element eq 'dp') {
+    $id = qq( id="dp_suggestion_$seq" name="dp_suggestion_$seq");
+    $text = ($suggestion->{$seq} or 'Suggest a decision point for this component');
+  }
+</%init>

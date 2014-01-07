@@ -1,0 +1,111 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+% # $Id: ferguson_ptd.mason,v 2.5 2013/11/16 18:27:55 stat Exp $
+<td class="ferguson_components_container" align="center" valign="middle" nowrap>\
+<table class="ferguson_components">\<tr class="header"><th>Component performance<\/th><th>Transition points<\/th><th>Decision points<\/th><\/tr>\
+% my $row = 0;
+% foreach my $comp ( @$components ) {
+%   next if $comp->{name} eq 'Knowledge';
+%   if (++$row % 2) {
+<tr class="odd">\
+%   } else {
+<tr>\
+%   }
+<td><div><% $comp->{name} or $m->scomp('suggestion_collector.mason', component => $comp, element => 'component', suggestion => \%component_suggestion) %><\/div><div style="margin-left: 1em"><%
+$m->scomp(
+  "ratings_button_group-simple.js.mason",
+  component => $comp,
+  element => 'performance',
+  ratings => [$Model->range_of_ratings_for(subtree => 'Component performance', role => $role)],
+  label => \%ratingSymbol,
+  title => \%ratingTitle,
+  useNP => 1,
+  isOptional => undef,
+  level => 0,
+)
+%>\
+<\/td><td><div><% $comp->{tp} or $m->scomp('suggestion_collector.mason', component => $comp, element => 'tp', suggestion => \%tp_suggestion) %><\/div><div style="margin-left: 1em"><%
+$m->scomp(
+  "ratings_button_group-simple.js.mason",
+  component => $comp,
+  element => 'tp',
+  nodeID => 1,
+  ratings => [$Model->range_of_ratings_for(subtree => 'Transition points', role => $role)],
+  label => \%ratingSymbol,
+  title => \%ratingTitle,
+  useNP => undef,
+  isOptional => undef,
+  level => 0,
+)
+%>\
+<\/div><\/td><td><div><% $comp->{dp} or $m->scomp('suggestion_collector.mason', component => $comp, element => 'dp', suggestion => \%dp_suggestion) %><\/div><div style="margin-left: 1em"><%
+$m->scomp(
+  "ratings_button_group-simple.js.mason",
+  component => $comp,
+  element => 'dp',
+  ratings => [$Model->range_of_ratings_for(subtree => 'Decision points', role => $role)],
+  label => \%ratingSymbol,
+  title => \%ratingTitle,
+  useNP => undef,
+  isOptional => undef,
+  level => 0,
+)
+%>\
+<\/div><\/td><\/tr>\
+% }
+<\/table>\
+<\/td>\
+<%args>
+  $procedure
+  $role
+  $components
+</%args>
+<%init>
+  my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/lib/ferguson_ptd.mason,v 2.5 2013/11/16 18:27:55 stat Exp $);
+  my $user = $User->uid;
+  my %ratingSymbol = $Model->rating_symbol_hash;
+  my %ratingTitle = $Model->rating_desc_hash;
+  my $query;
+
+  $query = qq(
+SELECT seq, text
+  FROM component_suggestion
+ WHERE "user" = '$user'
+   AND procedure = '$procedure'
+ ORDER BY "seq"
+);
+  my %component_suggestion = map {$_->[0] => $_->[1]} @{$Dbh->selectall_arrayref($query)};
+  die "can't run query: $query, " . $Dbh->errstr if $Dbh->err;
+
+  $query = qq(
+SELECT seq, text
+  FROM tp_suggestion
+ WHERE "user" = '$user'
+   AND procedure = '$procedure'
+ ORDER BY "seq"
+);
+  my %tp_suggestion = map {$_->[0] => $_->[1]} @{$Dbh->selectall_arrayref($query)};
+  die "can't run query: $query, " . $Dbh->errstr if $Dbh->err;
+
+  $query = qq(
+SELECT seq, text
+  FROM dp_suggestion
+ WHERE "user" = '$user'
+   AND procedure = '$procedure'
+ ORDER BY "seq"
+);
+  my %dp_suggestion = map {$_->[0] => $_->[1]} @{$Dbh->selectall_arrayref($query)};
+  die "can't run query: $query, " . $Dbh->errstr if $Dbh->err;
+</%init>

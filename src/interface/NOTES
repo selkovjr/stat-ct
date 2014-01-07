@@ -1,0 +1,140 @@
+1. Changes in closed folders do not cascade
+
+2. Changes in an open folder can be handled in two alternative
+   ways:
+
+     (a) cascade the new value to children
+
+     (b) reset children and close the folder
+
+   If the method (a) is chosen, the exception should be made
+   for when the new value is 'NP', in which case it should
+   work as (b).
+
+3. Setting a folder value to 'NP' prevents it from opening 
+   until a different value is selected.
+
+4. Opening a folder cascades its current setting, if defined, to the level
+   it expands to.  If partially expanded, the the settings propagate to
+   the immediate sub-folders. If expanded completely, all children get the
+   value of the folder being expanded.
+
+   If the current value is undefined, opening leaves the child nodes
+   untouched.
+
+5. A change of value in a node resets all its ancestor's values to
+   undefined, unless the new value is 'NP', in which case it should not
+   affect any of the ancestors.
+
+6. Closing a folder leaves its children untouched. This is just a means of
+   getting the folder out of the way. Opening it again will expose the
+   values set in the children earlier, if the folder value is undefined,
+   or propagate its non-null setting as defined in (4).
+
+   We are planning to add some means to indicate whether a collapsed
+   folder has children with non-null values in them.
+
+
+* CVS branching explained:
+
+  http://www.psc.edu/~semke/cvs_branches.html
+
+* In order for redirects from non-ssl to ssl to work, ssl must not be required in .htaccess
+
+* Migrating from dev to production involves:
+
+  1. Changing location of mason_handler.cgi in .htaccess
+  2. Chanding data_dir and comp_root in mason_handler.cgi:
+
+#  data_dir  => '/home/selkovjr/mason_data',
+#  comp_root  => '/home/selkovjr/public_html/stat/interface',
+  data_dir  => '/var/mason_data',
+  comp_root  => [['stat', '/home/www/root/stat'], ['lib', '/home/www/root/stat/lib'], ['root', '/home/www/root']],
+
+  3. Change database name to 'stat' in autohandler
+
+------------------------------------------------------------
+This method in autohandler was used to show popup help pages.
+Pages didn't scroll in some browsers
+
+<%method helplink>
+  <a href="javascript:showHelp()">Instructions</a>
+  <script language="javascript">
+    function showHelp () {
+      var w;
+      w = window.open(
+          "help.html?<% $m->base_comp->path %>",
+          "help", 
+          "width=600,height=450,status=no,location=no,menubar=no,toolbar=no,resizable=yes"
+      );
+      w.focus();
+    }
+  </script>
+</%method>
+
+Niels says the missing element is scrolbars=yes
+
+Throw in directories=no, innerwidth=<width> innerhight=<height>
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A method will not have arguments unless they are explicitly passed to it:
+
+<%method jshead>\
+<%args>
+  $procedure
+  $role
+</%args>
+<!-- begin eval.html:jshead -->
+    <script type="text/javascript" src="lib/ua.js"></script>
+    <script type="text/javascript" src="lib/ftiens4.js"></script>
+    <script type="text/javascript" src="lib/eval_handlers.js"></script>
+    <& lib/activity_tree.js.mason, procedure => $procedure, role => $role  &>
+    <!-- end eval.html:jshead -->
+</%method>
+
+This method must be called as:
+
+    <& SELF:jshead, %ARGS &>
+
+or 
+
+    <& SELF:jshead, procedure => $procedure, role => $role &>
+
+
+Alternatively, a method called without arguments can access the request object like so:
+
+
+<%method jshead><!-- begin eval.html:jshead -->
+    <script type="text/javascript" src="lib/ua.js"></script>
+    <script type="text/javascript" src="lib/ftiens4.js"></script>
+    <script type="text/javascript" src="lib/eval_handlers.js"></script>
+    <& lib/activity_tree.js.mason, procedure => $r->query->{procedure}->[0], role => $r->query->{role}->[0]  &>
+    <!-- end eval.html:jshead -->
+</%method>
+
+(although this is probably not as safe -- it's not good to mess with implementaiton details of $r)
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Authorization/Authentication in Mason
+
+http://www.perl.com/lpt/a/2002/12/11/mason.html
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ldapsearch:
+
+ldapsearch -H ldaps://ldap.uchicago.edu  -x  -b ou=people,dc=uchicago,dc=edu cn="Andrew Cooper Trueblood"
+
+ldapsearch -H ldap://ldap.uchicago.edu  -x  -b ou=people,dc=uchicago,dc=edu uid=mterry dn  cn sn givenName mail audio
+
+cd src/interface/lib
+perl -MDBIx::Class::Schema::Loader=make_schema_at,dump_to_dir:./perl -e 'make_schema_at("STAT::Schema", { debug => 1 }, [ "dbi:Pg:dbname=stat","selkovjr", "" ])'
+
+------------------------------------------------------
+
+to replace the cvs repo:
+
+ find . -type f -name Root -exec perl -pi -e 's/:ext:cvs@cci.uchicago.edu://' {} \;

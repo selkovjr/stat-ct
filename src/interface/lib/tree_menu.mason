@@ -1,0 +1,41 @@
+%#   Copyright 2006 University of Chicago
+%#
+%#   Licensed under the UChicago-STAT Public License, (the "License");
+%#   you may not use this file except in compliance with the License.
+%#   You may obtain a copy of the License in the "license.txt" file
+%#   distributed with this Work, or download it at
+%#   http://jcs.uchicago.edu/download/stat/license.txt
+%#
+%#   Unless required by applicable law or agreed to in writing, software
+%#   distributed under the License is distributed on an "AS IS" BASIS,
+%#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%#   See the License for the specific language governing permissions and
+%#   limitations under the License.
+%#
+<!-- begin <% $source %> -->
+
+                      <!------ The following is the message from the author of the Javascript Tree Menu: ----->
+                      <!-------------------------------------------------------------------------------------->
+                      <!--        By making any changes to the link below you are violating your            -->
+                      <!--        user agreement. Corporate users or any others that want to remove         -->
+                      <!--        the link should check the online FAQ for instructions on how to           -->
+                      <!--        obtain a version without the link.                                        -->
+                      <!--                                                                                  -->
+                      <!--        http://www.treemenu.net/treemenu/faq.asp#lic                              -->
+                      <!--                                                                                  -->
+                      <!--        Removing this link will make the script stop working:                     -->
+                      <table border=0><tr><td><a style="font-size:7pt;text-decoration:none;color:silver;background-color:white" href="http://www.treemenu.net/treemenu/instructions.asp">JavaScript Tree Menu</a></td></tr></table>
+
+                      <span class=TreeviewSpanArea>
+                        <script type="text/javascript">initializeDocument()</script>
+                      </span>
+                      <noscript>
+                        <p>
+                          A tree representation of surgical procedure steps will
+                          open here if you enable JavaScript in your browser.
+                        </p>
+                      </noscript>
+                      <!-- end <% $source %> -->
+<%init>
+  my $source = Util::source(q$Header: /opt/cvs/stat/src/interface/lib/tree_menu.mason,v 2.1 2009-02-20 14:51:36 selkovjr Exp $);
+</%init>

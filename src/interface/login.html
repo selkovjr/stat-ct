@@ -1,0 +1,155 @@
+<form action="login_submit.html" method="POST">
+              <input type="hidden" name="redirect_to" value="<% $redirect_to %>">
+
+% if ( $login_error ) {
+                    <& lib/error.mason, message => $login_error &>
+% } elsif ( $login_message ) {
+                    <& lib/alert.mason, message => $login_message &>
+% } else {
+                    <& lib/alert.mason, message => "You are not logged in" &>
+% }
+              <p style="margin-top: 0.2em">&nbsp;</p>
+              <table>
+                <tr>
+                  <td>Username:</td>
+                  <td><input type="text" name="username" value="<% $username | h %>"></td>
+                </tr>
+                <tr>
+                  <td>Password:</td>
+                  <td><input type="password" name="password" value="<% $password | h %>"></td>
+                </tr>
+                <tr>
+                  <td colspan="2" align="center"><input type="submit" value="Login"></td>
+                </tr>
+              </table>
+            </form>
+<%args>
+  $login_error => undef
+  $login_message => undef
+  $username => ''
+  $password => ''
+  $redirect_to => ''
+</%args>
+<%method title><& PARENT:title &>: Login</%method>
+<%method page_title>Login</%method>
+<%method menu_handle>Login</%method>
+<%method help>
+    <p style="margin-top: 1em">&nbsp;</p>
+
+% if ( $STAT::application =~ /demo/ ) {
+    <h3>STAT-Demo Scenarios</h3>
+
+    <p>
+%   if ( $STAT::application =~ /ortho/ ) {       
+       This site contains demo data modeled to approximate the typical
+       training cases performed in Orthopedic Surgery at the University of Chicago.
+%   } else {
+       This site contains demo data collected from the production
+       STAT site in General Surgery at the University of Chicago. The
+       surgeons' names were obfuscated and the dates were randomized;
+       otherwise, this is an exact snapshot of a working STAT
+       installation.
+%   }
+    </p>
+
+    <p>
+       You can log in as any of the following registered users, using
+       the password '<code>pass</code>'. Your choice of a user ID will
+       depend on the role you would like to assume &mdash; trainee or
+       attending &mdash; and we will further guide you towards particular
+       instances of interesting data.
+    </p>
+
+    <table cellspacing="10" style="margin-left: 1em">
+      <tr class="title">
+        <td>Trainee</td> <td>Attending</td> <td>Not associated</td>
+      </tr>
+      <tr>
+        <td valign="top"><% join("<br>", sort map {$_->uid} @trainees) %></td>
+        <td valign="top"><% join("<br>", sort map {$_->uid} @attendings) %></td>
+        <td valign="top"><% join("<br>", sort map {$_->uid} @unknown) %></td>
+      </tr>
+    </table>
+
+%   if ( $STAT::application =~ /ortho/ ) {       
+    <p>
+      For a start, try to log in as a trainee and submit an
+      assessment (click on 'NEW CASE' in the menu). For every page you
+      see, you will find explanations or instructions under
+      'HELP'). You can either write down or remember one of the ids
+      listed above to specify as your attending, or you can use the
+      case selection form to search for one, if it has been used
+      before.
+    </p>
+
+    </p>
+      When done assessing yourself, log out and log in as that
+      attending. A slightly different perspective will open for you,
+      and if you get to assess your imaginary trainee (or a real one
+      &mdash; we don't mind), you will use a different system of
+      ratings for some things, than you used as a trainee. The ratings
+      are also explained on the Help page, and you can see what the
+      symbols mean if you let your mouse pointer hover over them.
+    </p>
+%   } else {
+    <p>
+      For a start, try to log in as one of our most active trainees,
+      Dr. Cheselden (user id '<code>wimc</code>'). Look around. Submit
+      an assessment (click on 'NEW CASE' in the menu). For every page
+      you see, you will find explanations or instructions under
+      'HELP'). You can either write down or remember one of the
+      attendings' ids to enter when asked to identify your teammate,
+      or you can use the case selection form to search for one.
+    </p>
+
+    </p> When done assessing yourself, log out and log in as an
+       attending, Dr. Lewis (user id '<code>lewis</code>'). A slightly
+       different perspective will open for you, and if you get to
+       assess your imaginary trainee (or a real one &mdash; we don't
+       mind), you will use a different system of ratings for some
+       things, than you used as a trainee. The ratings are also
+       explained on the Help page, and you can see what the symbols
+       mean if you let your mouse pointer hover over them.  </p>
+
+%   }
+    <p>
+      Choosing an id that is "not associated" will let you start a new
+      life as a user unknown to the system. When you log in with one
+      of those ids, you will be asked about your role (attending or
+      trainee). Your choice will be recorded (forever, or until we
+      reload the demo data), so the next time you log in with that id,
+      your role will already be known.
+    </p>
+
+% } else { # normal production mode
+    <p>
+      Please contact <% $admin %> for help on using STAT at your institution.
+    </p>
+    <p>
+      For general questions on STAT, or to make a suggestion, write to: <a href="mailto:<% $STAT::contact%>"><% $STAT::contact %></a> 
+    </p>
+% }
+    <p></p>
+  <%init>
+  my @attendings;
+  my @trainees;
+  my @unknown;
+  my $admin = $Model->config('admin');
+  $admin =~ s%<([^>]+)>%<a href="mailto:$1">$1</a>%g;
+
+  if ( $STAT::application =~ /demo/ ) {
+    # find all available user ids and attach roles to them
+    foreach my $person ( Person->list_all(domain => 'stat-demo.org') ) {
+      $person->set_schema($Schema);
+      my $role = $person->role;
+      if ( $role eq 'attending' ) {
+        push @attendings, $person;
+      } elsif ( $role eq 'trainee' ) {
+        push @trainees, $person;
+      } else {
+        push @unknown, $person;
+      }
+    }
+  }
+  </%init>
+</%method>
