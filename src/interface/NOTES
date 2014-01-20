@@ -130,6 +130,8 @@ ldapsearch -H ldaps://ldap.uchicago.edu  -x  -b ou=people,dc=uchicago,dc=edu cn=
 
 ldapsearch -H ldap://ldap.uchicago.edu  -x  -b ou=people,dc=uchicago,dc=edu uid=mterry dn  cn sn givenName mail audio
 
+ldapsearch -H ldap://localhost  -x  -b o=ct,dc=uchicago-stat,dc=org uid cn mail
+
 cd src/interface/lib
 perl -MDBIx::Class::Schema::Loader=make_schema_at,dump_to_dir:./perl -e 'make_schema_at("STAT::Schema", { debug => 1 }, [ "dbi:Pg:dbname=stat","selkovjr", "" ])'
 
