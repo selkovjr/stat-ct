@@ -296,7 +296,7 @@ install:
 	@echo "\$$STAT::path_to_convert = '`which convert`';" >> config/STAT.pm
 	@echo "\$$STAT::path_to_fig2dev = '`which fig2dev`';" >> config/STAT.pm
 	@echo "\$$STAT::path_to_gnuplot43 = '/opt/bin/gnuplot';" >> config/STAT.pm
-	@echo "\$$STAT::path_to_gnuplot40 = '`which gnuplot`';" >> config/STAT.pm
+	@echo "\$$STAT::path_to_gnuplot40 = '/opt-vintage/bin/gnuplot';" >> config/STAT.pm
 	@echo "\$$STAT::gnuplot_version = '`gnuplot -V`';" >> config/STAT.pm
 	@echo "1;" >> config/STAT.pm
 
