@@ -57,10 +57,16 @@
           <table>
             <tbody>
               <tr>
-                <td style="padding-top: 2em; padding-bottom: 1em"><h4>Specific Assessments:</h4></td>
+                <td style="padding-top: 2em; padding-bottom: 1em"><h4>Component performance / Transition and Decision points:</h4></td>
               </tr>
               <tr>
-                <td nowrap valign="top" style="padding-left: 2em"><& lib/plot_category.mason, uid => $uid, category => 'Specific', year => $year, month => $month &> </td>
+                <td nowrap valign="top" style="padding-left: 2em"><& lib/plot_category.mason, uid => $uid, category => 'Performance', year => $year, month => $month &> </td>
+              </tr>
+              <tr>
+                <td nowrap valign="top" style="padding-left: 2em"><& lib/plot_category.mason, uid => $uid, category => 'Transition points', year => $year, month => $month &> </td>
+              </tr>
+              <tr>
+                <td nowrap valign="top" style="padding-left: 2em"><& lib/plot_category.mason, uid => $uid, category => 'Decision points', year => $year, month => $month &> </td>
               </tr>
             </tbody>
           </table>

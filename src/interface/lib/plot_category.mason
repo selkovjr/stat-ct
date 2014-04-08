@@ -43,40 +43,29 @@ my %label = (
              independence => "^independence\$",
             );
 
-my %tics = (
-            overall_trainee => 'F:30,D-:31,D:32,D+:33,C-:34,C:35,C+:36,B-:37,B:38,B+:39,A-:40,A:41,A+:42',
-            overall_attending => 'F:30,D-:31,D:32,D+:33,C-:34,C:35,C+:36,B-:37,B:38,B+:39,A-:40,A:41,A+:42',
-            knowledge_trainee => 'P:20,F:21,G:22,VG:23,E:24',
-            knowledge_attending => 'P:20,F:21,G:22,VG:23,E:24',
-            skill_trainee => 'P:20,F:21,G:22,VG:23,E:24',
-            skill_attending => 'P:20,F:21,G:22,VG:23,E:24',
-            independence_trainee => 'P:20,F:21,G:22,VG:23,E:24',
-            independence_attending => 'P:20,F:21,G:22,VG:23,E:24',
-            specific_trainee => 'C:10,I:11,A:12,P:13',
-            specific_attending => 'P:0,A:1,C:2,E:3',
-           );
-
 my @buf;
 my $query;
 
 # fill in the tick labels
+my %tics;
 foreach my $role ( qw/attending trainee/ ) {
   $query = qq(
-SELECT "desc", value
+SELECT symbol, value
   FROM rating, rating_map
  WHERE role = '$role'
    AND subtree = ?
    AND value BETWEEN low AND high
+   AND symbol <> 'Not discussed'
  ORDER BY value
 );
   my $sth = $Dbh->prepare($query);
   $Dbh->err and die $Dbh->errstr . "in: $query";
 
-  # get labels for specific assessments
-  $sth->execute('Specific') or die "can't execute query for (subtree = 'Specific'): $query; " . $Dbh->errstr;
+  # get labels for overall assessment
+  $sth->execute('Overall Case Assessment') or die "can't execute query for (subtree = 'Overall Case Assessment'): $query; " . $Dbh->errstr;
   my $res = $sth->fetchall_arrayref;
   $Dbh->err and die $Dbh->errstr . "while fetching results of: $query";
-  $tics{"specific_$role"} = join ",", map {"$_->[0]:$_->[1]"} @$res;
+  $tics{"overall_$role"} = join ",", map {"$_->[0]:$_->[1]"} @$res;
 
   # get labels for general competencies
   $sth->execute('General Capabilities') or die "can't execute query for (subtree = 'General Capabilities'): $query; " . $Dbh->errstr;
@@ -85,6 +74,24 @@ SELECT "desc", value
   foreach my $category ( qw/knowledge skill independence/ ) {
     $tics{"${category}_$role"} = join ",", map {"$_->[0]:$_->[1]"} @$res;
   }
+
+  # get labels for component performance
+  $sth->execute('Component performance') or die "can't execute query for (subtree = 'Component performance'): $query; " . $Dbh->errstr;
+  $res = $sth->fetchall_arrayref;
+  $Dbh->err and die $Dbh->errstr . "while fetching results of: $query";
+  $tics{"performance_$role"} = join ",", map {"$_->[0]:$_->[1]"} @$res;
+
+  # get labels for transition points
+  $sth->execute('Transition points') or die "can't execute query for (subtree = 'Transition points'): $query; " . $Dbh->errstr;
+  $res = $sth->fetchall_arrayref;
+  $Dbh->err and die $Dbh->errstr . "while fetching results of: $query";
+  $tics{"transition points_$role"} = join ",", map {"$_->[0]:$_->[1]"} @$res;
+
+  # get labels for decision points
+  $sth->execute('Decision points') or die "can't execute query for (subtree = 'Decision points'): $query; " . $Dbh->errstr;
+  $res = $sth->fetchall_arrayref;
+  $Dbh->err and die $Dbh->errstr . "while fetching results of: $query";
+  $tics{"decision points_$role"} = join ",", map {"$_->[0]:$_->[1]"} @$res;
 }
 
 # select individual cases; DISTINCT merges information about the cases
@@ -156,18 +163,29 @@ SELECT assessment FROM eval
    AND activity = $id_of_overall;
 );
     }
-    elsif ( $category eq 'specific' ) {
+    elsif ( $category eq 'performance' ) {
       $query = qq(
-SELECT avg(eval.assessment) FROM eval, "case"
- WHERE eval.assessment != -1
-   AND eval."case" = $assessment_id->[0]
-   AND eval."case" = "case".id
-   AND eval.activity IN (
-     SELECT t1.id
-       FROM activity AS t1, activity AS t2
-      WHERE t1.left_id BETWEEN t2.left_id AND t2.right_id
-        AND t2.id = "case".activity
-   );
+SELECT avg(performance.level) FROM performance, "case"
+ WHERE performance.level != -1
+   AND performance."case" = $assessment_id->[0]
+   AND performance."case" = "case".id
+);
+    }
+    elsif ( $category eq 'transition points' ) {
+      $query = qq(
+SELECT avg(performance.tp) FROM performance, "case"
+ WHERE performance.tp IS NOT null
+   AND performance."case" = $assessment_id->[0]
+   AND performance."case" = "case".id
+);
+    }
+    elsif ( $category eq 'decision points' ) {
+      $query = qq(
+SELECT avg(performance.dp) FROM performance, "case"
+ WHERE performance.dp IS NOT null
+   AND performance.dp <> 72 -- filter out 'Not discussed'
+   AND performance."case" = $assessment_id->[0]
+   AND performance."case" = "case".id
 );
     }
     else {
@@ -214,18 +232,29 @@ SELECT assessment FROM eval
    AND activity = $id_of_overall
 );
     }
-    elsif ( $category eq 'specific' ) {
+    elsif ( $category eq 'performance' ) {
       $query = qq(
-SELECT avg(eval.assessment) FROM eval, "case"
- WHERE eval.assessment != -1
-   AND eval."case" = $assessment_id->[0]
-   AND eval."case" = "case".id
-   AND eval.activity IN (
-     SELECT t1.id
-       FROM activity AS t1, activity AS t2
-      WHERE t1.left_id BETWEEN t2.left_id AND t2.right_id
-        AND t2.id = "case".activity
-   )
+SELECT avg(performance.level) FROM performance, "case"
+ WHERE performance.level != -1
+   AND performance."case" = $assessment_id->[0]
+   AND performance."case" = "case".id
+);
+    }
+    elsif ( $category eq 'transition points' ) {
+      $query = qq(
+SELECT avg(performance.tp) FROM performance, "case"
+ WHERE performance.tp IS NOT null 
+   AND performance."case" = $assessment_id->[0]
+   AND performance."case" = "case".id
+);
+    }
+    elsif ( $category eq 'decision points' ) {
+      $query = qq(
+SELECT avg(performance.dp) FROM performance, "case"
+ WHERE performance.dp IS NOT null 
+   AND performance.dp <> 72 -- filter out 'Not discussed'
+   AND performance."case" = $assessment_id->[0]
+   AND performance."case" = "case".id
 );
     }
     else {
@@ -269,6 +298,8 @@ my $height = 201;
 my $margin = 126;
 my $area_width = ($width - 2*$margin)/($npoints + 1);
 my $start = $margin + 0.5*$area_width;
+print STDERR "\n$category:";
+print STDERR Dumper($cases);
 foreach my $c ( @$cases ) {
   push @self_data, $c->[3]->{self} || 'x';
   my $avg = undef;

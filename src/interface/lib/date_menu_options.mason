@@ -32,6 +32,6 @@
   my $date_display_format = "%A %b %e";
   my @dates = (
                'today',
-               map {"$_ days ago"} 1 .. 14
+               map {"$_ days ago"} 1 .. 60
               );
 </%init>
