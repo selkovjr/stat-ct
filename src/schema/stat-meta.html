@@ -1,0 +1,3684 @@
+<p>
+  <a name="class:directory_cache">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>directory_cache</b> / aux</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">Accessible local storage for directory entries</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">LDAP and other directory queries</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#directory_cache:uid" align="left" valign="top" bgcolor="white">
+        <a name="directory_cache:uid"> uid
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">User ID</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">This attribute is part of the composite primary key (id, domain). A unique constraint needs to be defined on the two in the functions element.</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">LDAP or passwd</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Example:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top"><code>mcposner</code></td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#directory_cache:domain" align="left" valign="top" bgcolor="white">
+        <a name="directory_cache:domain"> domain
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Organisational domain</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">The domain attribute is used to identify the authentication source. It is part of the composite primary key (id, domain). A unique constraint needs to be defined on the two in the functions element.</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">LDAP or passwd</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Example:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top"><code>uchicago.edu\nmed.navy.mil</code></td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#directory_cache:dirtype" align="left" valign="top" bgcolor="white">
+        <a name="directory_cache:dirtype"> dirtype
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Specifies the kind of directory where this record originates</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Example:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top"><code>LDAP\npasswd</code></td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#directory_cache:password" align="left" valign="top" bgcolor="white">
+        <a name="directory_cache:password"> password
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Encrypted user password</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">LDAP or passwd</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Not used with LDAP directories.</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#directory_cache:cn" align="left" valign="top" bgcolor="white">
+        <a name="directory_cache:cn"> cn
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Common Name</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">LDAP or passwd</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Example:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top"><code>Michael C Posner</code></td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#directory_cache:sn" align="left" valign="top" bgcolor="white">
+        <a name="directory_cache:sn"> sn
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Surname</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">LDAP or passwd</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Example:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top"><code>Posner</code></td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#directory_cache:givenname" align="left" valign="top" bgcolor="white">
+        <a name="directory_cache:givenname"> givenname
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Given Name</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">LDAP or passwd</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Example:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top"><code>Michael</code></td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#directory_cache:mail" align="left" valign="top" bgcolor="white">
+        <a name="directory_cache:mail"> mail
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Electronic mail address</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">LDAP or passwd</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Example:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top"><code>mcposner@uchicago.edu</code></td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#directory_cache:department" align="left" valign="top" bgcolor="white">
+        <a name="directory_cache:department"> department
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Institutional department (where there are many)</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">LDAP or passwd</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Example:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top"><code>General Surgery</code></td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#directory_cache:ts" align="left" valign="top" bgcolor="white">
+        <a name="directory_cache:ts"> ts
+      </td>
+      <td valign="top"> timestamptz </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">The cache timestamp</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">automatic -- Person.pm</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:rating">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>rating</b> / enum</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">Enumerated performance ratings</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Comment:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">This class combines several different systems of grades used for different purposes. General skills and specific procedures are rated (UQ .. AA), while the overall grade is given in the range of (F .. A). The numeric values for different grade systems are offset by 10.</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">curator</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#rating:value" align="left" valign="top" bgcolor="#8282F4">
+        <a name="rating:value"> <font color=white><b>value</b></font>
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> 2 </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Numeric rating level</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#rating:symbol" align="left" valign="top" bgcolor="white">
+        <a name="rating:symbol"> symbol
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Rating symbol</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">curator</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#rating:desc" align="left" valign="top" bgcolor="white">
+        <a name="rating:desc"> desc
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Short description of the rating level</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">curator</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#rating:description" align="left" valign="top" bgcolor="white">
+        <a name="rating:description"> description
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Description of the rating level</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">curator</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="2">
+          <tr> <td valign="top"> <code>-1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>NP</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Non-participatory</code> </td> <td>&nbsp;</td> <td valign="top"> <code>trainee was not involved for the reasons indicated separately </code> </td> </tr> 
+          <tr> <td valign="top"> <code>0</code> </td> <td>&nbsp;</td> <td valign="top"> <code>P</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Poor</code> </td> <td>&nbsp;</td> <td valign="top"> <code>a serious problem exists </code> </td> </tr> 
+          <tr> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>A</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Awkward</code> </td> <td>&nbsp;</td> <td valign="top"> <code>worthy of concentrated efforts to improve </code> </td> </tr> 
+          <tr> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>C</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Competent</code> </td> <td>&nbsp;</td> <td valign="top"> <code>perfectly acceptable </code> </td> </tr> 
+          <tr> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>E</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Expert</code> </td> <td>&nbsp;</td> <td valign="top"> <code>finely done </code> </td> </tr> 
+          <tr> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>X</code> </td> <td>&nbsp;</td> <td valign="top"> <code>EXpert</code> </td> <td>&nbsp;</td> <td valign="top"> <code>finely done </code> </td> </tr> 
+          <tr> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>X</code> </td> <td>&nbsp;</td> <td valign="top"> <code>EXpert</code> </td> <td>&nbsp;</td> <td valign="top"> <code>finely done </code> </td> </tr> 
+          <tr> <td valign="top"> <code>10</code> </td> <td>&nbsp;</td> <td valign="top"> <code>C</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Cognitive</code> </td> <td>&nbsp;</td> <td valign="top"> <code>task performance is almost totally under conscious control </code> </td> </tr> 
+          <tr> <td valign="top"> <code>11</code> </td> <td>&nbsp;</td> <td valign="top"> <code>I</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Integrative</code> </td> <td>&nbsp;</td> <td valign="top"> <code>learner is in the process of integrating the task. Some activities require conscious deliberation, some are automatic </code> </td> </tr> 
+          <tr> <td valign="top"> <code>12</code> </td> <td>&nbsp;</td> <td valign="top"> <code>A</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Autonomous</code> </td> <td>&nbsp;</td> <td valign="top"> <code>task performance is locked-in, leaving the person free to engage in other activities or to monitor the environment </code> </td> </tr> 
+          <tr> <td valign="top"> <code>13</code> </td> <td>&nbsp;</td> <td valign="top"> <code>P</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Proficient</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Highly autonomous and proficient </code> </td> </tr> 
+          <tr> <td valign="top"> <code>20</code> </td> <td>&nbsp;</td> <td valign="top"> <code>P</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Poor</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>21</code> </td> <td>&nbsp;</td> <td valign="top"> <code>F</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Fair</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>22</code> </td> <td>&nbsp;</td> <td valign="top"> <code>G</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Good</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>23</code> </td> <td>&nbsp;</td> <td valign="top"> <code>VG</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Very Good</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>24</code> </td> <td>&nbsp;</td> <td valign="top"> <code>E</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Excellent</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>30</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Passed</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Successfully passed through this transition point</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>31</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Failed</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Transition point has not been reached or was ignored</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>40</code> </td> <td>&nbsp;</td> <td valign="top"> <code>N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Naïve</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Slow transition between steps; halting, uncertain movements; frequent instrument collisions if MIS; failure to progress </code> </td> </tr> 
+          <tr> <td valign="top"> <code>41</code> </td> <td>&nbsp;</td> <td valign="top"> <code>I</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Intermediate learner</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Reasonable transition between steps; moderately confident movements; rare instrument collisions if MIS; avoids most errors </code> </td> </tr> 
+          <tr> <td valign="top"> <code>42</code> </td> <td>&nbsp;</td> <td valign="top"> <code>C</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Competent</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Smooth flow of operation; confident movements; no instrument collisions if MIS; aviods common errors </code> </td> </tr> 
+          <tr> <td valign="top"> <code>43</code> </td> <td>&nbsp;</td> <td valign="top"> <code>E</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Expert</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Avoids errors; able to recover from errors and unexpected challenges; transitions to alternate techniques without hesitation when indicated </code> </td> </tr> 
+          <tr> <td valign="top"> <code>50</code> </td> <td>&nbsp;</td> <td valign="top"> <code>N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Naïve</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Understands rationale for component; understands major anatomic features; incomplete knowledge of surgical steps </code> </td> </tr> 
+          <tr> <td valign="top"> <code>51</code> </td> <td>&nbsp;</td> <td valign="top"> <code>I</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Intermediate learner</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Understands detailed anatomy; complete knowledge of standard surgical steps </code> </td> </tr> 
+          <tr> <td valign="top"> <code>52</code> </td> <td>&nbsp;</td> <td valign="top"> <code>C</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Competent</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Understands an alternative to standard surgical steps; understands how to avoid common errors </code> </td> </tr> 
+          <tr> <td valign="top"> <code>53</code> </td> <td>&nbsp;</td> <td valign="top"> <code>E</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Expert</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Understands several alternatives to standard surgical steps </code> </td> </tr> 
+          <tr> <td valign="top"> <code>60</code> </td> <td>&nbsp;</td> <td valign="top"> <code>N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Naïve</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>61</code> </td> <td>&nbsp;</td> <td valign="top"> <code>I</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Intermediate learner</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>62</code> </td> <td>&nbsp;</td> <td valign="top"> <code>C</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Competent</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>63</code> </td> <td>&nbsp;</td> <td valign="top"> <code>E</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Expert</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>70</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Passed</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Was aware of the possibilities to consider at this point</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>71</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Failed</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Required prompting or explanation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>72</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Not discussed</code> </td> <td>&nbsp;</td> <td valign="top"> <code>This point has not been brought up in teaching</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>100</code> </td> <td>&nbsp;</td> <td valign="top"> <code>F</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>101</code> </td> <td>&nbsp;</td> <td valign="top"> <code>D-</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>102</code> </td> <td>&nbsp;</td> <td valign="top"> <code>D</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>103</code> </td> <td>&nbsp;</td> <td valign="top"> <code>D+</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>104</code> </td> <td>&nbsp;</td> <td valign="top"> <code>C-</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>105</code> </td> <td>&nbsp;</td> <td valign="top"> <code>C</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>106</code> </td> <td>&nbsp;</td> <td valign="top"> <code>C+</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>107</code> </td> <td>&nbsp;</td> <td valign="top"> <code>B-</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>108</code> </td> <td>&nbsp;</td> <td valign="top"> <code>B</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>109</code> </td> <td>&nbsp;</td> <td valign="top"> <code>B+</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>110</code> </td> <td>&nbsp;</td> <td valign="top"> <code>A-</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>111</code> </td> <td>&nbsp;</td> <td valign="top"> <code>A</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>112</code> </td> <td>&nbsp;</td> <td valign="top"> <code>A+</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+        </table>
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:np_reason">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>np_reason</b> / enum</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">List of reasons for omission of activities</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">curator</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#np_reason:order" align="left" valign="top" bgcolor="white">
+        <a name="np_reason:order"> order
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Menu order</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">curator</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#np_reason:code" align="left" valign="top" bgcolor="#8282F4">
+        <a name="np_reason:code"> <font color=white><b>code</b></font>
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Abbreviation</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">curator</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#np_reason:text" align="left" valign="top" bgcolor="white">
+        <a name="np_reason:text"> text
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reason for omission</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">curator</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="2">
+          <tr> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>NR</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Not required </code> </td> </tr> 
+          <tr> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>PW</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Patient's welfare </code> </td> </tr> 
+          <tr> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>ML</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Multiple learners </code> </td> </tr> 
+          <tr> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>P</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Pace of operation </code> </td> </tr> 
+          <tr> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>T</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Team event </code> </td> </tr> 
+          <tr> <td valign="top"> <code>6</code> </td> <td>&nbsp;</td> <td valign="top"> <code>D</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Demonstration </code> </td> </tr> 
+          <tr> <td valign="top"> <code>7</code> </td> <td>&nbsp;</td> <td valign="top"> <code>O</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Other </code> </td> </tr> 
+        </table>
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:activity">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>activity</b> / enum</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">Hierarchy of procedure steps</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Comment:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">This is a nested-set representation of a tree, designed for easy selection of subtrees</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">curator</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#activity:id" align="left" valign="top" bgcolor="#8282F4">
+        <a name="activity:id"> <font color=white><b>id</b></font>
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> 2 </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Numeric ID of the tree node</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#activity:parent" align="left" valign="top" bgcolor="#D0E0FF">
+        <a name="activity:parent"> parent
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> 2 </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reference to the parent node</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#activity:left_id" align="left" valign="top" bgcolor="white">
+        <a name="activity:left_id"> left_id
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Sequence number of the node in pre-order traversal</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Defines the subtree comprising this node</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#activity:right_id" align="left" valign="top" bgcolor="white">
+        <a name="activity:right_id"> right_id
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Sequence number of the node in post-order traversal</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Defines the subtree comprising this node</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#activity:required" align="left" valign="top" bgcolor="white">
+        <a name="activity:required"> required
+      </td>
+      <td valign="top"> boolean </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">A flag indicating that this step is subject to mandatory assessment</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">curator</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#activity:opt" align="left" valign="top" bgcolor="white">
+        <a name="activity:opt"> opt
+      </td>
+      <td valign="top"> boolean </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">A flag indicating that this step is optional</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">curator</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#activity:label" align="left" valign="top" bgcolor="white">
+        <a name="activity:label"> label
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Node label</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">curator</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:component">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>component</b> / enum</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">Procedure components for Dr. Ferguson's decision/transition points' assessment</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Comment:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">This is a menu of possible procedure components linked to a class of procedures by name</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">curator</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#component:procedure" align="left" valign="top" bgcolor="white">
+        <a name="component:procedure"> procedure
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">The name of procedure class that is composed of this component set</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">This attribute is part of the composite primary key (procedure, seq). A unique constraint needs to be defined on the two in the functions element.</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">curator</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Example:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top"><code>Pulmonary</code></td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#component:seq" align="left" valign="top" bgcolor="white">
+        <a name="component:seq"> seq
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> 2 </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">The ordinal number of this component in a rendered list</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">This attribute is part of the composite primary key (procedure, seq). A unique constraint needs to be defined on the two in the functions element.</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">curator</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#component:name" align="left" valign="top" bgcolor="white">
+        <a name="component:name"> name
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">This component's name</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">curator</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Example:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top"><code>Nodal dissection</code></td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#component:difficulty" align="left" valign="top" bgcolor="white">
+        <a name="component:difficulty"> difficulty
+      </td>
+      <td valign="top"> char </td>
+      <td valign="top"> 1 </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Difficulty</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">curator</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Values:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">                <table border="0" cellborder="1" cellspacing="0">
+                  <tr> <td valign="top"> <code>l </td> <td>&nbsp;</td> <td valign="top"> <em>Low</em> </td> </tr>
+                  <tr> <td valign="top"> <code>m </td> <td>&nbsp;</td> <td valign="top"> <em>Moderate</em> </td> </tr>
+                  <tr> <td valign="top"> <code>h </td> <td>&nbsp;</td> <td valign="top"> <em>High</em> </td> </tr>
+                </table>
+</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#component:tp" align="left" valign="top" bgcolor="white">
+        <a name="component:tp"> tp
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Transition point</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">curator</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Example:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top"><code>Identified carina during level 7 dissection</code></td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#component:dp" align="left" valign="top" bgcolor="white">
+        <a name="component:dp"> dp
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Decision point</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">curator</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Example:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top"><code>Management of unexpected N2 disease</code></td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="2">
+          <tr> <td valign="top"> <code>Major lung resection</code> </td> <td>&nbsp;</td> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Knowledge</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Major lung resection</code> </td> <td>&nbsp;</td> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Preparation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Positioning and choice of incision(s)</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Major lung resection</code> </td> <td>&nbsp;</td> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Dissect levels 4, 5/6, 7, 8, 9</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Carina, esophagus, [SVC, trachea, azygos vein] or [aorta/PA] identified</code> </td> <td>&nbsp;</td> <td valign="top"> <code>N2 disease present </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Major lung resection</code> </td> <td>&nbsp;</td> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Dissect, divide pulmonary vein</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Pulmonary vein to remain in place identified</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Common pulmonary vein; how to control venous bleeding </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Major lung resection</code> </td> <td>&nbsp;</td> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Dissect, divide pulmonary artery branches</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Differentiate between branches to affected lobe vs other lobes</code> </td> <td>&nbsp;</td> <td valign="top"> <code>How to control arterial bleeding </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Major lung resection</code> </td> <td>&nbsp;</td> <td valign="top"> <code>6</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Complete fissure(s)</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Avoid impinging on other lobes</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Fissure involved by cancer </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Major lung resection</code> </td> <td>&nbsp;</td> <td valign="top"> <code>7</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Conclusion</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Thymectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Knowledge</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Thymectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Preparation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Positioning and choice of incision(s)</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Thymectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Opening pleura adjacent to ipsilateral phrenic nerve</code> </td> <td>&nbsp;</td> <td valign="top"> <code>l</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify phrenic nerve and internal thoracic vein</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Thymectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Dissection of pericardium</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify the plane between the thymus and pericardium</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Thymectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Dissection of upper poles</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify upper poles</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Thymectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>6</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Dissection and division of venous branches</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify innominate vein</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Thymectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>7</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Completion of dissection with preservation of contralateral phrenic nerve</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify contralateral phrenic nerve</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Thymectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>8</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Conclusion</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Radical pleurectomy/decortication</code> </td> <td>&nbsp;</td> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Knowledge</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Radical pleurectomy/decortication</code> </td> <td>&nbsp;</td> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Preparation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Positioning and choice of incision(s)</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Radical pleurectomy/decortication</code> </td> <td>&nbsp;</td> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Separation of lung from pleura</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify pleural plane</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Radical pleurectomy/decortication</code> </td> <td>&nbsp;</td> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>LN dissection</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Radical pleurectomy/decortication</code> </td> <td>&nbsp;</td> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Dissection of upper poles</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify of upper poles</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Radical pleurectomy/decortication</code> </td> <td>&nbsp;</td> <td valign="top"> <code>6</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Excision and reconstruction of diaphragm</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify the plane between the diaphragm and peritoneum</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Radical pleurectomy/decortication</code> </td> <td>&nbsp;</td> <td valign="top"> <code>7</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Excision and reconstruction of pericardium</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify the plane between the pericardium and epicardium</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Radical pleurectomy/decortication</code> </td> <td>&nbsp;</td> <td valign="top"> <code>8</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Conclusion</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Esophagectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Knowledge</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Esophagectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Preparation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Positioning and choice of incision(s)</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Esophagectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Mobilization of stomach</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify gastroepiploic arcade</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Esophagectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>LN dissection</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify left gastric vessels</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Esophagectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Creation of a gastric tube</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify angulus</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Esophagectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>6</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Gastric emptying procedure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identification of pylorus</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Esophagectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>7</code> </td> <td>&nbsp;</td> <td valign="top"> <code>J tube insertion</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify insertion site 30-40 cm from LOT</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Esophagectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>8</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Creation of a gastric tube</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify angulus</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Esophagectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>9</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Division of pleura</code> </td> <td>&nbsp;</td> <td valign="top"> <code>l</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Esophagectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>10</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Mobilization of infra-azygos esophagus</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify aorta, azygos, thoracic duct, contralateral pleura, pulmonary veins, airways</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Esophagectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>11</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Division of azygos and mobilization of upper thoracic esophagus</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify recurrent laryngeal nerves</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Esophagectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>12</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Nodal dissection</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Esophagectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>13</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Anastomosis</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify correct locations on gastric tube and esophagus</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Esophagectomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>14</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Conclusion</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Diaphragm (hiatal) hernia repair</code> </td> <td>&nbsp;</td> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Knowledge</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Diaphragm (hiatal) hernia repair</code> </td> <td>&nbsp;</td> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Preparation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Positioning and choice of incision(s)</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Diaphragm (hiatal) hernia repair</code> </td> <td>&nbsp;</td> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Dissection and excision of sac</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify peritoneal plane and hiatal margins</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Diaphragm (hiatal) hernia repair</code> </td> <td>&nbsp;</td> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Esophageal mobilization</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify aorta and pleura</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Diaphragm (hiatal) hernia repair</code> </td> <td>&nbsp;</td> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Performance of a lengthening procedure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Diagnosis of esophageal shortening</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Diaphragm (hiatal) hernia repair</code> </td> <td>&nbsp;</td> <td valign="top"> <code>6</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Hiatal closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Diaphragm (hiatal) hernia repair</code> </td> <td>&nbsp;</td> <td valign="top"> <code>7</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Gastric wrap</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Determination of the type of wrap to perform</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Diaphragm (hiatal) hernia repair</code> </td> <td>&nbsp;</td> <td valign="top"> <code>8</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Conclusion</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Lung transplant implant</code> </td> <td>&nbsp;</td> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Knowledge</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Lung transplant implant</code> </td> <td>&nbsp;</td> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Preparation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Positioning and choice of incision(s)</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Lung transplant implant</code> </td> <td>&nbsp;</td> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Lung transplant implant</code> </td> <td>&nbsp;</td> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Lung transplant implant</code> </td> <td>&nbsp;</td> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Lung transplant implant</code> </td> <td>&nbsp;</td> <td valign="top"> <code>6</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Conclusion</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Initiating CPB</code> </td> <td>&nbsp;</td> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Knowledge</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Initiating CPB</code> </td> <td>&nbsp;</td> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Preparation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Positioning and choice of incision(s)</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Initiating CPB</code> </td> <td>&nbsp;</td> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Aortic cannulation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Selection of site</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Initiating CPB</code> </td> <td>&nbsp;</td> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Venous cannulation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Selection of site(s) and cannula(e)</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Initiating CPB</code> </td> <td>&nbsp;</td> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Institution of bypass</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Initiating CPB</code> </td> <td>&nbsp;</td> <td valign="top"> <code>6</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Cross clamp and cardioplegia</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Selection of site and plan for plegia</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Initiating CPB</code> </td> <td>&nbsp;</td> <td valign="top"> <code>7</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Conclusion</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Separation from CPB</code> </td> <td>&nbsp;</td> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Knowledge</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Separation from CPB</code> </td> <td>&nbsp;</td> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Preparation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Knowledge of appropriate timing</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Separation from CPB</code> </td> <td>&nbsp;</td> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Rewarming</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify appropriate timing</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Separation from CPB</code> </td> <td>&nbsp;</td> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>De-airing and volume administration</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Separation from CPB</code> </td> <td>&nbsp;</td> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Rhythm assessment/need for pacing</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Separation from CPB</code> </td> <td>&nbsp;</td> <td valign="top"> <code>6</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Cannulae removal and heparin reversal</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Separation from CPB</code> </td> <td>&nbsp;</td> <td valign="top"> <code>7</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Conclusion</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>CABG</code> </td> <td>&nbsp;</td> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Knowledge</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>CABG</code> </td> <td>&nbsp;</td> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Preparation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Positioning and choice of incision(s) and conduit(s)</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>CABG</code> </td> <td>&nbsp;</td> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Mammary takedown</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>CABG</code> </td> <td>&nbsp;</td> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Target identification and exposure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Establish angiographic and anatomic correlates</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>CABG</code> </td> <td>&nbsp;</td> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Distal anastomosis</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>CABG</code> </td> <td>&nbsp;</td> <td valign="top"> <code>6</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Proximal anastomosis</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>CABG</code> </td> <td>&nbsp;</td> <td valign="top"> <code>7</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Conclusion</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>AVR</code> </td> <td>&nbsp;</td> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Knowledge</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>AVR</code> </td> <td>&nbsp;</td> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Preparation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Positioning and choice of incision(s)</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>AVR</code> </td> <td>&nbsp;</td> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Aortotomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify appropriate location</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>AVR</code> </td> <td>&nbsp;</td> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Leaflet removal/decalcification</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify mitral apparatus at risk</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>AVR</code> </td> <td>&nbsp;</td> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Suture placement</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify conduction system at risk</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>AVR</code> </td> <td>&nbsp;</td> <td valign="top"> <code>6</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Valve sizing and seating</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>AVR</code> </td> <td>&nbsp;</td> <td valign="top"> <code>7</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Aortic closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>AVR</code> </td> <td>&nbsp;</td> <td valign="top"> <code>8</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Conclusion</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>MV Repair</code> </td> <td>&nbsp;</td> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Knowledge</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>MV Repair</code> </td> <td>&nbsp;</td> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Preparation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Positioning and choice of incision(s)</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>MV Repair</code> </td> <td>&nbsp;</td> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Atriotomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify appropriate location</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>MV Repair</code> </td> <td>&nbsp;</td> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Leaflet remodeling</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify components of mitral apparatus at risk</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>MV Repair</code> </td> <td>&nbsp;</td> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Annuloplasty </code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify conduction system at risk</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>MV Repair</code> </td> <td>&nbsp;</td> <td valign="top"> <code>6</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Atriotomy closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>MV Repair</code> </td> <td>&nbsp;</td> <td valign="top"> <code>7</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Conclusion</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>LVAD</code> </td> <td>&nbsp;</td> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Knowledge</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>LVAD</code> </td> <td>&nbsp;</td> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Preparation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Positioning and choice of incision(s)</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>LVAD</code> </td> <td>&nbsp;</td> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Pocket creation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>l</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify location and orientation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>LVAD</code> </td> <td>&nbsp;</td> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Ventriculotomy</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Identify position relative to septum and orientation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>LVAD</code> </td> <td>&nbsp;</td> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Placement of inflow cannula</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>LVAD</code> </td> <td>&nbsp;</td> <td valign="top"> <code>6</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Placement of outflow graft</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>LVAD</code> </td> <td>&nbsp;</td> <td valign="top"> <code>7</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Assess management of RV</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>LVAD</code> </td> <td>&nbsp;</td> <td valign="top"> <code>8</code> </td> <td>&nbsp;</td> <td valign="top"> <code>VAD settings</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Determine relationship to septal position and aortic valve opening</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>LVAD</code> </td> <td>&nbsp;</td> <td valign="top"> <code>9</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Conclusion</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Heart transplant implant</code> </td> <td>&nbsp;</td> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Knowledge</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Heart transplant implant</code> </td> <td>&nbsp;</td> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Preparation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Positioning and choice of incision(s)</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Heart transplant implant</code> </td> <td>&nbsp;</td> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Heart transplant implant</code> </td> <td>&nbsp;</td> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Heart transplant implant</code> </td> <td>&nbsp;</td> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Heart transplant implant</code> </td> <td>&nbsp;</td> <td valign="top"> <code>6</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Heart transplant implant</code> </td> <td>&nbsp;</td> <td valign="top"> <code>7</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Heart transplant implant</code> </td> <td>&nbsp;</td> <td valign="top"> <code>8</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Heart transplant implant</code> </td> <td>&nbsp;</td> <td valign="top"> <code>9</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Conclusion</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>ASD closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Knowledge</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>ASD closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Preparation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Positioning and choice of incision(s)</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>ASD closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>ASD closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>ASD closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>ASD closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>6</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>ASD closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>7</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>ASD closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>8</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>ASD closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>9</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Conclusion</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>VSD closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Knowledge</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>VSD closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Preparation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Positioning and choice of incision(s)</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>VSD closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>VSD closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>VSD closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>VSD closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>6</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>VSD closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>7</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>VSD closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>8</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>VSD closure</code> </td> <td>&nbsp;</td> <td valign="top"> <code>9</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Conclusion</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Repair coarctation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Knowledge</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Repair coarctation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Preparation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Positioning and choice of incision(s)</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Repair coarctation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Repair coarctation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Repair coarctation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Repair coarctation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>6</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Repair coarctation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>7</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Repair coarctation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>8</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Repair coarctation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>9</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Conclusion</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Ligate PDA</code> </td> <td>&nbsp;</td> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Knowledge</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Ligate PDA</code> </td> <td>&nbsp;</td> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Preparation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Positioning and choice of incision(s)</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Ligate PDA</code> </td> <td>&nbsp;</td> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Ligate PDA</code> </td> <td>&nbsp;</td> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Ligate PDA</code> </td> <td>&nbsp;</td> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Ligate PDA</code> </td> <td>&nbsp;</td> <td valign="top"> <code>6</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Ligate PDA</code> </td> <td>&nbsp;</td> <td valign="top"> <code>7</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Ligate PDA</code> </td> <td>&nbsp;</td> <td valign="top"> <code>8</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Ligate PDA</code> </td> <td>&nbsp;</td> <td valign="top"> <code>9</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Conclusion</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Palliative shunt</code> </td> <td>&nbsp;</td> <td valign="top"> <code>1</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Knowledge</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Palliative shunt</code> </td> <td>&nbsp;</td> <td valign="top"> <code>2</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Preparation</code> </td> <td>&nbsp;</td> <td valign="top"> <code>h</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Positioning and choice of incision(s)</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Palliative shunt</code> </td> <td>&nbsp;</td> <td valign="top"> <code>3</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Palliative shunt</code> </td> <td>&nbsp;</td> <td valign="top"> <code>4</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Palliative shunt</code> </td> <td>&nbsp;</td> <td valign="top"> <code>5</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Palliative shunt</code> </td> <td>&nbsp;</td> <td valign="top"> <code>6</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Palliative shunt</code> </td> <td>&nbsp;</td> <td valign="top"> <code>7</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Palliative shunt</code> </td> <td>&nbsp;</td> <td valign="top"> <code>8</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Palliative shunt</code> </td> <td>&nbsp;</td> <td valign="top"> <code>9</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Conclusion</code> </td> <td>&nbsp;</td> <td valign="top"> <code>m</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N</code> </td> <td>&nbsp;</td> <td valign="top"> <code>\N </code> </td> </tr> 
+        </table>
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:config">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>config</b> / fact</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">Various site-specific configuration data</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">system administator</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#config:param" align="left" valign="top" bgcolor="#8282F4">
+        <a name="config:param"> <font color=white><b>param</b></font>
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Name of the configuration parameter</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">system administrator</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#config:value" align="left" valign="top" bgcolor="white">
+        <a name="config:value"> value
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Parameter value</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="2">
+          <tr> <td valign="top"> <code>institution</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Cardio-Thoracic </code> </td> </tr> 
+          <tr> <td valign="top"> <code>alerts</code> </td> <td>&nbsp;</td> <td valign="top"> <code>yes </code> </td> </tr> 
+          <tr> <td valign="top"> <code>admin</code> </td> <td>&nbsp;</td> <td valign="top"> <code>Gene Selkov </code> </td> </tr> 
+        </table>
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:case">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>case</b> / fact</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">Links trainer/trainee to a case that occurred on a given day</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">user input</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#case:id" align="left" valign="top" bgcolor="#8282F4">
+        <a name="case:id"> <font color=white><b>id (+)</b></font>
+      </td>
+      <td valign="top"> integer </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Unique ID</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">sequence</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#case:date" align="left" valign="top" bgcolor="white">
+        <a name="case:date"> date
+      </td>
+      <td valign="top"> date </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Date when the event took place</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#case:timestamp" align="left" valign="top" bgcolor="white">
+        <a name="case:timestamp"> timestamp
+      </td>
+      <td valign="top"> timestamptz </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Assessment timestamp</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#case:case_no" align="left" valign="top" bgcolor="white">
+        <a name="case:case_no"> case_no
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> 2 </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Sequential case number to be specified if more than one case of the same type is handled during the</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#case:activity" align="left" valign="top" bgcolor="#D0E0FF">
+        <a name="case:activity"> activity
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> 2 </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reference to a node in the activity tree</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">This table will refer to the highest levels of the activity tree, to identify an operation</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#case:body_part" align="left" valign="top" bgcolor="white">
+        <a name="case:body_part"> body_part
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Area of surgery</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">This attribute is useful for identification in Ortho and other specialties where they do many similar cases on the same day</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Example:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top"><code>Shoulder\n          Arm\n          Elbow\n          Forearm\n          Wrist\n          Hand/Fingers\n          Hip/Pelvis\n          Thigh\n          Knee\n          Leg\n          Ankle\n          Foot/Toes</code></td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#case:trainee" align="left" valign="top" bgcolor="#D0E0FF">
+        <a name="case:trainee"> trainee
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reference to Trainee (via CNetID)</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#case:attending" align="left" valign="top" bgcolor="#D0E0FF">
+        <a name="case:attending"> attending
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reference to Attending Physician (via CNetID)</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#case:assessor" align="left" valign="top" bgcolor="#D0E0FF">
+        <a name="case:assessor"> assessor
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reference to Assessor (via CNetID)</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:case_to_ignore">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>case_to_ignore</b> / fact</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">A list of cases that the assessor asserts he or she cannot assess, or cases that had to be corrected</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">user input</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#case_to_ignore:assessor" align="left" valign="top" bgcolor="white">
+        <a name="case_to_ignore:assessor"> assessor
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reference to Assessor (via CNetID)</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#case_to_ignore:case" align="left" valign="top" bgcolor="#D0E0FF">
+        <a name="case_to_ignore:case"> case
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reference to Case</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#case_to_ignore:reason" align="left" valign="top" bgcolor="white">
+        <a name="case_to_ignore:reason"> reason
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reason why the case should be ignored</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:eval">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>eval</b> / fact</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">Trainee evaluation</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">user input</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#eval:case" align="left" valign="top" bgcolor="#D0E0FF">
+        <a name="eval:case"> case
+      </td>
+      <td valign="top"> integer </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reference to the event during which training took place</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#eval:activity" align="left" valign="top" bgcolor="#D0E0FF">
+        <a name="eval:activity"> activity
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> 2 </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reference to a node in the activity tree</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">This can be an elementary operation, as well as a class of activities evaluated as a whole</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#eval:assessment" align="left" valign="top" bgcolor="#D0E0FF">
+        <a name="eval:assessment"> assessment
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> 2 </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reference to performance rating</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">The Assessor's (eval.assessor) rating of Trainee's (eval.trainee) performance while conducting the activity specified in (eval.activity)</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#eval:np_reason" align="left" valign="top" bgcolor="#D0E0FF">
+        <a name="eval:np_reason"> np_reason
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reference to explanation of reasons for omission</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:performance">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>performance</b> / fact</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">Ferguson component assessment</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">user input</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#performance:case" align="left" valign="top" bgcolor="#D0E0FF">
+        <a name="performance:case"> case
+      </td>
+      <td valign="top"> integer </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reference to the event during which training took place</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#performance:procedure" align="left" valign="top" bgcolor="white">
+        <a name="performance:procedure"> procedure
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reference to procedure name in the component table</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">This attribute is part of the composite primary key (id, domain). A unique constraint needs to be defined on the two in the functions element.</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#performance:seq" align="left" valign="top" bgcolor="white">
+        <a name="performance:seq"> seq
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> 2 </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reference to this component's ordinal number in the component table</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">This attribute is part of the composite primary key (id, domain). A unique constraint needs to be defined on the two in the functions element.</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#performance:level" align="left" valign="top" bgcolor="white">
+        <a name="performance:level"> level
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> 2 </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Performance level rating</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">The Assessor's (eval.assessor) rating of Trainee's (eval.trainee) performance while conducting the component of the class specified in component(procedure, seq)</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Values:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">                <table border="0" cellborder="1" cellspacing="0">
+                  <tr> <td valign="top"> <code>-2 </td> <td>&nbsp;</td> <td valign="top"> <em></em> </td> </tr>
+                  <tr> <td valign="top"> <code>0 </td> <td>&nbsp;</td> <td valign="top"> <em></em> </td> </tr>
+                  <tr> <td valign="top"> <code>1 </td> <td>&nbsp;</td> <td valign="top"> <em></em> </td> </tr>
+                  <tr> <td valign="top"> <code>2 </td> <td>&nbsp;</td> <td valign="top"> <em></em> </td> </tr>
+                  <tr> <td valign="top"> <code>3 </td> <td>&nbsp;</td> <td valign="top"> <em></em> </td> </tr>
+                </table>
+</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#performance:tp" align="left" valign="top" bgcolor="white">
+        <a name="performance:tp"> tp
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> 2 </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Transition point confirmation</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">The Assessor's (eval.assessor) assertion of whether the trainee (eval.trainee) a specified transition has been discussed or not</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Values:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">                <table border="0" cellborder="1" cellspacing="0">
+                  <tr> <td valign="top"> <code>-2 </td> <td>&nbsp;</td> <td valign="top"> <em></em> </td> </tr>
+                  <tr> <td valign="top"> <code>1 </td> <td>&nbsp;</td> <td valign="top"> <em></em> </td> </tr>
+                  <tr> <td valign="top"> <code>0 </td> <td>&nbsp;</td> <td valign="top"> <em></em> </td> </tr>
+                  <tr> <td valign="top"> <code>-1 </td> <td>&nbsp;</td> <td valign="top"> <em></em> </td> </tr>
+                </table>
+</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#performance:dp" align="left" valign="top" bgcolor="white">
+        <a name="performance:dp"> dp
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> 2 </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Decision-making competence</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Values:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">                <table border="0" cellborder="1" cellspacing="0">
+                  <tr> <td valign="top"> <code>-2 </td> <td>&nbsp;</td> <td valign="top"> <em></em> </td> </tr>
+                  <tr> <td valign="top"> <code>0 </td> <td>&nbsp;</td> <td valign="top"> <em></em> </td> </tr>
+                  <tr> <td valign="top"> <code>1 </td> <td>&nbsp;</td> <td valign="top"> <em></em> </td> </tr>
+                  <tr> <td valign="top"> <code>2 </td> <td>&nbsp;</td> <td valign="top"> <em></em> </td> </tr>
+                  <tr> <td valign="top"> <code>3 </td> <td>&nbsp;</td> <td valign="top"> <em></em> </td> </tr>
+                  <tr> <td valign="top"> <code>-1 </td> <td>&nbsp;</td> <td valign="top"> <em></em> </td> </tr>
+                </table>
+</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#performance:tp_np_reason" align="left" valign="top" bgcolor="#D0E0FF">
+        <a name="performance:tp_np_reason"> tp_np_reason
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reference to explanation of reasons for the omission of input</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#performance:dp_np_reason" align="left" valign="top" bgcolor="#D0E0FF">
+        <a name="performance:dp_np_reason"> dp_np_reason
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reference to explanation of reasons for the omission of input</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:component_suggestion">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>component_suggestion</b> / fact</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">Collector for user suggestions regarding Ferguson components</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">user input</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#component_suggestion:when" align="left" valign="top" bgcolor="white">
+        <a name="component_suggestion:when"> when
+      </td>
+      <td valign="top"> timestamptz </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Submission time for suggestion</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#component_suggestion:user" align="left" valign="top" bgcolor="white">
+        <a name="component_suggestion:user"> user
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">ID of the user who entered the suggestion</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#component_suggestion:procedure" align="left" valign="top" bgcolor="white">
+        <a name="component_suggestion:procedure"> procedure
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Procedure type this suggestion relates to. It is a reference to procedure name in the component table</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">This attribute is part of the composite primary key (id, domain). A unique constraint needs to be defined on the two in the functions element.</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#component_suggestion:seq" align="left" valign="top" bgcolor="white">
+        <a name="component_suggestion:seq"> seq
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> 2 </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reference to this component's ordinal number in the component table</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">This attribute is part of the composite primary key (id, domain). A unique constraint needs to be defined on the two in the functions element.</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#component_suggestion:text" align="left" valign="top" bgcolor="white">
+        <a name="component_suggestion:text"> text
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">User-supplied suggestion for this component</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:tp_suggestion">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>tp_suggestion</b> / fact</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">Collector for user suggestions regarding Ferguson transition points</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">user input</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#tp_suggestion:when" align="left" valign="top" bgcolor="white">
+        <a name="tp_suggestion:when"> when
+      </td>
+      <td valign="top"> timestamptz </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Submission time for suggestion</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#tp_suggestion:user" align="left" valign="top" bgcolor="white">
+        <a name="tp_suggestion:user"> user
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">ID of the user who entered the suggestion</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#tp_suggestion:procedure" align="left" valign="top" bgcolor="white">
+        <a name="tp_suggestion:procedure"> procedure
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Procedure type this suggestion relates to. It is a reference to procedure name in the component table</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">This attribute is part of the composite primary key (id, domain). A unique constraint needs to be defined on the two in the functions element.</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#tp_suggestion:seq" align="left" valign="top" bgcolor="white">
+        <a name="tp_suggestion:seq"> seq
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> 2 </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reference to this component's ordinal number in the component table</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">This attribute is part of the composite primary key (id, domain). A unique constraint needs to be defined on the two in the functions element.</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#tp_suggestion:text" align="left" valign="top" bgcolor="white">
+        <a name="tp_suggestion:text"> text
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">User-supplied suggestion for this transition point</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:dp_suggestion">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>dp_suggestion</b> / fact</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">Collector for user suggestions regarding Ferguson decision points</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">user input</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#dp_suggestion:when" align="left" valign="top" bgcolor="white">
+        <a name="dp_suggestion:when"> when
+      </td>
+      <td valign="top"> timestamptz </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Submission time for suggestion</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#dp_suggestion:user" align="left" valign="top" bgcolor="white">
+        <a name="dp_suggestion:user"> user
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">ID of the user who entered the suggestion</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#dp_suggestion:procedure" align="left" valign="top" bgcolor="white">
+        <a name="dp_suggestion:procedure"> procedure
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Procedure type this suggestion relates to. It is a reference to procedure name in the component table</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">This attribute is part of the composite primary key (id, domain). A unique constraint needs to be defined on the two in the functions element.</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#dp_suggestion:seq" align="left" valign="top" bgcolor="white">
+        <a name="dp_suggestion:seq"> seq
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> 2 </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Reference to this component's ordinal number in the component table</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">This attribute is part of the composite primary key (id, domain). A unique constraint needs to be defined on the two in the functions element.</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#dp_suggestion:text" align="left" valign="top" bgcolor="white">
+        <a name="dp_suggestion:text"> text
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">User-supplied suggestion for this decision point</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:remark">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>remark</b> / fact</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">Arbitrary remarks referring to a case</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">user input</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#remark:case" align="left" valign="top" bgcolor="#D0E0FF">
+        <a name="remark:case"> case
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Case ID</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#remark:text" align="left" valign="top" bgcolor="white">
+        <a name="remark:text"> text
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">text</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:note">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>note</b> / fact</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">"Pearls of wisdom" regarding elements of the case type</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">user input</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#note:when" align="left" valign="top" bgcolor="white">
+        <a name="note:when"> when
+      </td>
+      <td valign="top"> timestamptz </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Submission time for the note</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#note:user" align="left" valign="top" bgcolor="white">
+        <a name="note:user"> user
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">ID of the user who entered the note</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#note:activity" align="left" valign="top" bgcolor="#D0E0FF">
+        <a name="note:activity"> activity
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">An element of the case to which this note is to be attached</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#note:path" align="left" valign="top" bgcolor="white">
+        <a name="note:path"> path
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Complete path to activity node</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">This is needed to preserve the annotation for the elements that may be deleted or otherwise modified in the future</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#note:text" align="left" valign="top" bgcolor="white">
+        <a name="note:text"> text
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">text</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:feedback">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>feedback</b> / fact</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">user comments regarding elements of the case</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">user input</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#feedback:when" align="left" valign="top" bgcolor="white">
+        <a name="feedback:when"> when
+      </td>
+      <td valign="top"> timestamptz </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Submission time for the note</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#feedback:user" align="left" valign="top" bgcolor="white">
+        <a name="feedback:user"> user
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">ID of the user who entered the note</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#feedback:activity" align="left" valign="top" bgcolor="#D0E0FF">
+        <a name="feedback:activity"> activity
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">An element of the case to which this note is to be attached</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#feedback:path" align="left" valign="top" bgcolor="white">
+        <a name="feedback:path"> path
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Complete path to activity node</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Comment:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">This is needed to preserve the annotation for the elements that may be deleted or otherwise modified in the future</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#feedback:text" align="left" valign="top" bgcolor="white">
+        <a name="feedback:text"> text
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">text</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:review">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>review</b> / fact</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">Attendings' review of trainee performance</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">user input</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#review:when" align="left" valign="top" bgcolor="white">
+        <a name="review:when"> when
+      </td>
+      <td valign="top"> timestamptz </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Time stamp for the review</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#review:attending" align="left" valign="top" bgcolor="white">
+        <a name="review:attending"> attending
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">ID of the reviewing attending</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#review:trainee" align="left" valign="top" bgcolor="white">
+        <a name="review:trainee"> trainee
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">ID of the trainee being reviewed</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#review:plan" align="left" valign="top" bgcolor="white">
+        <a name="review:plan"> plan
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Improvement plan</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user input</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:role">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>role</b> / fact</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">indicates the user's role: trainee or attending</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">user input</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#role:user" align="left" valign="top" bgcolor="#8282F4">
+        <a name="role:user"> <font color=white><b>user</b></font>
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user ID</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#role:rolename" align="left" valign="top" bgcolor="white">
+        <a name="role:rolename"> rolename
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">the word indicating the user's role: "trainee" or "attending"</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#role:can_see_results" align="left" valign="top" bgcolor="white">
+        <a name="role:can_see_results"> can_see_results
+      </td>
+      <td valign="top"> bool </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">a flag indicating that this user can see departmental overviews</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#role:can_see_overview" align="left" valign="top" bgcolor="white">
+        <a name="role:can_see_overview"> can_see_overview
+      </td>
+      <td valign="top"> bool </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">a flag indicating that this user can see all results</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="2">
+          <tr> <td valign="top"> <code>roach</code> </td> <td>&nbsp;</td> <td valign="top"> <code>trainee</code> </td> <td>&nbsp;</td> <td valign="top"> <code>t</code> </td> <td>&nbsp;</td> <td valign="top"> <code>t </code> </td> </tr> 
+          <tr> <td valign="top"> <code>selkovjr</code> </td> <td>&nbsp;</td> <td valign="top"> <code>attending</code> </td> <td>&nbsp;</td> <td valign="top"> <code>t</code> </td> <td>&nbsp;</td> <td valign="top"> <code>t </code> </td> </tr> 
+        </table>
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:absent">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>absent</b> / fact</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">indicates the trainee has graduated or left the program for any reason</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">curator</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#absent:uid" align="left" valign="top" bgcolor="#8282F4">
+        <a name="absent:uid"> <font color=white><b>uid</b></font>
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">user ID</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:activity_change_log">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>activity_change_log</b> / fact</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">Keeps track of when and by whom the activity tree was changed</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">auto</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#activity_change_log:version" align="left" valign="top" bgcolor="#8282F4">
+        <a name="activity_change_log:version"> <font color=white><b>version (+)</b></font>
+      </td>
+      <td valign="top"> integer </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Version number</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">sequence</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#activity_change_log:when" align="left" valign="top" bgcolor="white">
+        <a name="activity_change_log:when"> when
+      </td>
+      <td valign="top"> timestamptz </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">The time when the tree was last updated</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#activity_change_log:who" align="left" valign="top" bgcolor="white">
+        <a name="activity_change_log:who"> who
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">CNetID of the user submitting the update</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">auto</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="2">
+          <tr> <td valign="top"> <code>0</code> </td> <td>&nbsp;</td> <td valign="top"> <code>'now'</code> </td> <td>&nbsp;</td> <td valign="top"> <code>operator </code> </td> </tr> 
+        </table>
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:time_log">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>time_log</b> / fact</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">Residents' time log</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">user input</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Constraint:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">ALTER TABLE time_log ADD CONSTRAINT "end of interval cannot be in the future" CHECK ("out" <= current_timestamp);</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Constraint:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">ALTER TABLE time_log ADD CONSTRAINT "start of interval cannot be in the future" CHECK ("in" <= current_timestamp);</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Constraint:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">ALTER TABLE time_log ADD CONSTRAINT "positive interval" CHECK ("out" > "in");</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#time_log:oid" align="left" valign="top" bgcolor="#C0FFC0">
+        <a name="time_log:oid"> oid
+      </td>
+      <td valign="top"> oid </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Built-in database object ID</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#time_log:id" align="left" valign="top" bgcolor="#D0E0FF">
+        <a name="time_log:id"> id
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">CNetID of the user</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#time_log:in" align="left" valign="top" bgcolor="white">
+        <a name="time_log:in"> in
+      </td>
+      <td valign="top"> timestamptz </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Time in</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#time_log:out" align="left" valign="top" bgcolor="white">
+        <a name="time_log:out"> out
+      </td>
+      <td valign="top"> timestamptz </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">Time out</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+  </table>
+</p>
+<p>
+  <a name="class:rating_map">
+  <table border="1" cellborder="1" cellspacing="0">
+    <tr> <td colspan=4 bgcolor="#808080"><font color="white" face="helvetica bold">Class: <b>rating_map</b> / map</font></td> </tr>
+    <tr> 
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="0">
+          <tr>
+            <td valign="top">
+              <font color="#808080">Description:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">Grade system selector</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Comment:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">This is a hack that allows the program code to determine which grade system to use depending on the purpose and the role of the user (trainee or attending). It serves as an index into the rating table.</td>
+          </tr>
+          <tr>
+            <td valign="top">
+              <font color="#808080">Source:</font>
+            </td>
+            <td> &nbsp; </td>
+            <td valign="top">curator</td>
+          </tr>
+       </table>
+    <tr>
+      <td href="stat-meta.html#rating_map:subtree" align="left" valign="top" bgcolor="white">
+        <a name="rating_map:subtree"> subtree
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">The name of the subtree for which the set range of ratings apply</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">curator</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#rating_map:role" align="left" valign="top" bgcolor="white">
+        <a name="rating_map:role"> role
+      </td>
+      <td valign="top"> text </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">User role (attending/trainee)</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">curator</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#rating_map:low" align="left" valign="top" bgcolor="#D0E0FF">
+        <a name="rating_map:low"> low
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">The lowest rate in the range</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">curator</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td href="stat-meta.html#rating_map:high" align="left" valign="top" bgcolor="#D0E0FF">
+        <a name="rating_map:high"> high
+      </td>
+      <td valign="top"> smallint </td>
+      <td valign="top"> &nbsp; </td>
+      <td valign="top">
+         <table border="0" cellborder="1" cellspacing="0">
+            <tr>
+              <td valign="top">
+                <font color="#808080">Description:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">The highest rate in the range</td>
+            </tr>
+            <tr>
+              <td valign="top">
+                <font color="#808080">Source:</font>
+              </td>
+              <td> &nbsp; </td>
+              <td valign="top">curator</td>
+            </tr>
+         </table>
+ 
+      </td>
+    </tr>
+    <tr>
+      <td colspan=4>
+        <table border="0" cellborder="1" cellspacing="2">
+          <tr> <td valign="top"> <code>Specific</code> </td> <td>&nbsp;</td> <td valign="top"> <code>attending</code> </td> <td>&nbsp;</td> <td valign="top"> <code>0</code> </td> <td>&nbsp;</td> <td valign="top"> <code>3 </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Specific</code> </td> <td>&nbsp;</td> <td valign="top"> <code>trainee</code> </td> <td>&nbsp;</td> <td valign="top"> <code>10</code> </td> <td>&nbsp;</td> <td valign="top"> <code>13 </code> </td> </tr> 
+          <tr> <td valign="top"> <code>General Capabilities</code> </td> <td>&nbsp;</td> <td valign="top"> <code>attending</code> </td> <td>&nbsp;</td> <td valign="top"> <code>50</code> </td> <td>&nbsp;</td> <td valign="top"> <code>53 </code> </td> </tr> 
+          <tr> <td valign="top"> <code>General Capabilities</code> </td> <td>&nbsp;</td> <td valign="top"> <code>trainee</code> </td> <td>&nbsp;</td> <td valign="top"> <code>50</code> </td> <td>&nbsp;</td> <td valign="top"> <code>53 </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Component performance</code> </td> <td>&nbsp;</td> <td valign="top"> <code>attending</code> </td> <td>&nbsp;</td> <td valign="top"> <code>40</code> </td> <td>&nbsp;</td> <td valign="top"> <code>43 </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Component performance</code> </td> <td>&nbsp;</td> <td valign="top"> <code>trainee</code> </td> <td>&nbsp;</td> <td valign="top"> <code>40</code> </td> <td>&nbsp;</td> <td valign="top"> <code>43 </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Transition points</code> </td> <td>&nbsp;</td> <td valign="top"> <code>attending</code> </td> <td>&nbsp;</td> <td valign="top"> <code>30</code> </td> <td>&nbsp;</td> <td valign="top"> <code>31 </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Transition points</code> </td> <td>&nbsp;</td> <td valign="top"> <code>trainee</code> </td> <td>&nbsp;</td> <td valign="top"> <code>30</code> </td> <td>&nbsp;</td> <td valign="top"> <code>31 </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Decision points</code> </td> <td>&nbsp;</td> <td valign="top"> <code>attending</code> </td> <td>&nbsp;</td> <td valign="top"> <code>70</code> </td> <td>&nbsp;</td> <td valign="top"> <code>42 </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Decision points</code> </td> <td>&nbsp;</td> <td valign="top"> <code>trainee</code> </td> <td>&nbsp;</td> <td valign="top"> <code>70</code> </td> <td>&nbsp;</td> <td valign="top"> <code>72 </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Overall Case Assessment</code> </td> <td>&nbsp;</td> <td valign="top"> <code>attending</code> </td> <td>&nbsp;</td> <td valign="top"> <code>60</code> </td> <td>&nbsp;</td> <td valign="top"> <code>63 </code> </td> </tr> 
+          <tr> <td valign="top"> <code>Overall Case Assessment</code> </td> <td>&nbsp;</td> <td valign="top"> <code>trainee</code> </td> <td>&nbsp;</td> <td valign="top"> <code>60</code> </td> <td>&nbsp;</td> <td valign="top"> <code>63 </code> </td> </tr> 
+        </table>
+      </td>
+    </tr>
+  </table>
+</p>
