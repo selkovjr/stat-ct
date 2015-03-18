@@ -47,7 +47,7 @@ DECLARE
     parent_node ALIAS FOR $1;
     parent_right_id INTEGER;
     old_left_id INTEGER;
-    offset INTEGER;
+    id_offset INTEGER;
     branch_width INTEGER;
 BEGIN
     -- remember the original range of the target node
@@ -63,11 +63,11 @@ BEGIN
     UPDATE copy_buffer SET parent = parent_node WHERE left_id = old_left_id;
 
     -- calculate the amount by which the entire branch in buffer must be shifted
-    offset := old_left_id - parent_right_id;
+    id_offset := old_left_id - parent_right_id;
 
     -- shift the branch
-    UPDATE copy_buffer SET left_id = left_id - offset;
-    UPDATE copy_buffer SET right_id = right_id - offset;
+    UPDATE copy_buffer SET left_id = left_id - id_offset;
+    UPDATE copy_buffer SET right_id = right_id - id_offset;
 
     -- shift nodes following the target node and expand the target node
     UPDATE activity_clone SET right_id = right_id + branch_width 
