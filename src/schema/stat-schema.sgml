@@ -746,6 +746,9 @@ Lung transplant implant	3	\N	\N	\N	\N
 Lung transplant implant	4	\N	\N	\N	\N
 Lung transplant implant	5	\N	\N	\N	\N
 Lung transplant implant	6	Conclusion	m	\N	\N
+Other thoracic	1	Preparation	\N	\N	\N
+Other thoracic	2	Performance	\N	\N	\N
+Other thoracic	3	Conclusion	\N	\N	\N
 Initiating CPB	1	Knowledge	h	\N	\N
 Initiating CPB	2	Preparation	h	Positioning and choice of incision(s)	\N
 Initiating CPB	3	Aortic cannulation	m	Selection of site	\N
@@ -800,6 +803,9 @@ Heart transplant implant	6	\N	\N	\N	\N
 Heart transplant implant	7	\N	\N	\N	\N
 Heart transplant implant	8	\N	\N	\N	\N
 Heart transplant implant	9	Conclusion	m	\N	\N
+Other adult cardiac	1	Preparation	\N	\N	\N
+Other adult cardiac	2	Performance	\N	\N	\N
+Other adult cardiac	3	Conclusion	\N	\N	\N
 ASD closure	1	Knowledge	h	\N	\N
 ASD closure	2	Preparation	h	Positioning and choice of incision(s)	\N
 ASD closure	3	\N	\N	\N	\N
@@ -845,6 +851,9 @@ Palliative shunt	6	\N	\N	\N	\N
 Palliative shunt	7	\N	\N	\N	\N
 Palliative shunt	8	\N	\N	\N	\N
 Palliative shunt	9	Conclusion	m	\N	\N
+Other congenital heart surgery	1	Preparation	\N	\N	\N
+Other congenital heart surgery	2	Performance	\N	\N	\N
+Other congenital heart surgery	3	Conclusion	\N	\N	\N
       </init>
     </class>
 
