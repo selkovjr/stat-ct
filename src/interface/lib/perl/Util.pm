@@ -558,7 +558,7 @@ sub send_alert {
   my ($user, $teammate_data, $assessment_id, $procedure, $date, $role) = @_;
   my ($teammate_uid, $teammate_name, $dept) = split ':', $teammate_data;
   my ( $teammate ) = Person->search_by_uid($teammate_uid);  #FQDN!
-  my $url = "https://$STAT::machine/$STAT::application/eval.html?link=$assessment_id";
+  my $url = "https://$STAT::machine.$STAT::domain/$STAT::application/eval.html?link=$assessment_id";
   my $teammate_role = $role eq 'trainee' ? 'attending' : 'trainee';
   my %mail = (
         smtp => $STAT::mail_relay,

@@ -342,6 +342,7 @@ install:
 	@cp -r src/interface/lib .
 
 	@echo "  report.cgi"
+	@cp src/interface/data.cgi .
 	@cp src/interface/report.cgi .
 
 	@echo "  favicon.ico"
